@@ -33,7 +33,7 @@
     updateState(clamped);
     track.scrollTo({
       left: clamped * track.clientWidth,
-      behavior: reduceMotion.matches ? 'instant' : 'smooth'
+      behavior: reduceMotion.matches ? 'auto' : 'smooth'
     });
     if (focusDot) dots[clamped]?.focus();
   };
