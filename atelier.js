@@ -9,11 +9,14 @@
 
   // Third-party stock photography should never leave the product carousel blank.
   for (const image of document.querySelectorAll('img[data-fallback]')) {
-    image.addEventListener('error', () => {
+    const showFallback = () => {
       if (image.dataset.fallbackUsed === 'true') return;
       image.dataset.fallbackUsed = 'true';
       image.src = image.dataset.fallback;
-    }, { once: false });
+    };
+    image.addEventListener('error', showFallback);
+    // Also catch images that fail before deferred scripts finish parsing.
+    if (image.complete && image.naturalWidth === 0) showFallback();
   }
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
