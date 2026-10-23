@@ -22,10 +22,22 @@
   let active = 0;
   let frame = false;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const hero = root.closest('.arch-hero');
+  const details = root.querySelector('.arch-details');
+  let lastPainted = -1;
 
   function setActive(i) {
     active = Math.min(products.length - 1, Math.max(0, i));
     const product = products[active];
+    const changed = lastPainted !== active;
+    hero?.setAttribute('data-active', product.grams);
+    if (changed && lastPainted !== -1 && details && !reducedMotion.matches) {
+      details.classList.remove('is-switching');
+      // Restart the short transition for deliberate pack changes.
+      void details.offsetWidth;
+      details.classList.add('is-switching');
+    }
+    lastPainted = active;
     label.textContent = product.name;
     subtitle.textContent = product.subtitle;
     price.textContent = product.price;
