@@ -11,13 +11,16 @@
 <title>MicroSprouts — Fresh starts small.</title>
 <link rel="stylesheet" href="studio.css">
 <link rel="stylesheet" href="arch.css">
+<link rel="stylesheet" href="atelier.css">
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
 <script src="shop.js" defer></script>
 <script src="arch-carousel.js" defer></script>
+<script src="atelier.js" defer></script>
 </head>
 <body>
 <header class="page-header app-nav">
   <div class="shell app-nav-inner">
-    <a class="brand" href="#top" aria-label="MicroSprouts home">Micro<b>Sprouts</b></a>
+    <a class="brand" href="#top" aria-label="MicroSprouts home">Micro<b>Sprouts</b><span class="brand-mark" aria-hidden="true">✳</span></a>
     <nav aria-label="Main navigation">
       <ul class="nav-links" id="nav-links">
         <li><a href="#top">Overview</a></li>
@@ -34,7 +37,7 @@
 </header>
 
 <main id="top">
-<section class="hero arch-hero" id="sprouts" aria-labelledby="hero-title">
+<section class="hero arch-hero" data-active="200" id="sprouts" aria-labelledby="hero-title">
   <div class="shell">
     <span class="arch-eyebrow">FRESHLY GROWN IN LONDON</span>
     <h1 id="hero-title">Fresh starts <span>small.</span></h1>
@@ -46,10 +49,12 @@
         <div class="arch-viewport">
           <div class="arch-track" id="product-track">
             <div class="arch-slide" role="group" aria-roledescription="slide" aria-label="Pack of Sprouts, 200g" data-pack-size="200">
-              <img src="hero.webp" alt="Fresh broccoli sprouts on toast, 200g pack option" width="502" height="657" fetchpriority="high">
+              <img src="https://images.unsplash.com/photo-1721730633054-b4af5bfd595b?auto=format&amp;fit=crop&amp;w=1100&amp;h=1280&amp;q=84"
+                   data-fallback="hero.webp" alt="Close-up of broccoli sprouts, illustrating the 200g Week Supply" width="550" height="640" fetchpriority="high" decoding="async">
             </div>
             <div class="arch-slide" role="group" aria-roledescription="slide" aria-label="Family Pack, 500g" data-pack-size="500">
-              <img src="hero.webp" alt="Fresh broccoli sprouts on toast, family pack option" width="502" height="657" loading="lazy">
+              <img src="https://images.unsplash.com/photo-1639852684427-5db9537fe74b?auto=format&amp;fit=crop&amp;w=1100&amp;h=1280&amp;q=84"
+                   data-fallback="hero.webp" alt="Fresh broccoli sprouts in a prepared meal, illustrating the 500g Family Pack" width="550" height="640" loading="lazy" decoding="async">
             </div>
           </div>
         </div>
@@ -72,8 +77,20 @@
   </div>
 </section>
 
+<section class="editorial-section" id="story" aria-labelledby="editorial-title">
+  <div class="editorial-inner">
+    <div class="editorial-image"><img src="hero.webp" alt="Fresh broccoli sprouts layered onto seeded toast" width="502" height="657" loading="lazy" decoding="async"></div>
+    <div class="editorial-copy" data-reveal>
+      <span class="editorial-kicker">THE BEAUTY OF FRESH</span>
+      <h2 id="editorial-title">Grown slowly.<br><span>Enjoyed fresh.</span></h2>
+      <p>Every batch starts from seed and gets the time it needs. Six days of growing, a little extra care, and your sprouts are ready.</p>
+      <a href="#enquire">Arrange your fresh batch <span aria-hidden="true">↗</span></a>
+    </div>
+  </div>
+</section>
+
 <section class="how" id="how" aria-labelledby="how-title">
-  <div class="shell how-grid">
+  <div class="shell how-grid" data-reveal>
     <div>
       <span class="eyebrow">GROWN TO ORDER</span>
       <h2 id="how-title">Fresh.<br>On your schedule.</h2>
@@ -97,7 +114,7 @@
 </section>
 
 <section class="regular" id="subscriptions" aria-labelledby="regular-title">
-  <div class="shell">
+  <div class="shell" data-reveal>
     <span class="eyebrow">REGULAR ORDERS</span>
     <h2 id="regular-title">Keep it fresh.</h2>
     <p>One-time, weekly or fortnightly. Regular orders are arranged personally for now — no automatic billing yet.</p>
@@ -106,7 +123,7 @@
 </section>
 
 <section class="order" id="enquire" aria-labelledby="enquire-title">
-  <div class="shell order-grid">
+  <div class="shell order-grid" data-reveal>
     <div class="order-head">
       <span class="eyebrow">LET'S GET GROWING</span>
       <h2 id="enquire-title">Your sprouts.<br>Your way.</h2>
@@ -173,6 +190,7 @@
     <span>Fresh broccoli sprouts, grown in London.</span>
     <a href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer">WhatsApp · 07386853514 ↗</a>
   </div>
+  <div class="shell"><p class="photo-credit">Sprout photography for illustration; actual harvest and packaging may vary. Photos: <a href="https://unsplash.com/photos/a-close-up-of-a-bunch-of-broccoli-sprouts-kfRr0Iw8C9Y" target="_blank" rel="noopener noreferrer">Naoki Suzuki</a> and <a href="https://unsplash.com/photos/a-plate-of-broccoli-sprouts-on-a-table-a1_1OaHLFjY" target="_blank" rel="noopener noreferrer">Razieh Bakhtom</a> / Unsplash.</p></div>
 </footer>
 </body>
 </html>
