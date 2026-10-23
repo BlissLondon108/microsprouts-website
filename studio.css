@@ -175,9 +175,9 @@ p{line-height:1.54}
  .app-nav-inner{height:54px}
  .nav-links{display:none}
  .mobile-menu{display:block}
- .app-nav.open .nav-links{display:flex;flex-direction:column;align-items:stretch;gap:0;position:absolute;top:54px;left:0;right:0;background:#171a18;padding:14px 22px 22px;border-top:1px solid #323732;box-shadow:0 20px 35px #0005}
- .app-nav.open .nav-links li{border-bottom:1px solid #2b332e}
- .app-nav.open .nav-links a{display:block;padding:14px 0;font-size:15px}
+ .app-nav.menu-open .nav-links{display:flex;flex-direction:column;align-items:stretch;gap:0;position:absolute;top:54px;left:0;right:0;background:#171a18;padding:14px 22px 22px;border-top:1px solid #323732;box-shadow:0 20px 35px #0005}
+ .app-nav.menu-open .nav-links li{border-bottom:1px solid #2b332e}
+ .app-nav.menu-open .nav-links a{display:block;padding:14px 0;font-size:15px}
  .hero{padding-top:65px}
  .hero h1{font-size:clamp(54px,11.1vw,84px)}
  .hero-stage{min-height:395px;height:60vw}
