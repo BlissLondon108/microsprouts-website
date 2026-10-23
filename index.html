@@ -10,8 +10,9 @@
 <meta property="og:description" content="Fresh broccoli sprouts grown with love and care in London.">
 <title>MicroSprouts — Fresh starts small.</title>
 <link rel="stylesheet" href="studio.css">
+<link rel="stylesheet" href="arch.css">
 <script src="shop.js" defer></script>
-<script src="carousel.js" defer></script>
+<script src="arch-carousel.js" defer></script>
 </head>
 <body>
 <header class="page-header app-nav">
@@ -20,7 +21,7 @@
     <nav aria-label="Main navigation">
       <ul class="nav-links" id="nav-links">
         <li><a href="#top">Overview</a></li>
-        <li><a href="#sprouts">Shop</a></li>
+        <li><a href="#sprouts">Packs</a></li>
         <li><a href="#how">How it works</a></li>
         <li><a href="#subscriptions">Regular orders</a></li>
       </ul>
@@ -33,62 +34,41 @@
 </header>
 
 <main id="top">
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero arch-hero" id="sprouts" aria-labelledby="hero-title">
   <div class="shell">
-    <span class="eyebrow">MICROSPROUTS · LONDON</span>
-    <h1 id="hero-title">Fresh starts<br><span>small.</span></h1>
-    <p class="lead">Broccoli sprouts, grown with love and care.</p>
-    <a class="button" href="#sprouts">Explore our sprouts ↗</a>
-  </div>
-  <div class="hero-visual">
-    <img src="hero.webp" alt="Fresh broccoli sprouts topping a slice of avocado toast" fetchpriority="high" width="502" height="657">
-  </div>
-</section>
+    <span class="arch-eyebrow">FRESHLY GROWN IN LONDON</span>
+    <h1 id="hero-title">Fresh starts <span>small.</span></h1>
+    <p class="arch-intro">Broccoli sprouts, grown with love and care.</p>
 
-<section class="shop" id="sprouts" aria-labelledby="sprouts-title">
-  <div class="shell">
-    <div class="section-heading">
-      <span class="eyebrow">FRESHLY GROWN</span>
-      <h2 id="sprouts-title">Choose your pack.</h2>
-    </div>
-    <div class="carousel-wrap">
-      <div class="product-carousel" id="product-carousel" role="region" aria-roledescription="carousel" aria-label="Broccoli sprouts pack sizes" tabindex="0">
-        <div class="carousel-window">
-          <div class="carousel-track" id="product-track">
-            <article class="product-slide" role="group" aria-roledescription="slide" aria-label="200g broccoli sprouts" data-pack-size="200">
-              <div class="slide-copy">
-                <span class="eyebrow">BROCCOLI SPROUTS</span>
-                <h3>200g</h3>
-                <div class="slide-price">£9.99</div>
-                <a href="#enquire" class="button" data-pack="200">Choose 200g ↗</a>
-              </div>
-              <div class="slide-image"><img src="hero.webp" width="502" height="657" alt="Fresh broccoli sprouts served on seeded toast"></div>
-            </article>
-            <article class="product-slide" role="group" aria-roledescription="slide" aria-label="500g broccoli sprouts" data-pack-size="500">
-              <div class="slide-copy">
-                <span class="eyebrow">BROCCOLI SPROUTS</span>
-                <h3>500g</h3>
-                <div class="slide-price">£16.99</div>
-                <a href="#enquire" class="button" data-pack="500">Choose 500g ↗</a>
-              </div>
-              <div class="slide-image"><img src="hero.webp" loading="lazy" width="502" height="657" alt="Young broccoli sprouts with delicate stems and green leaves"></div>
-            </article>
+    <div class="arch-carousel" id="product-carousel" role="region" aria-roledescription="carousel" aria-label="MicroSprouts pack selection" tabindex="0">
+      <div class="arch-stage">
+        <button class="arch-arrow previous" type="button" data-slide-prev aria-label="Previous pack">‹</button>
+        <div class="arch-viewport">
+          <div class="arch-track" id="product-track">
+            <div class="arch-slide" role="group" aria-roledescription="slide" aria-label="Pack of Sprouts, 200g" data-pack-size="200">
+              <img src="hero.webp" alt="Fresh broccoli sprouts on toast, 200g pack option" width="502" height="657" fetchpriority="high">
+            </div>
+            <div class="arch-slide" role="group" aria-roledescription="slide" aria-label="Family Pack, 500g" data-pack-size="500">
+              <img src="hero.webp" alt="Fresh broccoli sprouts on toast, family pack option" width="502" height="657" loading="lazy">
+            </div>
           </div>
         </div>
-        <div class="carousel-controls">
-          <div class="carousel-pagination" aria-label="Select pack">
-            <button class="carousel-dot" type="button" data-slide-to="0" aria-label="Show 200g broccoli sprouts" aria-current="true"></button>
-            <button class="carousel-dot" type="button" data-slide-to="1" aria-label="Show 500g broccoli sprouts" aria-current="false"></button>
-          </div>
-          <div class="carousel-actions">
-            <span class="carousel-count" data-slide-count aria-live="polite" aria-atomic="true">1 / 2</span>
-            <button class="carousel-arrow" type="button" data-slide-prev aria-label="Previous pack">‹</button>
-            <button class="carousel-arrow" type="button" data-slide-next aria-label="Next pack">›</button>
-          </div>
-        </div>
+        <button class="arch-arrow next" type="button" data-slide-next aria-label="Next pack">›</button>
       </div>
+
+      <div class="arch-dots" aria-label="Select pack">
+        <button class="arch-dot" type="button" data-slide-to="0" aria-current="true" aria-label="Pack of Sprouts (200g) — selected"></button>
+        <button class="arch-dot" type="button" data-slide-to="1" aria-current="false" aria-label="Family Pack (500g)"></button>
+      </div>
+
+      <div class="arch-details" aria-live="polite" aria-atomic="true">
+        <h2 id="selected-pack-name" class="arch-product-title">Pack of Sprouts (200g)</h2>
+        <p id="selected-pack-subtitle" class="arch-product-subtitle">Week supply</p>
+        <p id="selected-pack-price" class="arch-product-price">£9.99</p>
+      </div>
+      <a id="selected-pack-order" href="#enquire" class="button arch-order" data-pack="200" aria-label="Enquire about Pack of Sprouts (200g) for £9.99">Order ↗</a>
     </div>
-    <p class="shop-note">Swipe to compare · Free collection or £2.30 London delivery</p>
+    <p class="arch-shipping">Free collection · £2.30 London delivery</p>
   </div>
 </section>
 
