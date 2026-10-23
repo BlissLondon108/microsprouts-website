@@ -1,0 +1,193 @@
+/* MicroSprouts arch hero — approved minimal preview.
+   This file only overrides the hero and navigation; the enquiry form retains its styling. */
+
+.page-header.app-nav {
+  background:rgba(250,250,249,.94);
+  color:#161b17;
+  border-bottom:1px solid #e9ede8;
+  backdrop-filter:blur(20px);
+}
+.app-nav .brand{color:#151916;letter-spacing:-.048em;font-weight:760}
+.app-nav .brand b{color:#226b30}
+.app-nav .nav-links a{color:#363d38}
+.app-nav .nav-links a:hover{color:#1f6c30}
+.app-nav .mobile-menu{color:#1c2b20}
+.app-nav .button-small{background:#202622;color:#fff}
+
+.arch-hero {
+  text-align:center;
+  background:radial-gradient(ellipse at 50% 52%,#f0f2ee 0%,#fafaf9 73%);
+  padding:62px 18px 88px;
+  overflow:hidden;
+}
+.arch-hero .arch-eyebrow {
+  font-weight:650;
+  font-size:11px;
+  color:#4e8556;
+  letter-spacing:.19em;
+}
+.arch-hero h1 {
+  font-size:clamp(58px,8.5vw,106px);
+  line-height:1;
+  font-weight:775;
+  letter-spacing:-.075em;
+  margin:13px 0 13px;
+}
+.arch-hero h1 span {color:#246c34}
+.arch-hero .arch-intro {
+  margin:0 auto;
+  font-size:clamp(17px,2.4vw,23px);
+  color:#656c67;
+  letter-spacing:-.024em;
+  line-height:1.35;
+}
+.arch-carousel {
+  margin:32px auto 0;
+  max-width:990px;
+  outline:none;
+}
+.arch-stage{
+  width:100%;
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.arch-viewport{
+  width:min(64vw,435px);
+  height:clamp(340px,43vw,465px);
+  overflow:hidden;
+  border-radius:49% 49% 15px 15px / 42% 42% 15px 15px;
+  background:#dfe9dd;
+  box-shadow:0 25px 52px #1a3b2122;
+  position:relative;
+  flex:none;
+}
+.arch-track {
+  display:flex;
+  overflow-x:auto;
+  width:100%;
+  height:100%;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  touch-action:pan-x pan-y;
+}
+.arch-track::-webkit-scrollbar{display:none}
+.arch-slide {
+  width:100%;
+  height:100%;
+  flex:0 0 100%;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  overflow:hidden;
+  background:#e3ece0;
+}
+.arch-slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 33%;
+}
+.arch-slide[data-pack-size="500"] img{
+  object-position:center 24%;
+  transform:scale(1.12);
+}
+.arch-arrow {
+  width:46px;
+  height:46px;
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  border:0;
+  border-radius:50%;
+  background:#ebecea;
+  color:#222824;
+  font-size:29px;
+  font-weight:350;
+  display:grid;
+  place-items:center;
+  line-height:1;
+  transition:background .2s;
+  z-index:2;
+}
+.arch-arrow:hover{background:#dadfda}
+.arch-arrow.previous{left:12%}
+.arch-arrow.next{right:12%}
+.arch-dots{
+  display:flex;
+  justify-content:center;
+  gap:9px;
+  margin:23px 0 19px;
+}
+.arch-dot {
+  appearance:none;
+  background:#bfc4c0;
+  border:0;
+  width:9px;
+  height:9px;
+  border-radius:18px;
+  padding:0;
+  transition:background .18s,width .18s;
+}
+.arch-dot[aria-current="true"]{
+  background:#2b7340;
+  width:25px;
+}
+.arch-product-title {
+  font-size:clamp(23px,3vw,33px);
+  font-weight:710;
+  letter-spacing:-.045em;
+  margin:0 0 2px;
+  line-height:1.2;
+}
+.arch-product-subtitle{
+  color:#777d78;
+  font-size:16px;
+  margin:3px 0 5px;
+}
+.arch-product-price{
+  font-size:30px;
+  font-weight:730;
+  letter-spacing:-.045em;
+  margin:7px 0 13px;
+}
+.arch-hero .arch-order{
+  margin:0;
+  min-width:150px;
+  background:#1f2521;
+}
+.arch-hero .arch-order:hover{background:#343e36}
+.arch-shipping{
+  font-size:12px;
+  color:#858b85;
+  margin:20px auto 0;
+}
+
+@media(max-width:800px){
+ .app-nav.menu-open .nav-links{background:#fafaf9;border-top:1px solid #e4e8e1;box-shadow:0 15px 28px #1d2a1c18}
+ .app-nav.menu-open .nav-links a{color:#252f27}
+ .arch-hero{padding-top:53px}
+ .arch-arrow.previous{left:3%}
+ .arch-arrow.next{right:3%}
+ .arch-viewport{width:min(66vw,435px);height:clamp(320px,60vw,440px)}
+}
+@media(max-width:540px){
+ .arch-hero{padding:43px 10px 69px}
+ .arch-hero h1{font-size:clamp(49px,12vw,66px)}
+ .arch-hero .arch-intro{font-size:16px}
+ .arch-carousel{margin-top:24px}
+ .arch-viewport{height:clamp(295px,80vw,390px);width:72vw;max-width:355px}
+ .arch-arrow{width:38px;height:38px;font-size:25px}
+ .arch-arrow.previous{left:0}
+ .arch-arrow.next{right:0}
+ .arch-dots{margin:20px 0 18px}
+ .arch-product-subtitle{font-size:15px}
+ .arch-product-price{font-size:29px}
+}
+@media(prefers-reduced-motion:reduce){
+ .arch-track{scroll-behavior:auto}
+ .arch-dot,.arch-arrow{transition:none}
+}
