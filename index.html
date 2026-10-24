@@ -142,13 +142,13 @@
       <div class="timeline-header reveal"><span class="overline">A LITTLE PATIENCE, A LOT OF CARE</span><h2 id="process-title" class="section-title">Freshness that grows over time.</h2><p>Explore an illustrative growing journey. Exact timing varies by batch; broccoli requires at least six days before harvest.</p></div>
       <div class="timeline-grid">
         <div class="timeline-list" role="tablist" aria-label="Growing stages">
-          <button class="timeline-step" type="button" data-stage="0" role="tab" aria-selected="true"><strong>01 · Seeds prepared</strong><span>A fresh batch starts with carefully prepared seeds.</span></button>
-          <button class="timeline-step" type="button" data-stage="1" role="tab" aria-selected="false"><strong>02 · Germination</strong><span>Fine pale stems begin to emerge.</span></button>
-          <button class="timeline-step" type="button" data-stage="2" role="tab" aria-selected="false"><strong>03 · Sprouts develop</strong><span>Small green cotyledon leaves open.</span></button>
-          <button class="timeline-step" type="button" data-stage="3" role="tab" aria-selected="false"><strong>04 · Harvest when ready</strong><span>A fresh batch is prepared for your agreed date.</span></button>
+          <button class="timeline-step" type="button" data-stage="0" id="stage-tab-0" role="tab" tabindex="0" aria-controls="stage-panel" aria-selected="true"><strong>01 · Seeds prepared</strong><span>A fresh batch starts with carefully prepared seeds.</span></button>
+          <button class="timeline-step" type="button" data-stage="1" id="stage-tab-1" role="tab" tabindex="-1" aria-controls="stage-panel" aria-selected="false"><strong>02 · Germination</strong><span>Fine pale stems begin to emerge.</span></button>
+          <button class="timeline-step" type="button" data-stage="2" id="stage-tab-2" role="tab" tabindex="-1" aria-controls="stage-panel" aria-selected="false"><strong>03 · Sprouts develop</strong><span>Small green cotyledon leaves open.</span></button>
+          <button class="timeline-step" type="button" data-stage="3" id="stage-tab-3" role="tab" tabindex="-1" aria-controls="stage-panel" aria-selected="false"><strong>04 · Harvest when ready</strong><span>A fresh batch is prepared for your agreed date.</span></button>
         </div>
         <div>
-          <div class="timeline-card" id="stage-panel" role="tabpanel">
+          <div class="timeline-card" id="stage-panel" role="tabpanel" aria-labelledby="stage-tab-0">
             <img id="stage-image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Broccoli_sprouts.jpg/960px-Broccoli_sprouts.jpg" data-fallback="hero.webp" alt="Illustrative photograph of young broccoli sprouts" width="960" height="720" loading="lazy">
             <div class="timeline-overlay"><strong id="stage-title">Seeds prepared</strong><p id="stage-note">A fresh batch begins with carefully prepared broccoli seeds.</p></div>
           </div>
