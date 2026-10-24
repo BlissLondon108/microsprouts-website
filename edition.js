@@ -149,20 +149,51 @@
   ];
   const stageImage=$('stage-image'),stageTitle=$('stage-title'),stageNote=$('stage-note');
   const steps=[...document.querySelectorAll('[data-stage]')],bars=[...document.querySelectorAll('.timeline-dots>div')];
-  steps.forEach((step,index)=>step.addEventListener('click',()=>{
-    steps.forEach((s,i)=>s.setAttribute('aria-selected',String(i===index)));
+  let stageLoad=0;
+  function activateStage(index,focus=false){
+    const stage=timeline[index];
+    if(!stage)return;
+    steps.forEach((s,i)=>{
+      s.setAttribute('aria-selected',String(i===index));
+      s.tabIndex=i===index?0:-1;
+    });
+    $('stage-panel')?.setAttribute('aria-labelledby','stage-tab-'+index);
     bars.forEach((b,i)=>b.classList.toggle('active',i===index));
-    if(stageTitle)stageTitle.textContent=timeline[index].title;
-    if(stageNote)stageNote.textContent=timeline[index].note;
+    if(stageTitle)stageTitle.textContent=stage.title;
+    if(stageNote)stageNote.textContent=stage.note;
+    if(focus)steps[index]?.focus();
     if(stageImage){
+      const request=++stageLoad;
       stageImage.style.opacity='.25';
-      const wanted=timeline[index].src;
       const photo=new Image();
-      photo.onload=()=>{stageImage.src=wanted;stageImage.alt=timeline[index].title+' — illustrative broccoli sprout photograph';stageImage.style.opacity='1'};
-      photo.onerror=()=>{stageImage.src='hero.webp';stageImage.style.opacity='1'};
-      photo.src=wanted;
+      photo.onload=()=>{
+        if(request!==stageLoad)return;
+        stageImage.src=stage.src;
+        stageImage.alt=stage.title+' — illustrative broccoli sprout photograph';
+        stageImage.style.opacity='1';
+      };
+      photo.onerror=()=>{
+        if(request!==stageLoad)return;
+        stageImage.src='hero.webp';
+        stageImage.alt='Fresh sprouts on toast, illustrative photo';
+        stageImage.style.opacity='1';
+      };
+      photo.src=stage.src;
     }
-  }));
+  }
+  steps.forEach((step,index)=>{
+    step.addEventListener('click',()=>activateStage(index));
+    step.addEventListener('keydown',event=>{
+      const move={ArrowDown:1,ArrowRight:1,ArrowUp:-1,ArrowLeft:-1};
+      let next=null;
+      if(event.key==='Home')next=0;
+      else if(event.key==='End')next=steps.length-1;
+      else if(Object.hasOwn(move,event.key))next=(index+move[event.key]+steps.length)%steps.length;
+      if(next===null)return;
+      event.preventDefault();
+      activateStage(next,true);
+    });
+  });
 
   const revealTargets=[...document.querySelectorAll('.reveal')];
   if(revealTargets.length && !reduceMotion.matches && 'IntersectionObserver' in window){
