@@ -1,12 +1,112 @@
-/* MicroSprouts product gallery and accessible content interactions. */
-(()=>{'use strict';const $=id=>document.getElementById(id);const hero=$('hero-photo');const thumbs=[...document.querySelectorAll('[data-gallery]')];const url=name=>'assets/'+name+'.webp';let selectedPack='200';let photoSerial=0;
-function setHero(image,alt){const serial=++photoSerial;const photo=new Image();photo.onload=()=>{if(serial!==photoSerial)return;hero.classList.add('fading');setTimeout(()=>{if(serial!==photoSerial)return;hero.src=image;hero.alt=alt;hero.classList.remove('fading')},145)};photo.onerror=()=>{if(serial!==photoSerial)return;hero.src=url(selectedPack==='500'?'family':'week');hero.classList.remove('fading')};photo.src=image;}
-thumbs.forEach(btn=>btn.addEventListener('click',()=>{thumbs.forEach(x=>x.classList.remove('active'));btn.classList.add('active');setHero(url(btn.dataset.gallery),btn.querySelector('img').alt)}));
-function setPack(grams,fromForm=false){if(!['200','500'].includes(grams))return;selectedPack=grams;const price=grams==='200'?'£9.99':'£16.99';$('display-price').textContent=price;$('display-subtitle').textContent=(grams==='200'?'Week Supply':'Family Pack')+' · '+grams+'g';$('mobile-product').textContent=(grams==='200'?'Week Supply':'Family Pack')+' · '+price;document.querySelectorAll('button.choice').forEach(btn=>{const active=btn.dataset.pack===grams;btn.classList.toggle('selected',active);btn.setAttribute('aria-pressed',String(active))});$('panel-order').dataset.pack=grams;$('mobile-cta-link').dataset.pack=grams;thumbs.forEach(x=>x.classList.remove('active'));setHero(url(grams==='200'?'week':'family'),'Premium studio image showing the '+grams+'g broccoli sprouts pack');if(!fromForm){$('pack').value=grams;$('pack').dispatchEvent(new Event('input',{bubbles:true}))}}
-document.querySelectorAll('button.choice').forEach(btn=>btn.addEventListener('click',()=>setPack(btn.dataset.pack)));$('pack')?.addEventListener('change',()=>setPack($('pack').value,true));document.querySelectorAll('a[data-pack]').forEach(a=>a.addEventListener('click',()=>setPack(a.dataset.pack)));
-const menu=$('menu-toggle'),header=$('header');menu?.addEventListener('click',()=>{const open=header.classList.toggle('menu-open');menu.setAttribute('aria-expanded',String(open))});document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>{header.classList.remove('menu-open');menu.setAttribute('aria-expanded','false')}));
-const lightbox=$('lightbox');$('expand-image')?.addEventListener('click',()=>{if(!lightbox.showModal)return;$('lightbox-photo').src=hero.currentSrc||hero.src;$('lightbox-photo').alt=hero.alt;lightbox.showModal()});$('lightbox-close')?.addEventListener('click',()=>lightbox.close());lightbox?.addEventListener('click',e=>{if(e.target===lightbox)lightbox.close()});
-const stages=[...document.querySelectorAll('button.stage')],stagePhotos=['tray','macro','tray','harvest'],stageTitles=['Seeds prepared','Germination','Sprouts develop','Harvest when ready'],stageDescriptions=['A new batch begins with carefully prepared broccoli seeds.','Fine pale stems begin to emerge.','Small green leaves open and the sprouts continue developing.','After at least six days, the sprouts are assessed for harvest.'];
-function selectStage(i,focus){stages.forEach((b,n)=>{const selected=i===n;b.classList.toggle('active',selected);b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1});$('stage-name').textContent=stageTitles[i];$('stage-description').textContent=stageDescriptions[i];$('stage-photo').src=url(stagePhotos[i]);$('stage-photo').alt=stageTitles[i]+' illustrated with broccoli sprouts';if(focus)stages[i].focus()}
-stages.forEach((btn,i)=>{btn.addEventListener('click',()=>selectStage(i,false));btn.addEventListener('keydown',e=>{const move={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1};if(!(e.key in move))return;e.preventDefault();selectStage((i+move[e.key]+stages.length)%stages.length,true)})});selectStage(0,false);
+/* MicroSprouts: visual gallery, product selection, and growing journey.
+ * Checkout currently leads to a WhatsApp enquiry, not payment. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const hero = $('hero-photo');
+  const thumbs = [...document.querySelectorAll('[data-gallery]')];
+  const url = name => 'assets/' + name + '.webp';
+  const womanUrl = 'https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&cs=tinysrgb&w=900';
+  let currentPack = '200', photoSerial = 0;
+
+  const choiceImage = pack => url(pack === '500' ? 'family' : 'week');
+  const loadPhoto = (image, alt) => {
+    if (!hero) return;
+    const token = ++photoSerial;
+    const next = new Image();
+    next.onload = () => {
+      if (token !== photoSerial) return;
+      hero.classList.add('fading');
+      const swap = () => {
+        if (token !== photoSerial) return;
+        hero.src = image;
+        hero.alt = alt;
+        hero.classList.remove('fading');
+      };
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) swap();
+      else setTimeout(swap, 120);
+    };
+    next.onerror = () => {
+      if (token !== photoSerial) return;
+      hero.src = choiceImage(currentPack);
+      hero.alt = 'Fresh broccoli sprouts in a clear container';
+      hero.classList.remove('fading');
+    };
+    next.src = image;
+  };
+
+  thumbs.forEach(button => button.addEventListener('click', () => {
+    thumbs.forEach(item => {
+      item.classList.toggle('active', item === button);
+      item.setAttribute('aria-pressed', String(item === button));
+    });
+    const photoUrl = button.dataset.galleryUrl || (button.dataset.gallery === 'woman' ? womanUrl : url(button.dataset.gallery));
+    loadPhoto(photoUrl, button.querySelector('img')?.alt || 'Fresh broccoli sprouts');
+  }));
+
+  function selectPack(pack, fromForm = false) {
+    if (!['200', '500'].includes(pack)) return;
+    currentPack = pack;
+    const money = pack === '200' ? '£9.99' : '£16.99';
+    const desc = (pack === '200' ? 'Week Supply' : 'Family Pack') + ' · ' + pack + 'g';
+
+    if ($('display-price')) $('display-price').textContent = money;
+    if ($('display-subtitle')) $('display-subtitle').textContent = desc;
+    if ($('mobile-product')) $('mobile-product').textContent = (pack === '200' ? 'Week Supply' : 'Family Pack') + ' · ' + money;
+    for (const button of document.querySelectorAll('button.choice')) {
+      const active = button.dataset.pack === pack;
+      button.classList.toggle('selected', active);
+      button.setAttribute('aria-pressed', String(active));
+    }
+    if ($('panel-order')) $('panel-order').dataset.pack = pack;
+    if ($('mobile-cta-link')) $('mobile-cta-link').dataset.pack = pack;
+    thumbs.forEach(item => {
+      item.classList.remove('active');
+      item.setAttribute('aria-pressed', 'false');
+    });
+    loadPhoto(choiceImage(pack), 'Fresh broccoli sprouts pack (' + pack + 'g option)');
+    if (!fromForm && $('pack')) {
+      $('pack').value = pack;
+      $('pack').dispatchEvent(new Event('input', { bubbles:true }));
+    }
+  }
+
+  document.querySelectorAll('button.choice').forEach(button => button.addEventListener('click', () => selectPack(button.dataset.pack)));
+  $('pack')?.addEventListener('change', () => selectPack($('pack').value, true));
+  document.querySelectorAll('a[data-pack]').forEach(link => link.addEventListener('click', () => selectPack(link.dataset.pack)));
+
+  const menu = $('menu-toggle'), header = $('header');
+  menu?.addEventListener('click', () => {
+    const open = header.classList.toggle('menu-open');
+    menu.setAttribute('aria-expanded', String(open));
+  });
+  document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', () => {
+    header?.classList.remove('menu-open');
+    menu?.setAttribute('aria-expanded', 'false');
+  }));
+
+  const growthCards = [...document.querySelectorAll('.grow-card')];
+  const growthDescriptions = [
+    'Day 0 — Broccoli seeds are prepared and sown for a fresh batch.',
+    'Days 1–2 — The seeds absorb water and the earliest tiny sprouts emerge.',
+    'Days 3–5 — Pale stems lengthen and green leaves form as the sprouts develop.',
+    'Day 6+ — Each batch is checked and harvested when ready.'
+  ];
+  growthCards.forEach((card, index) => {
+    card.addEventListener('click', () => {
+      growthCards.forEach((item,i) => {
+        item.classList.toggle('active',i === index);
+        item.setAttribute('aria-pressed',String(i === index));
+      });
+      if ($('growth-detail')) $('growth-detail').textContent = growthDescriptions[index];
+    });
+    card.addEventListener('keydown', event => {
+      const dir = {ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[event.key];
+      if (!dir) return;
+      event.preventDefault();
+      const target = (index + dir + growthCards.length) % growthCards.length;
+      growthCards[target].focus();
+      growthCards[target].click();
+    });
+  });
 })();
