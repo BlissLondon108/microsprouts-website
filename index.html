@@ -1,133 +1,173 @@
 <!doctype html>
 <html lang="en-GB">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#183717">
-<meta name="description" content="MicroSprouts — fresh broccoli sprouts grown in London. 200g Week Supply £9.99, 500g Family Pack £16.99. Personal delivery £2.30 or free collection.">
-<title>MicroSprouts · Fresh broccoli sprouts, grown in London</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#042b12">
+<meta name="description" content="MicroSprouts — fresh broccoli sprouts in London. Week Supply 200g £9.99, Family Pack 500g £16.99. Free collection or £2.30 personal London delivery.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MicroSprouts — Fresh broccoli sprouts, grown in London">
+<meta property="og:description" content="Fresh broccoli sprouts grown in small batches. Explore our Week Supply and Family Pack, then arrange collection or personal London delivery.">
+<title>MicroSprouts | Freshly grown in London</title>
 <link rel="preload" as="image" href="assets/week.webp">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="approved.css">
-<script src="shop.js" defer></script><script src="site.js" defer></script>
+<link rel="stylesheet" href="comp.css">
+<script src="shop.js" defer></script>
+<script src="comp.js" defer></script>
 </head>
 <body>
-<div class="announcement">Fresh broccoli sprouts, grown in London <span class="ann-bullet">•</span> <a href="#enquire">20% off eligible one-time sprouts orders with SPROUT <span aria-hidden="true">→</span></a></div>
-<header class="site-header" id="header">
-<div class="shell nav-inner">
-<a class="wordmark" href="#top" aria-label="MicroSprouts home">MicroSprouts</a>
-<nav aria-label="Main navigation" id="primary-nav"><ul class="nav-links"><li><a href="#product">Shop</a></li><li><a href="#story">Discover</a></li><li><a href="#process">How it grows</a></li><li><a href="#regular">Regular orders</a></li><li><a href="#faq">FAQs</a></li></ul></nav>
-<div class="nav-right"><a href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer" class="nav-contact">WhatsApp</a><a href="#enquire" class="btn btn-small btn-dark">Enquire</a><button id="menu-toggle" class="menu-toggle" type="button" aria-label="Toggle navigation" aria-controls="primary-nav" aria-expanded="false">☰</button></div>
-</div></header>
 <main id="top">
-<section id="product" class="product-section shell" aria-labelledby="product-title">
-<div class="gallery" id="gallery">
-  <div class="gallery-hero" id="gallery-hero">
-    <img id="hero-photo" src="assets/week.webp" alt="Studio photograph of a clear container filled with broccoli sprouts against a dark green backdrop" fetchpriority="high" width="1448" height="540">
-    
-  </div>
-  <div class="gallery-grid" id="gallery-thumbs">
-    <button class="gallery-tile" type="button" data-gallery="harvest" aria-label="View a container of fresh broccoli sprouts"><img src="assets/harvest.webp" alt="Full fresh broccoli sprouts in a clear container" width="704" height="528" loading="lazy"></button>
-    <button class="gallery-tile" type="button" data-gallery="toast" aria-label="View fresh broccoli sprouts on avocado toast"><img src="assets/toast.webp" alt="Broccoli sprouts served on avocado toast" width="704" height="528" loading="lazy"></button>
-    <button class="gallery-tile" type="button" data-gallery="tray" aria-label="View a plate of fresh sprouts"><img src="assets/tray.webp" alt="Freshly grown broccoli sprouts in a growing tray" width="704" height="528" loading="lazy"></button>
-    <button class="gallery-tile" type="button" data-gallery="woman" data-gallery-url="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" aria-label="View a smiling woman enjoying a fresh green salad"><img src="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=680" onerror="this.onerror=null;this.src='assets/harvest.webp'" alt="Smiling woman holding a bowl of fresh greens" width="680" height="450" loading="lazy"></button>
+  <div class="site-hero" id="hero">
+    <header class="comp-nav">
+      <a href="#top" class="wordmark">MicroSprouts</a>
+      <nav aria-label="Main navigation">
+        <ul class="comp-nav-links" id="nav-links">
+          <li><a href="#benefits">Benefits</a></li>
+          <li><a href="#journey">Growing Journey</a></li>
+          <li><a href="#products">Products</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+      <button type="button" class="menu-btn" id="menu-toggle" aria-controls="nav-links" aria-expanded="false">Menu ☰</button>
+    </header>
+    <section class="hero-content" id="products" aria-labelledby="product-heading">
+      <div class="product-gallery" aria-label="Broccoli sprouts gallery">
+        <div class="gallery-main">
+          <img id="hero-photo" src="assets/week.webp" width="1448" height="540" alt="Fresh broccoli sprouts in a clear glass-like container on a deep green studio background" fetchpriority="high">
+        </div>
+        <div class="gallery-thumbs" id="gallery-thumbs">
+          <button class="gallery-thumb" type="button" data-gallery="harvest" aria-label="View fresh broccoli sprouts in a clear container" aria-pressed="false"><img src="assets/harvest.webp" alt="Fresh broccoli sprouts held in hands" loading="lazy"></button>
+          <button class="gallery-thumb" type="button" data-gallery="macro" aria-label="View broccoli sprouts up close" aria-pressed="false"><img src="assets/macro.webp" alt="Delicate pale stems and little green seed leaves" loading="lazy"></button>
+          <button class="gallery-thumb" type="button" data-gallery="tray" aria-label="View a thick harvest of broccoli sprouts" aria-pressed="false"><img src="assets/tray.webp" alt="Broccoli sprouts grown densely in a clear tray" loading="lazy"></button>
+          <button class="gallery-thumb" type="button" data-gallery="woman" data-url="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" aria-label="View a lifestyle image of a woman enjoying fresh greens" aria-pressed="false"><img src="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=500" alt="Smiling woman enjoying freshly prepared greens" loading="lazy" onerror="this.onerror=null;this.src='assets/harvest.webp'"></button>
+        </div>
+      </div>
+
+      <div class="product-panel">
+        <h1 id="product-heading">MicroSprouts</h1>
+        <p class="tagline">Freshly grown in London</p>
+        <p class="description">Broccoli sprouts, grown with love and care for your everyday meals.</p>
+        <div class="package-options" aria-label="Choose your broccoli sprouts pack">
+          <button type="button" class="package-option" data-pack="200" aria-pressed="true">
+            <span class="radio-circle" aria-hidden="true"></span>
+            <span class="package-info"><strong class="package-grams">200g</strong><span class="package-title">Week Supply</span><strong class="package-price">£9.99</strong></span>
+          </button>
+          <button type="button" class="package-option" data-pack="500" aria-pressed="false">
+            <span class="radio-circle" aria-hidden="true"></span>
+            <span class="package-info"><strong class="package-grams">500g</strong><span class="package-title">Family Pack</span><strong class="package-price">£16.99</strong></span>
+          </button>
+        </div>
+        <a class="checkout-btn" data-pack="200" id="checkout-button" href="#enquire" aria-label="Continue to checkout enquiry">Checkout <span aria-hidden="true">→</span></a>
+        <div class="delivery-highlights">
+          <span><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2 9h17v15H2zM19 14h6l5 6v4H19z"/><circle cx="9" cy="26" r="3"/><circle cx="24" cy="26" r="3"/></svg>£2.30 London delivery</span>
+          <i class="line" aria-hidden="true"></i>
+          <span><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2 16 16 5l14 11M7 14v15h18V14M12 29V19h8v10"/></svg>Free collection</span>
+        </div>
+        <p class="trust-caption">Checkout opens a WhatsApp enquiry; no payment is taken here.</p>
+      </div>
+    </section>
   </div>
 
-</div>
-<aside class="purchase-panel" aria-label="Product and ordering options">
-  <div class="product-eyebrow">BROCCOLI SPROUTS</div>
-  <h1 id="product-title">Fresh Broccoli Sprouts</h1>
-  <p class="purchase-desc">Fresh, delicate broccoli sprouts. Grown in small batches with love and care, then harvested for your order.</p>
-  <div class="price" id="display-price">£9.99</div>
-  <div class="price-caption" id="display-subtitle">Week Supply <span aria-hidden="true">·</span> 200g</div>
-  <fieldset class="choices"><legend>Choose your supply</legend>
-    <button class="choice selected" type="button" data-pack="200" aria-pressed="true"><span class="choice-dot"></span><span class="choice-main"><strong>Week Supply</strong><small>200g</small></span><span class="choice-price">£9.99</span></button>
-    <button class="choice" type="button" data-pack="500" aria-pressed="false"><span class="choice-dot"></span><span class="choice-main"><strong>Family Pack</strong><small>500g</small></span><span class="choice-price">£16.99</span></button>
-  </fieldset>
-  <a id="panel-order" class="btn btn-wide btn-dark" href="#enquire" data-pack="200">Checkout <span aria-hidden="true">→</span></a>
-  <p class="micro-note">Checkout currently opens a WhatsApp enquiry. No payment is taken on this website.</p>
-  <div class="delivery-highlights"><div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 10h18l-2 18H9L7 10ZM11 12V8a5 5 0 0 1 10 0v4"/></svg><span><b>Free collection</b><small>By arrangement</small></span></div><div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2 8h18v17H2zM20 14h6l4 5v6H20z"/><circle cx="9" cy="26" r="3"/><circle cx="24" cy="26" r="3"/></svg><span><b>London delivery</b><small>£2.30 per order</small></span></div></div>
-  <div class="accordion compact">
-    <details open><summary>Why sprouts?</summary><p>Enjoy their fresh, peppery flavour with sandwiches, salads and everyday meals. These are young broccoli sprouts—not larger microgreens.</p></details>
-    <details><summary>How they're grown</summary><p>Broccoli sprouts need at least six days to grow. Please request seven days ahead, allowing a little preparation time.</p></details>
-    <details><summary>Delivery & collection</summary><p>Free collection at a time we agree. London personal delivery is generally Tuesday–Thursday, subject to availability.</p></details>
-    <details><summary>Regular orders</summary><p>You can enquire about a weekly or fortnightly supply. No automatic subscription charges are active yet.</p></details>
-  </div>
-  <div class="promo-mini"><span><strong>Save 20% with SPROUT</strong><small>On eligible one-time sprout orders.</small></span><a href="#enquire" aria-label="Use SPROUT discount in enquiry form">↗</a></div>
-</aside>
-</section>
-<section class="shell story-feature" id="story" aria-labelledby="story-title">
-  <div class="story-photo"><div class="story-shade"></div><h2 id="story-title">Freshness you can see.<br>Care in every batch.</h2>
-    <div class="glass-benefits">
-      <div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 29V14M16 18C5 18 5 7 6 4c8 0 10 7 10 14ZM16 23c10 0 11-9 11-15-9 0-11 7-11 15Z"/></svg><strong>Grown to order</strong><small>No pre-made inventory.</small></div>
-      <div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5v22M8 13h16M8 20h16M3 5h26v22H3z"/></svg><strong>Small batches</strong><small>Personally tended and harvested.</small></div>
-      <div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 10h17v15H3zM20 15h5l5 5v5H20z"/><circle cx="10" cy="25" r="3"/><circle cx="24" cy="25" r="3"/></svg><strong>London delivery</strong><small>£2.30 by arrangement.</small></div>
-      <div><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 11h20l-2 16H8L6 11ZM12 12V8a4 4 0 0 1 8 0v4"/></svg><strong>Free collection</strong><small>At an agreed time.</small></div>
-    </div>
-  </div>
-</section>
-<section class="shell botanical" aria-labelledby="seed-title" id="botanical">
-  <div class="botanical-copy">
-    <span class="eyebrow light">FROM SEED TO FRESH SPROUTS</span>
-    <h2 id="seed-title">From seed to<br>fresh sprouts.</h2>
-    <p>Grown slowly, harvested fresh. A simple process where each broccoli seed has time to develop into tender stems and tiny green leaves.</p>
-    <a href="#process" class="text-link light">Explore our growing process →</a>
-  </div>
-  <div class="botanical-art">
-    <img src="assets/tray.webp" width="704" height="528" loading="lazy" alt="Young broccoli sprouts with fine pale stems and green cotyledon leaves">
-    <div class="botanical-label botanical-label-a"><span></span>Tender green leaves <small>(cotyledons)</small></div>
-    <div class="botanical-label botanical-label-b"><span></span>Delicate sprouted stems</div>
-    <div class="botanical-label botanical-label-c"><span></span>Young broccoli sprouts</div>
-  </div>
-</section>
-<section class="journey" id="process" aria-labelledby="journey-title">
-  <div class="shell">
-    <div class="section-heading journey-heading">
-      <span class="eyebrow">FROM SEED TO HARVEST</span>
-      <h2 id="journey-title">The growing journey.</h2>
-      <p>From seed to harvest in around six to seven days. Select a stage to explore.</p>
-    </div>
-    <div class="journey-photo-grid" role="group" aria-label="Four stages of growing broccoli sprouts">
-      <button class="grow-card active" data-grow-step="0" type="button" aria-pressed="true">
-        <div class="grow-image"><img src="assets/stage-seeds.svg" alt="Broccoli seeds falling from above onto a bed of seeds" loading="lazy"><span class="grow-day">Day 0</span></div>
-        <strong>Seeds prepared and sown</strong>
-        <p>High-quality broccoli seeds begin their growing journey.</p>
+  <section class="banner" id="story" aria-labelledby="story-title">
+    <h2 class="serif" id="story-title">From Seed to<br>Fresh Sprouts</h2>
+    <span class="separator" aria-hidden="true"></span>
+    <p>Pure, simple and natural —<br>just broccoli seeds, water and time.</p>
+  </section>
+
+  <section class="growth-section" id="journey" aria-labelledby="journey-title">
+    <h2 class="serif" id="journey-title">From Seed to Harvest</h2>
+    <p class="growth-intro">A simple growing process, taking at least six days.</p>
+    <div class="growth-grid" role="group" aria-label="Broccoli sprout growing stages">
+      <button type="button" class="growth-item" data-stage="0" aria-pressed="true" aria-label="Day zero: broccoli seeds prepared">
+        <span class="growth-image"><img src="assets/day0.svg" alt="Brown broccoli seeds falling onto a dark green surface" loading="lazy"></span>
+        <span class="day-badge">Day 0</span>
+        <span class="growth-caption">Broccoli seeds</span>
       </button>
-      <button class="grow-card" data-grow-step="1" type="button" aria-pressed="false">
-        <div class="grow-image"><img src="assets/stage-germination.svg" alt="Tiny broccoli sprouts emerging from a bed of seeds" loading="lazy"><span class="grow-day">Days 1–2</span></div>
-        <strong>Germination</strong>
-        <p>The seeds absorb water and begin to sprout.</p>
+      <button type="button" class="growth-item" data-stage="1" aria-pressed="false" aria-label="Day one to two: seeds start to sprout">
+        <span class="growth-image"><img src="assets/macro.webp" alt="Tiny broccoli sprouts emerging from seeds" loading="lazy"></span>
+        <span class="day-badge">Day 1–2</span>
+        <span class="growth-caption">Seeds begin to sprout</span>
       </button>
-      <button class="grow-card" data-grow-step="2" type="button" aria-pressed="false">
-        <div class="grow-image"><img src="assets/stage-jar.svg" alt="Broccoli sprouts developing inside a clear glass jar" loading="lazy"><span class="grow-day">Days 3–5</span></div>
-        <strong>Developing</strong>
-        <p>Fine stems and their first green leaves develop.</p>
+      <button type="button" class="growth-item" data-stage="2" aria-pressed="false" aria-label="Day three to five: broccoli sprouts grow in a jar">
+        <span class="growth-image"><img src="assets/jar.svg" alt="Growing broccoli sprouts inside a clear glass jar" loading="lazy"></span>
+        <span class="day-badge">Day 3–5</span>
+        <span class="growth-caption">Sprouts grow and develop</span>
       </button>
-      <button class="grow-card" data-grow-step="3" type="button" aria-pressed="false">
-        <div class="grow-image"><img src="assets/tray.webp" alt="Fresh broccoli sprouts at the ready-to-harvest stage" loading="lazy"><span class="grow-day">Day 6+</span></div>
-        <strong>Harvest when ready</strong>
-        <p>Tender, fresh sprouts are prepared for your order.</p>
+      <button type="button" class="growth-item" data-stage="3" aria-pressed="false" aria-label="Day six and later: fresh broccoli sprouts ready for harvest">
+        <span class="growth-image"><img src="assets/week.webp" alt="A full tray of freshly grown broccoli sprouts" loading="lazy"></span>
+        <span class="day-badge">Day 6+</span>
+        <span class="growth-caption">Fresh broccoli sprouts</span>
       </button>
     </div>
-    <p class="journey-detail" id="growth-detail" aria-live="polite">Day 0 — Every fresh batch begins with the seeds.</p>
-    <div class="benefit-editorial" id="benefits" aria-label="Why choose broccoli sprouts">
-      <article class="benefit-panel benefit-chemistry">
-        <div class="benefit-content"><span class="eyebrow">NATURALLY OCCURRING COMPOUNDS</span><h3>Little sprouts.<br>Remarkable chemistry.</h3><p>Broccoli sprouts contain glucoraphanin, a natural compound that can be converted into sulforaphane.</p><a href="#care" class="text-link">Explore the sprouts →</a></div>
-        <div class="chem-art" aria-hidden="true"><span></span><i></i><b></b><em></em><span></span></div>
-      </article>
-      <article class="benefit-panel benefit-wellness">
-        <div class="benefit-photo"><img src="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1000" alt="Smiling woman enjoying a fresh bowl of greens" loading="lazy" onerror="this.onerror=null;this.src='assets/harvest.webp'"></div>
-        <div class="benefit-content"><span class="eyebrow">FRESH EVERYDAY INGREDIENT</span><h3>Small sprouts.<br>Big flavour.</h3><p>Crunchy, fresh, and easy to enjoy in sandwiches, wraps and salads.</p><a class="text-link" href="#enquire">Explore your pack →</a></div>
-      </article>
+    <p id="growth-detail" class="growth-detail" aria-live="polite">Day 0 — Broccoli seeds are prepared for a fresh growing batch.</p>
+  </section>
+
+  <section class="benefits-section" id="benefits" aria-label="Broccoli sprouts and everyday goodness">
+    <article class="benefit-card">
+      <img class="benefit-bg" src="assets/macro.webp" alt="" loading="lazy">
+      <div class="benefit-eyebrow">WHY BROCCOLI SPROUTS ARE GOOD</div>
+      <h3 class="serif">Naturally rich in<br>glucoraphanin</h3>
+      <p>Broccoli sprouts contain glucoraphanin, a plant compound that can be converted into sulforaphane.</p>
+    </article>
+    <article class="benefit-card">
+      <img class="benefit-bg" src="assets/toast.webp" alt="" loading="lazy">
+      <div class="benefit-eyebrow">EVERYDAY GOODNESS</div>
+      <h3 class="serif">An easy way to<br>enjoy your meals</h3>
+      <p>Add a fresh, peppery crunch to sandwiches, salads and other favourites.</p>
+    </article>
+  </section>
+
+  <section class="order-section" id="enquire" aria-labelledby="order-title">
+    <div class="order-inner">
+      <div class="order-copy">
+        <h2 class="serif" id="order-title">Fresh sprouts.<br>On your schedule.</h2>
+        <p>Choose your pack, quantity and preferred date. I'll personally confirm availability, the collection or delivery time and payment arrangements through WhatsApp.</p>
+        <p class="text-note">Broccoli requires at least six days to grow, so please request seven days ahead. Personal delivery is normally Tuesday to Thursday. Collection is free by appointment.</p>
+      </div>
+      <form id="interest-form" class="order-card">
+        <h3>Checkout enquiry</h3>
+        <p class="intro">No payment is taken here. Your choices will be prepared as a WhatsApp enquiry.</p>
+        <div class="order-form-grid">
+          <div class="field"><label for="pack">Pack size</label><select id="pack"><option value="200">Week Supply · 200g · £9.99</option><option value="500">Family Pack · 500g · £16.99</option></select></div>
+          <div class="field"><label for="qty">Quantity</label><input type="number" id="qty" min="1" max="10" value="1" step="1" required></div>
+        </div>
+        <div class="field"><label for="frequency">Frequency</label><select id="frequency"><option value="once">One-time</option><option value="weekly">Weekly enquiry (arranged manually)</option><option value="fortnightly">Fortnightly enquiry (arranged manually)</option></select></div>
+        <div class="field"><span class="field-label">How will you receive your sprouts?</span>
+          <div class="method-options">
+            <label class="method-option"><input type="radio" name="method" value="pickup" checked><strong>Free collection</strong><small>By appointment</small></label>
+            <label class="method-option"><input type="radio" name="method" value="delivery"><strong>London delivery</strong><small>+£2.30 per order</small></label>
+          </div>
+        </div>
+        <div class="order-form-grid">
+          <div class="field"><label for="date">Preferred date</label><input type="date" id="date" required></div>
+          <div class="field" id="postcode-field" hidden><label for="postcode">London postcode</label><input id="postcode" type="text" autocomplete="postal-code" maxlength="9" placeholder="e.g. SE1"></div>
+        </div>
+        <p class="form-hint" id="datehint">All dates subject to confirmation.</p>
+        <div class="field"><label for="code">Discount code (optional)</label><input id="code" type="text" placeholder="SPROUT" maxlength="20" autocomplete="off"><p class="form-hint" id="promo-hint">SPROUT gives 20% off sprouts on eligible one-time enquiries.</p></div>
+        <div class="price-summary">
+          <div class="price-row"><span>Sprouts</span><strong id="subtotal">£9.99</strong></div>
+          <div class="price-row"><span>Collection / delivery</span><strong id="deliveryfee">FREE</strong></div>
+          <div class="price-row" id="discountline" hidden><span>SPROUT discount</span><strong id="discount">−£0.00</strong></div>
+          <div class="price-row total"><span>Indicative total</span><strong id="total">£9.99</strong></div>
+        </div>
+        <button class="submit-btn" type="submit">Continue to WhatsApp →</button>
+        <p class="form-hint" id="form-message" aria-live="polite">Nothing is reserved or charged until confirmed personally.</p>
+        <a id="whatsapp-fallback" class="whatsapp-fallback" href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer" hidden>Open prepared WhatsApp message ↗</a>
+      </form>
     </div>
-  </div>
-</section>
-<section class="care-block shell" id="care" aria-labelledby="care-title"><div class="care-layout"><div class="care-visual"><h2 id="care-title">Simply grown.<br>Carefully prepared.</h2><img src="assets/tray.webp" width="704" height="528" loading="lazy" alt="Broccoli sprouts in a growing tray"></div><div class="care-details accordion"><details open><summary>Broccoli seeds and sprouts</summary><p>Our product is young broccoli sprouts, with fine pale stems and tiny paired green leaves.</p></details><details><summary>Harvesting and handling</summary><p>Each batch is prepared close to an agreed collection or delivery date.</p></details><details><summary>Storage guidance</summary><p>Keep refrigerated and follow the storage and use-by advice supplied with your order.</p></details><details><summary>Collection and delivery</summary><p>Free collection by appointment, or personal delivery in selected London areas for £2.30.</p></details><details><summary>Pack sizes and weight</summary><p>Week Supply: 200g for £9.99. Family Pack: 500g for £16.99.</p></details><div class="care-icons"><span>❧ <small>Fresh batches</small></span><span>◷ <small>Six-day minimum</small></span><span>⌂ <small>London grown</small></span><span>♡ <small>With care</small></span></div></div></div></section>
-<section class="comparison" aria-labelledby="compare-title"><div class="shell compare-grid"><div><span class="eyebrow light">A BETTER ROUTINE</span><h2 id="compare-title">Grown fresh.<br>For your order.</h2><p>Small-batch broccoli sprouts, with a direct line to the grower and collection or delivery that works for you.</p></div><div class="compare-sheet"><div class="compare-header"><strong>MicroSprouts</strong><strong>Your order</strong></div><div><span>Week Supply</span><strong>200g · £9.99</strong></div><div><span>Family Pack</span><strong>500g · £16.99</strong></div><div><span>Collection</span><strong>Free, by agreement</strong></div><div><span>Local delivery</span><strong>£2.30 · selected areas</strong></div><div><span>Lead time</span><strong>Request 7 days ahead</strong></div><div><span>Repeat orders</span><strong>Weekly / fortnightly enquiry</strong></div></div></div></section>
-<section class="regular shell" id="regular" aria-labelledby="regular-title"><div class="section-heading section-heading-left"><span class="eyebrow">FRESH SPROUTS, ON YOUR SCHEDULE</span><h2 id="regular-title">Fresh, again and again.</h2><p>One-time, weekly or fortnightly. Arranged directly with you.</p></div><div class="supply-grid"><article class="supply-card"><img src="assets/harvest.webp" loading="lazy" width="704" height="528" alt="Person holding a prepared pack of broccoli sprouts"><div><span class="eyebrow">WEEK SUPPLY</span><h3>Pack of Sprouts</h3><p>200g · £9.99</p><p class="supply-muted">A fresh batch for your everyday meals.</p><a class="text-link" href="#enquire" data-pack="200" data-plan="weekly">Enquire about 200g ↗</a></div></article><article class="supply-card"><img src="assets/family.webp" width="1448" height="540" loading="lazy" alt="A larger clear container filled with broccoli sprouts"><div><span class="eyebrow">FAMILY PACK</span><h3>More to share.</h3><p>500g · £16.99</p><p class="supply-muted">A larger pack for sprout lovers.</p><a class="text-link" href="#enquire" data-pack="500" data-plan="fortnightly">Enquire about 500g ↗</a></div></article></div><p class="small-hint">Regular orders are arranged manually. Automatic subscriptions aren't enabled yet.</p></section>
-<section class="enquiry-section" id="enquire"><div class="shell enquiry-grid"><div class="enquiry-intro"><span class="eyebrow">FRESH FROM LONDON</span><h2>Let's arrange<br>your sprouts.</h2><p>Choose your pack, a preferred date and collection or delivery. We'll confirm everything directly through WhatsApp.</p><p class="enquiry-note">Broccoli sprouts require at least six days to grow; please request seven days ahead. No payment or confirmed booking is made through this form.</p></div>
-<form id="interest-form" class="order-card"><h3>Your enquiry</h3><p class="tiny-muted">Choose your options. You'll send the details on WhatsApp.</p><div class="form-grid"><div class="field"><label for="pack">Pack size</label><select id="pack"><option value="200">Week Supply · 200g · £9.99</option><option value="500">Family Pack · 500g · £16.99</option></select></div><div class="field"><label for="qty">Packs</label><input id="qty" type="number" min="1" max="10" step="1" value="1" required></div></div><div class="field"><label for="frequency">How often?</label><select id="frequency"><option value="once">One-time enquiry</option><option value="weekly">Weekly enquiry</option><option value="fortnightly">Fortnightly enquiry</option></select></div><div class="field"><label>Collection or delivery?</label><div class="radio-choices"><label><input name="method" type="radio" value="pickup" checked> Free collection</label><label><input name="method" type="radio" value="delivery"> London delivery +£2.30</label></div></div><div class="form-grid"><div class="field"><label for="date">Preferred date</label><input id="date" type="date" required></div><div class="field" id="postcode-field" hidden><label for="postcode">London postcode</label><input id="postcode" placeholder="e.g. SE1" maxlength="9" autocomplete="postal-code"></div></div><p id="datehint" class="tiny-muted">Dates subject to availability.</p><div class="field"><label for="code">Discount code (optional)</label><input id="code" placeholder="SPROUT" maxlength="20" autocomplete="off"><p id="promo-hint" class="tiny-muted">20% off sprouts on eligible one-time enquiries.</p></div><div class="total-block"><div><span>Sprouts</span><b id="subtotal">£9.99</b></div><div><span>Collection / delivery</span><b id="deliveryfee">FREE</b></div><div id="discountline" hidden><span>SPROUT discount</span><b id="discount">−£0.00</b></div><div class="grand-total"><span>Indicative total</span><b id="total">£9.99</b></div></div><button type="submit" class="btn btn-wide btn-dark">Send WhatsApp enquiry ↗</button><p id="form-message" class="tiny-muted" aria-live="polite">Nothing is charged or confirmed until we agree your order.</p><a id="whatsapp-fallback" href="https://wa.me/447386853514" class="btn btn-outline btn-wide" hidden target="_blank" rel="noopener noreferrer">Open prepared WhatsApp message</a></form></div></section>
-<section class="faq shell" id="faq"><div class="faq-heading"><span class="eyebrow">GOOD TO KNOW</span><h2>Questions?<br>Here to help.</h2></div><div class="faq-list accordion"><details><summary>How long do the sprouts take to grow?</summary><p>At least six days for broccoli, with a seven-day minimum advance request to allow a small buffer.</p></details><details><summary>Can I collect my sprouts?</summary><p>Yes, collection is free and available by arrangement on any day, within a mutually agreed window.</p></details><details><summary>Which days do you deliver?</summary><p>Usually Tuesday, Wednesday and Thursday in selected London areas, for £2.30 per order.</p></details><details><summary>Can I receive sprouts every week?</summary><p>Yes, we can discuss regular supply via WhatsApp. Automated subscriptions are not available yet.</p></details><details><summary>Are these broccoli sprouts or microgreens?</summary><p>These are broccoli sprouts: young germinated plants, with fine pale stems and small green seed leaves.</p></details></div></section>
+  </section>
+
+  <section class="faq" id="faq" aria-labelledby="faq-title">
+    <div class="faq-inner">
+      <h2 class="serif" id="faq-title">Frequently asked<br>questions.</h2>
+      <div>
+        <details><summary>How long do the sprouts take to grow?</summary><p>At least six days. The website requires seven days' advance notice to allow a buffer.</p></details>
+        <details><summary>When can I collect my order?</summary><p>Collection can be requested on any day, subject to an agreed collection window. The location is confirmed privately.</p></details>
+        <details><summary>Which days do you deliver?</summary><p>Personal deliveries in selected London areas are usually available Tuesday, Wednesday and Thursday for £2.30 per order.</p></details>
+        <details><summary>Can I order sprouts regularly?</summary><p>You can enquire about weekly or fortnightly arrangements. Automatic subscriptions and billing aren't yet available.</p></details>
+      </div>
+    </div>
+  </section>
 </main>
-<footer class="footer"><div class="shell footer-layout"><a class="wordmark" href="#top">MicroSprouts</a><nav aria-label="Footer links"><a href="#product">Shop</a><a href="#story">Discover</a><a href="#process">Growing</a><a href="#regular">Regular orders</a><a href="#enquire">Contact</a></nav><span>Grown with love and care in London.</span></div><div class="shell footer-bottom"><span>Illustrative product photography. Actual packaging and harvest may vary.</span><a href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer">WhatsApp · 07386853514</a></div></footer>
-
-<div class="mobile-cta"><span id="mobile-product">Week Supply · £9.99</span><a href="#enquire" class="btn btn-dark" data-pack="200" id="mobile-cta-link">Checkout →</a></div>
-</body></html>
+<footer class="footer"><div class="footer-inner"><strong>MicroSprouts · London</strong><span>Grown with love and care.</span><a href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer">WhatsApp 07386853514 ↗</a></div></footer>
+</body>
+</html>
