@@ -62,7 +62,7 @@
     }
   });
 
-  const map = { harvest:'assets/harvest.webp',macro:'assets/macro.webp',tray:'assets/tray.webp' };
+  const map = { seeds:'assets/day0.svg',germination:'assets/day1.svg',macro:'assets/macro.webp',tray:'assets/tray.webp' };
   thumbs.forEach(btn => btn.addEventListener('click', () => {
     const name = btn.dataset.gallery;
     const url = btn.dataset.url || map[name];
