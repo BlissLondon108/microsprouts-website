@@ -112,10 +112,13 @@ try{
  res=await submit({...customer,total_pence:1,unit_amount:1,discount:999});
  check("Sandbox Checkout Session created with fixed prices",res.status===200&&(await res.json()).url.startsWith("https://checkout.stripe.com/"));
  check("All three products provisioned exactly once",products.size===3&&stats.productCreates===3);
- check("Nine recurring and one-time price objects provisioned",prices.size===9&&stats.priceCreates===9);
- check("Every required price lookup key has the right amount",PRODUCT_DEFINITIONS.every(d=>BILLING_FREQUENCIES.every(freq=>{
+ check("Seven new-sale product and delivery prices provisioned",prices.size===7&&stats.priceCreates===7);
+ check("Every reusable one-time and discounted recurring price matches",PRODUCT_DEFINITIONS.every(d=>
+  (d.kind==="delivery"?["once"]:BILLING_FREQUENCIES).every(freq=>{
    const a=prices.get(priceLookupKey(d,freq));
-   return a&&a.currency==="gbp"&&a.unit_amount===d.amount&&(freq==="once"?!a.recurring:a.recurring?.interval_count===(freq==="weekly"?1:2));
+   const expected=freq==="once"?d.amount:d.subscriptionAmount;
+   return a&&a.currency==="gbp"&&a.unit_amount===expected&&
+      (freq==="once"?!a.recurring:a.recurring?.interval_count===(freq==="weekly"?1:2));
  })));
  check("Reusable price ID used instead of inline pricing",sessionForm.has("line_items[0][price]")&&!sessionForm.has("line_items[0][price_data][unit_amount]"));
  check("Client cannot supply their own goods price",sessionForm.get("metadata[total_pence]")==="1998"&&sessionForm.get("line_items[0][quantity]")==="2");
@@ -137,12 +140,31 @@ try{
  check("One-time subtotal discount tracked correctly",sessionForm.get("metadata[total_pence]")==="2398");
  const weekly={...customer,frequency:"weekly",pack:"500",method:"delivery",date:requestedDate(true),postcode:"SE1 1AA"};
  res=await submit(weekly);
- check("Subscription Checkout uses recurring 500g and delivery prices",res.status===200&&sessionForm.get("mode")==="subscription"&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_weekly_v1").id&&sessionForm.get("line_items[1][price]")===prices.get("ms_delivery_london_weekly_v1").id);
- check("Recurring customer metadata and total reflect delivery",sessionForm.get("metadata[total_pence]")==="3628"&&sessionForm.get("subscription_data[metadata][frequency]")==="weekly");
+ check("Weekly subscription uses cheaper 500g pack price and free delivery",
+  res.status===200&&sessionForm.get("mode")==="subscription"&&
+  sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_weekly_v2").id&&
+  !sessionForm.has("line_items[1][price]"));
+ check("Weekly billing totals £30.98 for two Family Packs with complimentary delivery",
+  sessionForm.get("metadata[total_pence]")==="3098"&&
+  sessionForm.get("metadata[delivery_pence]")==="0"&&
+  sessionForm.get("metadata[subscription_savings_pence]")==="300"&&
+  sessionForm.get("subscription_data[metadata][frequency]")==="weekly");
  res=await submit({...weekly,frequency:"fortnightly"});
- check("Fortnightly subscription uses two-week reusable prices",res.status===200&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_fortnightly_v1").id&&sessionForm.get("line_items[1][price]")===prices.get("ms_delivery_london_fortnightly_v1").id);
+ check("Fortnightly subscription has same lower price and free delivery",
+  res.status===200&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_fortnightly_v2").id&&
+  !sessionForm.has("line_items[1][price]")&&sessionForm.get("metadata[total_pence]")==="3098");
  res=await submit({...weekly,code:"SPROUT"});
  check("Promo cannot discount recurring subscription",res.status===400);
+ const weeklySingle={...weekly,pack:"200",quantity:1,frequency:"weekly"};
+ res=await submit(weeklySingle);
+ check("Single Pack weekly subscription costs £8.99 with delivery included",
+   res.status===200&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_200g_weekly_v2").id&&
+   sessionForm.get("metadata[total_pence]")==="899"&&!sessionForm.has("line_items[1][price]"));
+ res=await submit({...weeklySingle,frequency:"fortnightly"});
+ check("Single Pack fortnightly subscription costs £8.99 every two weeks, including delivery",
+   res.status===200&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_200g_fortnightly_v2").id&&
+   sessionForm.get("metadata[total_pence]")==="899"&&!sessionForm.has("line_items[1][price]"));
+
  res=await submit({...customer,email:""});
  check("Contact email required",res.status===400);
  res=await submit({...customer,date:"2020-01-01"});
