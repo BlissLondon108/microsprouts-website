@@ -50,7 +50,7 @@
         <div class="package-options" aria-label="Choose your broccoli sprouts pack">
           <button type="button" class="package-option" data-pack="200" aria-pressed="true">
             <span class="radio-circle" aria-hidden="true"></span>
-            <span class="package-info"><strong class="package-grams">200g</strong><span class="package-title">Week Supply</span><strong class="package-price">£9.99</strong></span>
+            <span class="package-info"><strong class="package-grams">200g</strong><span class="package-title">Single Pack</span><strong class="package-price">£9.99</strong></span>
           </button>
           <button type="button" class="package-option" data-pack="500" aria-pressed="false">
             <span class="radio-circle" aria-hidden="true"></span>
@@ -135,14 +135,14 @@
         <h3>Checkout enquiry</h3>
         <p class="intro">No payment is taken here. Your choices will be prepared as a WhatsApp enquiry.</p>
         <div class="order-form-grid">
-          <div class="field"><label for="pack">Pack size</label><select id="pack"><option value="200">Week Supply · 200g · £9.99</option><option value="500">Family Pack · 500g · £16.99</option></select></div>
+          <div class="field"><label for="pack">Pack size</label><select id="pack"><option value="200">Single Pack · 200g · £9.99</option><option value="500">Family Pack · 500g · £16.99</option></select></div>
           <div class="field"><label for="qty">Quantity</label><input type="number" id="qty" min="1" max="10" value="1" step="1" required></div>
         </div>
-        <div class="field"><label for="frequency">Frequency</label><select id="frequency"><option value="once">One-time</option><option value="weekly">Weekly enquiry (arranged manually)</option><option value="fortnightly">Fortnightly enquiry (arranged manually)</option></select></div>
+        <div class="field"><label for="frequency">Frequency</label><select id="frequency"><option value="once">One-time</option><option value="weekly">Weekly subscription enquiry · £8.99 / £15.49</option><option value="fortnightly">Fortnightly subscription enquiry · £8.99 / £15.49</option></select></div>
         <div class="field"><span class="field-label">How will you receive your sprouts?</span>
           <div class="method-options">
             <label class="method-option"><input type="radio" name="method" value="pickup" checked><strong>Free collection</strong><small>By appointment</small></label>
-            <label class="method-option"><input type="radio" name="method" value="delivery"><strong>London delivery</strong><small>+£2.30 per order</small></label>
+            <label class="method-option"><input type="radio" name="method" value="delivery"><strong>London delivery</strong><small>£2.30 one-time · free on subscriptions</small></label>
           </div>
         </div>
         <div class="order-form-grid">
@@ -150,12 +150,12 @@
           <div class="field" id="postcode-field" hidden><label for="postcode">London postcode</label><input id="postcode" type="text" autocomplete="postal-code" maxlength="9" placeholder="e.g. SE1"></div>
         </div>
         <p class="form-hint" id="datehint">All dates subject to confirmation.</p>
-        <div class="field"><label for="code">Discount code (optional)</label><input id="code" type="text" placeholder="SPROUT" maxlength="20" autocomplete="off"><p class="form-hint" id="promo-hint">SPROUT gives 20% off sprouts on eligible one-time enquiries.</p></div>
+        <div class="field"><label for="code">Discount code (optional)</label><input id="code" type="text" placeholder="SPROUT" maxlength="20" autocomplete="off"><p class="form-hint" id="promo-hint">SPROUT gives 20% off sprouts on eligible one-time enquiries.</p><p class="form-hint">Subscription enquiries: Single Pack £8.99, Family Pack £15.49, with free London delivery. Recurring billing is available through the separate sandbox checkout while testing.</p></div>
         <div class="price-summary">
           <div class="price-row"><span>Sprouts</span><strong id="subtotal">£9.99</strong></div>
           <div class="price-row"><span>Collection / delivery</span><strong id="deliveryfee">FREE</strong></div>
           <div class="price-row" id="discountline" hidden><span>SPROUT discount</span><strong id="discount">−£0.00</strong></div>
-          <div class="price-row total"><span>Indicative total</span><strong id="total">£9.99</strong></div>
+          <div class="price-row total"><span id="enquiry-total-label">Indicative total</span><strong id="total">£9.99</strong></div>
         </div>
         <button class="submit-btn" type="submit">Continue to WhatsApp →</button>
         <p class="form-hint" id="form-message" aria-live="polite">Nothing is reserved or charged until confirmed personally.</p>
