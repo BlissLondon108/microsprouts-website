@@ -23,17 +23,17 @@
     };
     image.onerror = () => {
       if (current !== requestId) return;
-      const fallback = activePack === '500' ? 'assets/family.webp' : 'assets/week.webp';
+      const fallback = activePack === '500' ? 'assets/family-plate.webp' : 'assets/single-plate.webp';
       hero.src = fallback;
-      hero.alt = 'Fresh broccoli sprouts in a clear container';
+      hero.alt = 'Fresh broccoli sprouts arranged on a natural stone plate';
       hero.classList.remove('is-switching');
     };
     image.src = src;
   }
 
   const packLabels = {
-    '200': { name: 'Week Supply', price: '£9.99', image: 'assets/week.webp' },
-    '500': { name: 'Family Pack', price: '£16.99', image: 'assets/family.webp' }
+    '200': { name: 'Single Pack', price: '£9.99', image: 'assets/single-plate.webp' },
+    '500': { name: 'Family Pack', price: '£16.99', image: 'assets/family-plate.webp' }
   };
   function setPack(pack, updateForm = true) {
     if (!packLabels[pack]) return;
@@ -44,7 +44,7 @@
     if (checkout) checkout.dataset.pack = pack;
     thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'));
     const assetKey = pack === '500' ? 'family' : 'week';
-    setPhoto(approved.get(assetKey) || packLabels[pack].image, 'Fresh broccoli sprouts, ' + pack + ' gram ' + packLabels[pack].name + ' option');
+    setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on a stone plate, ' + pack + ' gram ' + packLabels[pack].name + ' option');
     const select = $('pack');
     if (updateForm && select) {
       select.value = pack;
