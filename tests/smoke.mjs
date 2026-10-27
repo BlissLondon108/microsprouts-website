@@ -67,7 +67,7 @@ check("Homepage uses the new Single Pack name with Family Pack preserved",
   html.includes('>Single Pack</span>')&&html.includes('>Family Pack</span>')&&!html.includes('>Week Supply</span>'));
 check("Product hero has replaced the former glass photo with a stone-plate shot",
   html.includes('id="hero-photo" src="assets/single-plate.webp"')&&
-  html.includes('stone plate')&&!html.includes('data-asset="week" src="assets/week.webp"'));
+  html.includes('stone plate')&&!html.includes('id="hero-photo" data-asset="week"'));
 const singlePhoto=path.join(root,"assets/single-plate.webp");
 const familyPhoto=path.join(root,"assets/family-plate.webp");
 check("Matched pack photos exist as distinct WebP assets",
