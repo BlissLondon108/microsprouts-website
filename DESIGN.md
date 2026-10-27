@@ -21,7 +21,7 @@ Do not confuse broccoli sprouts with microgreens or mature broccoli heads.
 3. Product name, concise tagline, short description, selectable 200g / 500g packs, Checkout button and fulfilment summary on the right.
 4. Wide "From Seed to Fresh Sprouts" botanical banner.
 5. Warm cream "From Seed to Harvest" growing timeline with four stages.
-6. Two side-by-side benefit cards.
+6. Two side-by-side benefit cards plus a centred sulforaphane science card.
 7. Customer enquiry form and FAQ below the approved visual composition to preserve actual business functionality.
 
 ## Palette
@@ -57,16 +57,14 @@ These are targets rather than an automated pixel-diff guarantee.
 
 - Selecting 200g or 500g updates pack highlights, hero photograph and the enquiry form.
 - Thumbnails switch the main product image without opening a modal or zoom overlay.
-- Timeline buttons update active state and explanatory text; support arrow keys.
+- Timeline buttons update active state, with keyboard arrow-key support; no extra explanatory line appears on click.
 - Checkout scrolls to the WhatsApp enquiry form. Do not imply payment happens here.
 - Motion is subtle; respect \`prefers-reduced-motion\`.
 - Mobile stacks product photography and purchase controls, switches the growing timeline to a two-column grid, and stacks benefits.
 
 ## Images
 
-Current code uses locally hosted photographs from \`assets/\`, plus selected illustrated growth-stage artwork and a Pexels lifestyle image with a local fallback.
-
-The approved comp's photo-for-photo recreation is **not yet guaranteed**: Day 0, Days 1–2 and Days 3–5 currently use original vector/composited illustrations, and the lifestyle photo is illustrative. Replace these with dedicated, verified photos matching the reference when the exact assets can be published to the repository.
+Current code uses original product images and approved illustrative photographs from \`assets/approved/\`, loaded by \`comp.js\` when its manifest and images are available. Existing images remain safe fallbacks. The visuals are illustrative rather than verified photographs of particular delivered MicroSprouts packs.
 
 Do not falsely label generated/illustrative imagery as a photograph of delivered MicroSprouts packs.
 
@@ -79,3 +77,11 @@ Do not falsely label generated/illustrative imagery as a photograph of delivered
 - Minimum six days' growth; site accepts preferred dates at least seven days ahead.
 - SPROUT promotion: 20% off eligible one-time sprouts orders, delivery excluded.
 - Checkout remains a WhatsApp enquiry, not a payment gateway.
+
+## Additional pages (2026-10-27)
+
+- `sprouts.html` — **More Sprouts**: broccoli, radish, mung bean and leek. Broccoli links to existing priced enquiries; the other varieties have separate WhatsApp availability enquiries without invented prices.
+- `science.html` — **Science of Sprouts**: three independently linked scientific publications, with short summaries. The two link labels in the first two homepage benefit cards were removed. The third benefit card's "Read about the research" link goes to `science.html#sulforaphane`.
+- `pages.css` and `pages.js` support both pages, retaining the MicroSprouts forest-green/cream visual language. Interior mobile navigation must remain accessible.
+- On every page, navigation places **More Sprouts** immediately before **Science of Sprouts**, and the latter can grow as additional research is supplied.
+- Keep species-specific imagery botanically accurate. Abstract letter artwork on new enquiry-only varieties is temporary; do not substitute broccoli imagery for radish, mung bean or leek.
