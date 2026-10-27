@@ -5,7 +5,8 @@ const money=value=>"£"+(value/100).toFixed(2);
 let enabled=false,working=false;
 const pack=el("pack"),qty=el("quantity"),frequency=el("frequency"),date=el("date"),postcode=el("postcode"),code=el("code");
 const method=()=>form.querySelector('input[name="method"]:checked')?.value||"pickup";
-const subtotal=()=>((pack.value==="500")?1699:999)*Number(qty.value||1);
+const basePrice=()=>pack.value==="500"?1699:999;
+const subscriptionPrice=()=>pack.value==="500"?1549:899;
 const isPromo=()=>frequency.value==="once"&&code.value.trim().toUpperCase()==="SPROUT";
 const count=()=>Math.max(1,Math.min(10,Number(qty.value)||1));
 const getValues=()=>({pack:pack.value,quantity:count(),frequency:frequency.value,
@@ -13,30 +14,57 @@ const getValues=()=>({pack:pack.value,quantity:count(),frequency:frequency.value
  code:code.value.trim().toUpperCase(),name:el("name").value.trim(),
  email:el("email").value.trim(),whatsapp:el("whatsapp").value.trim()});
 function update(){
- const goods=((pack.value==="500")?1699:999)*count();
- const fee=method()==="delivery"?230:0;
- const discount=isPromo()?Math.round(goods*.2):0;
- el("subtotal").textContent=money(goods);
- el("deliveryfee").textContent=fee?money(fee):"FREE";
+ const n=count(),base=basePrice(),recurring=frequency.value!=="once";
+ const sproutSubtotal=base*n;
+ const subscriptionSaving=recurring?(base-subscriptionPrice())*n:0;
+ const fee=method()==="delivery"&&!recurring?230:0;
+ const discount=isPromo()?Math.round(sproutSubtotal*.2):0;
+ const total=sproutSubtotal-subscriptionSaving+fee-discount;
+ el("subtotal").textContent=money(sproutSubtotal);
+ el("subscription-savings-row").hidden=!recurring;
+ el("subscription-savings").textContent="−"+money(subscriptionSaving);
+ el("subscription-savings-label").textContent="Subscription saving ("+money(base-subscriptionPrice())+" / pack)";
+ el("deliveryfee").textContent=fee?money(fee):recurring&&method()==="delivery"?"FREE · included":"FREE";
  el("discount-row").hidden=!discount;
  el("discount").textContent="−"+money(discount);
- el("total").textContent=money(goods+fee-discount);
- const recurring=frequency.value!=="once";
- el("total-label").textContent=recurring?"Each billing period":"Total today";
+ el("total").textContent=money(total);
+ el("total-label").textContent=recurring?"Price per "+(frequency.value==="weekly"?"week":"2 weeks"):"Total today";
  el("repeat-summary").textContent=recurring?
-   (frequency.value==="weekly"?"Automatically billed every week.":"Automatically billed every two weeks.")+" Delivery is charged each period if selected.":
-   "A one-time order.";
+   "Automatically billed "+money(total)+(frequency.value==="weekly"?" every week.":" every two weeks.")+
+   " Cancel future renewals via the secure Stripe customer portal.":
+   "A one-time order. You will be charged only once.";
  el("subscription-disclosure").hidden=!recurring;
- el("frequency-note").textContent=recurring?"Recurring charges continue until the subscription is cancelled. Dates and times are arranged separately.":"One-time purchase. You pay once.";
+ el("subscription-perk").hidden=!recurring;
+ el("subscription-delivery-hint").hidden=!recurring;
+ el("frequency-note").textContent=recurring?
+   "Save "+money(base-subscriptionPrice())+" per pack on each order, with free London delivery. "+
+   (frequency.value==="weekly"?"Billed weekly.":"Billed every two weeks."):
+   "One-time purchase. You pay once.";
+ el("delivery-method-price").textContent=recurring?"FREE with your subscription":"£2.30 per one-time delivery";
  el("postcode-field").hidden=method()!=="delivery";
  postcode.required=method()==="delivery";
- el("checkout-message").textContent=enabled?"Your date will be confirmed personally after payment.":"Secure checkout is not enabled yet; no payment will be taken here.";
+ code.disabled=recurring;
+ if(recurring&&code.value.trim())code.value="";
+ el("summary-product-title").textContent=(pack.value==="500"?"Family Pack · 500g":"Single Pack · 200g")+" × "+n;
+ const photo=el("summary-photo");
+ photo.src=pack.value==="500"?"assets/family-plate.webp":"assets/single-plate.webp";
+ photo.alt=(pack.value==="500"?"Family Pack":"Single Pack")+" broccoli sprouts on a stone plate";
+ form.querySelectorAll("[data-pack-choice]").forEach(button=>
+   button.setAttribute("aria-pressed",String(button.dataset.packChoice===pack.value)));
+ el("checkout-message").textContent=enabled?
+   "Your preferred date and exact delivery/collection time are subject to confirmation.":
+   "Secure checkout is not enabled yet; no payment will be taken here.";
  el("pay-button").disabled=!enabled||working;
  el("pay-button").textContent=working?"Connecting to Stripe…":"Continue to secure payment →";
 }
 form.querySelectorAll("input, select").forEach(input=>{
  input.addEventListener("input",update);input.addEventListener("change",update);
 });
+form.querySelectorAll("[data-pack-choice]").forEach(button=>
+ button.addEventListener("click",()=>{
+   pack.value=button.dataset.packChoice;
+   pack.dispatchEvent(new Event("change",{bubbles:true}));
+ }));
 const chosen=new URL(location.href).searchParams;
 if(["200","500"].includes(chosen.get("pack")))pack.value=chosen.get("pack");
 if(chosen.get("cancelled")==="1")el("checkout-state").textContent="Payment cancelled. You have not been charged here. You can review your details below.";
