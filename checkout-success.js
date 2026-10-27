@@ -29,6 +29,7 @@ if(!id||!/^cs_(?:test_|live_)[A-Za-z0-9_]+$/.test(id)){
   lines.push("","Please can we arrange the exact date and time?");
   $("paid-whatsapp").href="https://wa.me/447386853514?text="+encodeURIComponent(lines.join("\n"));
   $("paid-details").hidden=false;
+  $("manage-subscription-link").hidden=data.frequency==="once";
  }catch{
   $("payment-title").textContent="Verification unavailable";
   status.textContent="We couldn't check Stripe just now. Please try reloading the page or contact MicroSprouts. Do not pay again without checking.";
