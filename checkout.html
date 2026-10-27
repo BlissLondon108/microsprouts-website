@@ -48,9 +48,10 @@
 <div class="field"><label for="email">Email address <span aria-label="required">*</span></label><input id="email" type="email" autocomplete="email" maxlength="254" required><p class="checkout-hint">Required so we can contact you about your order.</p></div>
 <div class="field"><label for="whatsapp">WhatsApp number (optional)</label><input id="whatsapp" type="tel" autocomplete="tel" maxlength="28" placeholder="+44 7…"></div>
 <p class="checkout-hint">We will contact you to agree the final collection or delivery window. Your preferred date is not a guaranteed booking.</p>
-<p class="checkout-hint" id="subscription-disclosure" hidden>Subscriptions are charged automatically at the displayed price every week or every two weeks, including the delivery charge if selected. You can manage or cancel your subscription via Stripe's customer portal once enabled. The first requested fulfilment date is subject to confirmation.</p>
+<p class="checkout-hint" id="subscription-disclosure" hidden>Subscriptions are charged automatically at the displayed price every week or every two weeks, including the £2.30 delivery charge each period if selected. You can manage your payment method or cancel future renewal through Stripe's secure customer portal. The first requested fulfilment date is subject to confirmation.</p>
 <button id="pay-button" class="submit-btn" type="submit" disabled>Preparing secure checkout…</button>
 <p class="form-hint" id="checkout-message" aria-live="polite">Payment is currently unavailable while Stripe is being configured.</p>
+<p class="checkout-hint">Already subscribed? <a href="manage-subscription.html">Manage or cancel your subscription through Stripe</a>.</p>
 </form>
 <aside class="checkout-summary" aria-label="Order summary">
 <h2 class="serif">Order summary</h2>
