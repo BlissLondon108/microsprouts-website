@@ -32,13 +32,13 @@
     <section class="hero-content" id="products" aria-labelledby="product-heading">
       <div class="product-gallery" aria-label="Broccoli sprouts gallery">
         <div class="gallery-main">
-          <img id="hero-photo" src="assets/week.webp" width="1448" height="540" alt="Fresh broccoli sprouts in a clear glass-like container on a deep green studio background" fetchpriority="high">
+          <img id="hero-photo" data-asset="week" src="assets/week.webp" width="1448" height="540" alt="Fresh broccoli sprouts in a clear glass-like container on a deep green studio background" fetchpriority="high">
         </div>
         <div class="gallery-thumbs" id="gallery-thumbs">
-          <button class="gallery-thumb" type="button" data-gallery="seeds" aria-label="View broccoli seeds ready to grow" aria-pressed="false"><img src="assets/day0.svg" alt="Broccoli seeds falling onto a pile" loading="lazy"></button>
-          <button class="gallery-thumb" type="button" data-gallery="germination" aria-label="View broccoli seeds germinating" aria-pressed="false"><img src="assets/day1.svg" alt="Small shoots emerging from broccoli seeds" loading="lazy"></button>
-          <button class="gallery-thumb" type="button" data-gallery="macro" aria-label="View a close-up of broccoli sprouts" aria-pressed="false"><img src="assets/macro.webp" alt="Fine stems and small paired broccoli sprout leaves" loading="lazy"></button>
-          <button class="gallery-thumb" type="button" data-gallery="woman" data-url="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" aria-label="View a lifestyle image of a woman enjoying fresh greens" aria-pressed="false"><img src="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=500" alt="Smiling woman enjoying freshly prepared greens" loading="lazy" onerror="this.onerror=null;this.src='assets/harvest.webp'"></button>
+          <button class="gallery-thumb" type="button" data-gallery="seeds" data-asset="seeds" aria-label="View broccoli seeds ready to grow" aria-pressed="false"><img src="assets/day0.svg" alt="Broccoli seeds falling onto a pile" loading="lazy"></button>
+          <button class="gallery-thumb" type="button" data-gallery="germination" data-asset="germination" aria-label="View broccoli seeds germinating" aria-pressed="false"><img src="assets/day1.svg" alt="Small shoots emerging from broccoli seeds" loading="lazy"></button>
+          <button class="gallery-thumb" type="button" data-gallery="macro" data-asset="macro" aria-label="View a close-up of broccoli sprouts" aria-pressed="false"><img src="assets/macro.webp" alt="Fine stems and small paired broccoli sprout leaves" loading="lazy"></button>
+          <button class="gallery-thumb" type="button" data-gallery="woman" data-asset="woman" data-url="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" aria-label="View a lifestyle image of a woman enjoying fresh greens" aria-pressed="false"><img src="https://images.pexels.com/photos/5622196/pexels-photo-5622196.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=500" alt="Smiling woman enjoying freshly prepared greens" loading="lazy" onerror="this.onerror=null;this.src='assets/harvest.webp'"></button>
         </div>
       </div>
 
@@ -78,22 +78,22 @@
     <p class="growth-intro">A simple growing process, taking at least six days.</p>
     <div class="growth-grid" role="group" aria-label="Broccoli sprout growing stages">
       <button type="button" class="growth-item" data-stage="0" aria-pressed="true" aria-label="Day zero: broccoli seeds prepared">
-        <span class="growth-image"><img src="assets/day0.svg" alt="Brown broccoli seeds falling onto a dark green surface" loading="lazy"></span>
+        <span class="growth-image"><img data-asset="seeds" src="assets/day0.svg" alt="Brown broccoli seeds falling onto a dark green surface" loading="lazy"></span>
         <span class="day-badge">Day 0</span>
         <span class="growth-caption">Broccoli seeds</span>
       </button>
       <button type="button" class="growth-item" data-stage="1" aria-pressed="false" aria-label="Day one to two: seeds start to sprout">
-        <span class="growth-image"><img src="assets/day1.svg" alt="Tiny broccoli sprouts emerging from seeds" loading="lazy"></span>
+        <span class="growth-image"><img data-asset="germination" src="assets/day1.svg" alt="Tiny broccoli sprouts emerging from seeds" loading="lazy"></span>
         <span class="day-badge">Day 1–2</span>
         <span class="growth-caption">Seeds begin to sprout</span>
       </button>
       <button type="button" class="growth-item" data-stage="2" aria-pressed="false" aria-label="Day three to five: broccoli sprouts grow in a jar">
-        <span class="growth-image"><img src="assets/jar.svg" alt="Growing broccoli sprouts inside a clear glass jar" loading="lazy"></span>
+        <span class="growth-image"><img data-asset="jar" src="assets/jar.svg" alt="Growing broccoli sprouts inside a clear glass jar" loading="lazy"></span>
         <span class="day-badge">Day 3–5</span>
         <span class="growth-caption">Sprouts grow and develop</span>
       </button>
       <button type="button" class="growth-item" data-stage="3" aria-pressed="false" aria-label="Day six and later: fresh broccoli sprouts ready for harvest">
-        <span class="growth-image"><img src="assets/week.webp" alt="A full tray of freshly grown broccoli sprouts" loading="lazy"></span>
+        <span class="growth-image"><img data-asset="week" src="assets/week.webp" alt="A full tray of freshly grown broccoli sprouts" loading="lazy"></span>
         <span class="day-badge">Day 6+</span>
         <span class="growth-caption">Fresh broccoli sprouts</span>
       </button>
@@ -103,13 +103,13 @@
 
   <section class="benefits-section" id="benefits" aria-label="Broccoli sprouts and everyday goodness">
     <article class="benefit-card">
-      <img class="benefit-bg" src="assets/macro.webp" alt="" loading="lazy">
+      <img class="benefit-bg" data-asset="macro" src="assets/macro.webp" alt="" loading="lazy">
       <div class="benefit-eyebrow">WHY BROCCOLI SPROUTS ARE GOOD</div>
       <h3 class="serif">Naturally rich in<br>glucoraphanin</h3>
       <p>Broccoli sprouts contain glucoraphanin, a plant compound that can be converted into sulforaphane.</p>
     </article>
     <article class="benefit-card">
-      <img class="benefit-bg" src="assets/toast.webp" alt="" loading="lazy">
+      <img class="benefit-bg" data-asset="toast" src="assets/toast.webp" alt="" loading="lazy">
       <div class="benefit-eyebrow">EVERYDAY GOODNESS</div>
       <h3 class="serif">An easy way to<br>enjoy your meals</h3>
       <p>Add a fresh, peppery crunch to sandwiches, salads and other favourites.</p>
