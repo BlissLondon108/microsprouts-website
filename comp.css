@@ -297,3 +297,12 @@ a{color:inherit}
   background:linear-gradient(90deg,#eaf0dd 0%,#eaf0ddfa 61%,#eaf0dddb 85%,#eaf0dd80 100%);
  }
 }
+
+/* Five-item navigation: keep More Sprouts and Science of Sprouts readable before the mobile menu. */
+@media(min-width:771px){
+ .comp-nav-links{gap:clamp(15px,2vw,28px)}
+}
+@media(min-width:771px) and (max-width:920px){
+ .comp-nav-links a{font-size:13px}
+ .comp-nav{padding-inline:clamp(18px,3vw,35px)}
+}
