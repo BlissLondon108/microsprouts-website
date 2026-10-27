@@ -43,6 +43,14 @@ res=await api("/index.html");
 check("Public static homepage is served unmodified",await res.text()==="asset fetched");
 const products=new Map(),prices=new Map(),coupons=new Map(),portals=new Map();
 let deliberatelyFailPriceLookups=false;
+ deliberatelyFailPortal=true;
+ res=await submit(customer);
+ check("Unavailable customer portal does not block an otherwise valid checkout",
+   res.status===200&&(await res.json()).url.startsWith("https://checkout.stripe.com/"));
+ res=await api("/api/checkout/portal",{},envOn);
+ check("Portal setup error is isolated to customer portal, not payments",res.status===502);
+ deliberatelyFailPortal=false;
+let deliberatelyFailPortal=false;
 let session,sessionForm,stats={productCreates:0,priceCreates:0,couponCreates:0,portalCreates:0,checkouts:0};
 const originalFetch=globalThis.fetch;
 function parseForm(init){return new URLSearchParams(init.body)}
@@ -85,8 +93,11 @@ async function mockStripe(input,init={}){
     duration:field(p,"duration"),applies_to:{products:[field(p,"applies_to[products][0]"),field(p,"applies_to[products][1]")]}};
   coupons.set(item.id,item);return response(item);
  }
- if(method==="GET"&&path==="billing_portal/configurations")
+ if(method==="GET"&&path==="billing_portal/configurations"){
+  if(deliberatelyFailPortal)
+    return response({error:{code:"account_portal_unavailable"}},403);
   return response({data:[...portals.values()]});
+ }
  if(method==="POST"&&path==="billing_portal/configurations"){
   stats.portalCreates++;
   const item={id:"bpc_mock",name:field(p,"name"),active:true,login_page:{
