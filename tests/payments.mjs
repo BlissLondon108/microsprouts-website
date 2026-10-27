@@ -1,84 +1,141 @@
 import assert from "node:assert/strict";
-import { webcrypto } from "node:crypto";
+import {webcrypto} from "node:crypto";
 import worker from "../worker.js";
-
-globalThis.crypto ||= webcrypto;
+import {PRODUCT_DEFINITIONS,BILLING_FREQUENCIES,priceLookupKey,PROMO_COUPON_ID} from "../stripe-catalog.js";
+globalThis.crypto||=webcrypto;
 const base="https://microsprouts.bhaktivedanta-london.workers.dev";
 const envOff={ASSETS:{fetch:async()=>new Response("asset fetched")}};
-const envOn={...envOff,STRIPE_SECRET_KEY:"sk_test_mock_value",PAYMENTS_ENABLED:"true",STRIPE_WEBHOOK_SECRET:"whsec_mock"};
+const envOn={...envOff,PAYMENTS_ENABLED:"true",STRIPE_SECRET_KEY:"sk_test_mock_value",STRIPE_WEBHOOK_SECRET:"whsec_mock"};
 let checks=0;
-function check(label,truth){assert.ok(truth,label);console.log("✓ "+label);checks++}
-async function api(path,init={},env=envOff){return worker.fetch(new Request(base+path,init),env)}
-async function checkout(body,env=envOn){return api("/api/checkout/session",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)},env)}
-function validDate(delivery=false){
+function check(label,truth){assert.ok(truth,label);checks++;console.log("✓ "+label)}
+function response(value,status=200){return new Response(JSON.stringify(value),{status,headers:{"content-type":"application/json"}})}
+const api=(path,init={},env=envOff)=>worker.fetch(new Request(base+path,init),env);
+const submit=(data,env=envOn)=>api("/api/checkout/session",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)},env);
+function requestedDate(delivery=false){
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
- const date=new Date([parts.year,parts.month,parts.day].join("-")+"T12:00:00Z");
- date.setUTCDate(date.getUTCDate()+9);
- if(delivery)while(![2,3,4].includes(date.getUTCDay()))date.setUTCDate(date.getUTCDate()+1);
- return date.toISOString().slice(0,10);
+ const dt=new Date([parts.year,parts.month,parts.day].join("-")+"T12:00:00Z");
+ dt.setUTCDate(dt.getUTCDate()+9);
+ if(delivery)while(![2,3,4].includes(dt.getUTCDay()))dt.setUTCDate(dt.getUTCDate()+1);
+ return dt.toISOString().slice(0,10);
 }
-const customer={pack:"200",quantity:2,frequency:"once",method:"pickup",date:validDate(),postcode:"",code:"",name:"Test Customer",email:"test@example.com",whatsapp:""};
-let resp=await api("/api/checkout/status");
-let state=await resp.json();
-check("Checkout disabled until explicitly configured",!state.enabled&&state.mode==="not-configured");
-resp=await checkout(customer,envOff);
-check("No payments accepted without Stripe key and enable flag",resp.status===503);
-resp=await api("/index.html",{},envOff);
-check("Original static storefront remains accessible",await resp.text()==="asset fetched");
-let captured;
+const customer={pack:"200",quantity:2,frequency:"once",method:"pickup",date:requestedDate(),
+ postcode:"",code:"",name:"Test Customer",email:"test@example.com",whatsapp:""};
+let res=await api("/api/checkout/status");
+check("Checkout remains off without sandbox runtime settings",(await res.json()).enabled===false);
+res=await submit(customer,envOff);
+check("Missing test credentials prevents any checkout",res.status===503);
+res=await api("/index.html");
+check("Public static homepage is served unmodified",await res.text()==="asset fetched");
+const products=new Map(),prices=new Map(),coupons=new Map(),portals=new Map();
+let session,sessionForm,stats={productCreates:0,priceCreates:0,couponCreates:0,portalCreates:0,checkouts:0};
 const originalFetch=globalThis.fetch;
-globalThis.fetch=async(url,init={})=>{
- captured={url,init,params:new URLSearchParams(init.body)};
- return new Response(JSON.stringify({mode:captured.params.get("mode"),
-   url:"https://checkout.stripe.com/c/pay/cs_test_mock"}),{status:200,headers:{"content-type":"application/json"}});
-};
+function parseForm(init){return new URLSearchParams(init.body)}
+const field=(p,k)=>p.get(k);
+const portalLogin="https://billing.stripe.com/p/login/test_microsprouts";
+async function mockStripe(input,init={}){
+ const u=new URL(input),path=u.pathname.replace(/^\/v1\//,""),method=init.method||"GET";
+ const p=init.body?parseForm(init):null;
+ if(method==="GET"&&path.startsWith("products/")){
+  const value=products.get(decodeURIComponent(path.slice("products/".length)));
+  return value?response(value):response({error:{message:"Not found"}},404);
+ }
+ if(method==="POST"&&path==="products"){
+  stats.productCreates++;
+  const item={id:field(p,"id"),name:field(p,"name"),active:true,type:field(p,"type"),
+    shippable:field(p,"shippable")==="true"};
+  products.set(item.id,item);
+  return response(item);
+ }
+ if(method==="GET"&&path==="prices"){
+  return response({data:[...prices.values()].filter(v=>v.lookup_key===u.searchParams.get("lookup_keys[]"))});
+ }
+ if(method==="POST"&&path==="prices"){
+  stats.priceCreates++;
+  const item={id:"price_mock_"+stats.priceCreates,product:field(p,"product"),active:true,
+    currency:field(p,"currency"),unit_amount:Number(field(p,"unit_amount")),
+    lookup_key:field(p,"lookup_key"),recurring:field(p,"recurring[interval]")?
+      {interval:field(p,"recurring[interval]"),interval_count:Number(field(p,"recurring[interval_count]"))}:null};
+  prices.set(item.lookup_key,item);return response(item);
+ }
+ if(method==="GET"&&path.startsWith("coupons/")){
+  const item=coupons.get(decodeURIComponent(path.slice("coupons/".length)));
+  return item?response(item):response({error:{message:"Not found"}},404);
+ }
+ if(method==="POST"&&path==="coupons"){
+  stats.couponCreates++;
+  const item={id:field(p,"id"),valid:true,percent_off:Number(field(p,"percent_off")),
+    duration:field(p,"duration"),applies_to:{products:[field(p,"applies_to[products][0]"),field(p,"applies_to[products][1]")]}};
+  coupons.set(item.id,item);return response(item);
+ }
+ if(method==="GET"&&path==="billing_portal/configurations")
+  return response({data:[...portals.values()]});
+ if(method==="POST"&&path==="billing_portal/configurations"){
+  stats.portalCreates++;
+  const item={id:"bpc_mock",name:field(p,"name"),active:true,login_page:{
+    enabled:field(p,"login_page[enabled]")==="true",url:portalLogin
+  },features:{subscription_cancel:{enabled:field(p,"features[subscription_cancel][enabled]")==="true"},
+    payment_method_update:{enabled:field(p,"features[payment_method_update][enabled]")==="true"}}};
+  portals.set(item.id,item);return response(item);
+ }
+ if(method==="POST"&&path==="checkout/sessions"){
+  stats.checkouts++;sessionForm=p;
+  return response({mode:field(p,"mode"),url:"https://checkout.stripe.com/c/pay/cs_test_mock"});
+ }
+ if(method==="GET"&&path==="checkout/sessions/cs_test_example")
+  return response(session);
+ return response({error:{message:"Unexpected test Stripe path: "+method+" "+path}},404);
+}
+globalThis.fetch=mockStripe;
 try{
- resp=await checkout({...customer,total_pence:1,unit_amount:1,discount:999});
- check("Sandbox accepts server-priced guest order",resp.status===200);
- let payload=await resp.json();
- check("Checkout URL is hosted on Stripe",payload.url.startsWith("https://checkout.stripe.com/"));
- check("Server sets correct 200g price and quantity",captured.params.get("line_items[0][price_data][unit_amount]")==="999"&&captured.params.get("line_items[0][quantity]")==="2");
- check("Server ignores forged client prices",!captured.init.body.toString().includes("unit_amount=1")&&captured.params.get("metadata[total_pence]")==="1998");
- check("Email and customer details copied to Stripe",captured.params.get("customer_email")==="test@example.com"&&captured.params.get("metadata[name]")==="Test Customer");
- check("One-time flow uses payment mode",captured.params.get("mode")==="payment");
- check("One-time flow omits subscription-only option",!captured.params.has("payment_method_collection"));
- const disabled=await checkout({...customer,email:""});
- check("Email required before Stripe session",disabled.status===400);
- const tooSoon=await checkout({...customer,date:"2020-01-01"});
- check("Minimum lead time enforced on backend",tooSoon.status===400);
- const invalidDelivery=await checkout({...customer,method:"delivery",date:validDate(true),postcode:"not a postcode"});
- check("Delivery postcode validated on backend",invalidDelivery.status===400);
- const badCoupon=await checkout({...customer,code:"FREE"});
- check("Only official promo supported",badCoupon.status===400);
- resp=await checkout({...customer,quantity:3,code:"SPROUT"});
- check("One-time discount checkout accepted",resp.status===200);
- check("Server calculates exact 20% discount across pack subtotal",captured.params.get("line_items[0][price_data][unit_amount]")==="2398"&&captured.params.get("line_items[0][quantity]")==="1");
- const weekly={...customer,frequency:"weekly",method:"delivery",date:validDate(true),postcode:"SE1 1AA"};
- resp=await checkout(weekly);
- check("Weekly subscription checkout accepted",resp.status===200);
- check("Weekly recurring Stripe prices and delivery fee",captured.params.get("mode")==="subscription"&&captured.params.get("line_items[0][price_data][recurring][interval_count]")==="1"&&captured.params.get("line_items[1][price_data][recurring][interval_count]")==="1"&&captured.params.get("line_items[1][price_data][unit_amount]")==="230");
- resp=await checkout({...weekly,frequency:"fortnightly"});
- check("Fortnightly billing uses two-week interval",resp.status===200&&captured.params.get("line_items[0][price_data][recurring][interval_count]")==="2"&&captured.params.get("line_items[1][price_data][recurring][interval_count]")==="2");
- resp=await checkout({...weekly,code:"SPROUT"});
- check("Promotion rejected on subscriptions",resp.status===400);
- let session={
-   payment_status:"paid",amount_total:1998,currency:"gbp",client_reference_id:"sample-reference",
-   metadata:{total_pence:"1998",pack:"200",quantity:"2",frequency:"once",
-    method:"pickup",preferred_date:validDate(),name:"Test Customer",postcode:""}
- };
- globalThis.fetch=async()=>new Response(JSON.stringify(session),{status:200,headers:{"content-type":"application/json"}});
- resp=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
- payload=await resp.json();
- check("Paid Stripe session creates customer-facing confirmation",resp.status===200&&payload.paid&&payload.reference==="sample-reference");
+ res=await submit({...customer,total_pence:1,unit_amount:1,discount:999});
+ check("Sandbox Checkout Session created with fixed prices",res.status===200&&(await res.json()).url.startsWith("https://checkout.stripe.com/"));
+ check("All three products provisioned exactly once",products.size===3&&stats.productCreates===3);
+ check("Nine recurring and one-time price objects provisioned",prices.size===9&&stats.priceCreates===9);
+ check("Every required price lookup key has the right amount",PRODUCT_DEFINITIONS.every(d=>BILLING_FREQUENCIES.every(freq=>{
+   const a=prices.get(priceLookupKey(d,freq));
+   return a&&a.currency==="gbp"&&a.unit_amount===d.amount&&(freq==="once"?!a.recurring:a.recurring?.interval_count===(freq==="weekly"?1:2));
+ })));
+ check("Reusable price ID used instead of inline pricing",sessionForm.has("line_items[0][price]")&&!sessionForm.has("line_items[0][price_data][unit_amount]"));
+ check("Client cannot supply their own goods price",sessionForm.get("metadata[total_pence]")==="1998"&&sessionForm.get("line_items[0][quantity]")==="2");
+ check("Coupon restricted to sprouts products",coupons.get(PROMO_COUPON_ID)?.applies_to?.products?.every(id=>id!=="prod_microsprouts_delivery_london"));
+ check("Customer portal login and cancellation enabled",portals.get("bpc_mock")?.login_page?.enabled&&portals.get("bpc_mock")?.features?.subscription_cancel?.enabled);
+ res=await api("/api/checkout/portal",{},envOn);
+ check("Customer portal is accessible through secure Stripe login",(await res.json()).url===portalLogin);
+ const snapshot={...stats};
+ res=await submit({...customer,quantity:1});
+ check("Repeat checkout doesn't create duplicate products/prices",res.status===200&&stats.productCreates===snapshot.productCreates&&stats.priceCreates===snapshot.priceCreates&&stats.portalCreates===snapshot.portalCreates);
+ check("Standard one-time purchase has pack quantity",sessionForm.get("mode")==="payment"&&sessionForm.get("line_items[0][quantity]")==="1");
+ res=await submit({...customer,quantity:3,code:"SPROUT"});
+ check("One-time SPROUT applies product-only coupon, not adjusted custom price",res.status===200&&sessionForm.get("discounts[0][coupon]")===PROMO_COUPON_ID&&sessionForm.get("line_items[0][quantity]")==="3"&&sessionForm.has("line_items[0][price]"));
+ check("One-time subtotal discount tracked correctly",sessionForm.get("metadata[total_pence]")==="2398");
+ const weekly={...customer,frequency:"weekly",pack:"500",method:"delivery",date:requestedDate(true),postcode:"SE1 1AA"};
+ res=await submit(weekly);
+ check("Subscription Checkout uses recurring 500g and delivery prices",res.status===200&&sessionForm.get("mode")==="subscription"&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_weekly_v1").id&&sessionForm.get("line_items[1][price]")===prices.get("ms_delivery_london_weekly_v1").id);
+ check("Recurring customer metadata and total reflect delivery",sessionForm.get("metadata[total_pence]")==="3628"&&sessionForm.get("subscription_data[metadata][frequency]")==="weekly");
+ res=await submit({...weekly,frequency:"fortnightly"});
+ check("Fortnightly subscription uses two-week reusable prices",res.status===200&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_fortnightly_v1").id&&sessionForm.get("line_items[1][price]")===prices.get("ms_delivery_london_fortnightly_v1").id);
+ res=await submit({...weekly,code:"SPROUT"});
+ check("Promo cannot discount recurring subscription",res.status===400);
+ res=await submit({...customer,email:""});
+ check("Contact email required",res.status===400);
+ res=await submit({...customer,date:"2020-01-01"});
+ check("Seven-day advance notice enforced",res.status===400);
+ res=await submit({...customer,method:"delivery",date:requestedDate(true),postcode:"invalid"});
+ check("Delivery postcode validated",res.status===400);
+ session={payment_status:"paid",amount_total:1998,currency:"gbp",client_reference_id:"test-order-123",
+  metadata:{total_pence:"1998",pack:"200",quantity:"2",frequency:"once",method:"pickup",
+    preferred_date:requestedDate(),name:"Test Customer",postcode:""}};
+ res=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
+ check("Paid Stripe session alone creates successful order display",(await res.json()).reference==="test-order-123");
  session={...session,payment_status:"unpaid"};
- resp=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
- check("Unpaid session cannot reach confirmation",(await resp.json()).paid===false);
+ res=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
+ check("Unpaid Stripe sessions never confirm",(await res.json()).paid===false);
  session={...session,payment_status:"paid",amount_total:1};
- resp=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
- check("Total mismatch blocks paid confirmation",resp.status===409);
- resp=await api("/api/checkout/verify?session_id=INVALID",{},envOn);
- check("Invalid session IDs rejected",resp.status===400);
- resp=await api("/api/stripe/webhook",{method:"POST",headers:{"stripe-signature":"t=1,v1=incorrect"},body:"{}"},envOn);
- check("Webhook rejects invalid signatures",resp.status===400);
+ res=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
+ check("Incorrect paid total is rejected",res.status===409);
+ res=await api("/api/checkout/verify?session_id=INVALID",{},envOn);
+ check("Malformed Stripe session IDs cannot verify",res.status===400);
+ res=await api("/api/stripe/webhook",{method:"POST",headers:{"stripe-signature":"t=1,v1=bad"},body:"{}"},envOn);
+ check("Unsigned or outdated webhook messages are rejected",res.status===400);
 }finally{globalThis.fetch=originalFetch}
-console.log("\nStripe sandbox checkout tests passed: "+checks);
+console.log("\nStripe catalogue, recurring billing and portal regression tests: "+checks+" passed.");
