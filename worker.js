@@ -198,7 +198,12 @@ export default {
     const path=new URL(request.url).pathname;
     if(path==="/api/checkout/status"&&request.method==="GET")
       return json({enabled:ready(env),mode:ready(env)?"test":"not-configured",
-        minimum_date:minimumDate()});
+        minimum_date:minimumDate(),
+        checks:{
+          payment_toggle_enabled:env.PAYMENTS_ENABLED==="true",
+          sandbox_key_available:typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_"),
+          webhook_secret_available:typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")
+        }});
     if(path==="/api/checkout/session"&&request.method==="POST")return createSession(request,env);
     if(path==="/api/checkout/verify"&&request.method==="GET")return verifySession(request,env);
     if(path==="/api/checkout/portal"&&request.method==="GET")return getPortalLogin(env);
