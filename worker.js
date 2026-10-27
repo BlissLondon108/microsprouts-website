@@ -1,0 +1,195 @@
+/* MicroSprouts server-side Stripe Checkout API. Cloudflare Worker, no secrets in source.
+ * Set STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET and PAYMENTS_ENABLED in Worker secrets.
+ * With PAYMENTS_ENABLED unset, storefront remains enquiry-only and Stripe sessions cannot start.
+ */
+const PRICE_PENCE = Object.freeze({ "200":999, "500":1699 });
+const DELIVERY_PENCE = 230;
+const WHATSAPP = "447386853514";
+const GOOD_FREQUENCIES = new Set(["once","weekly","fortnightly"]);
+const SESS_RE = /^cs_(?:test_|live_)[A-Za-z0-9_]+$/;
+const json = (data, status=200) => new Response(JSON.stringify(data),{
+  status, headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store",
+    "x-content-type-options":"nosniff","referrer-policy":"no-referrer"}
+});
+const issue = (message,status=400) => json({error:message},status);
+const londonDay = (instant=new Date()) => {
+  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-GB",{
+    timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"
+  }).formatToParts(instant).filter(x=>x.type!=="literal").map(x=>[x.type,x.value]));
+  return parts.year+"-"+parts.month+"-"+parts.day;
+};
+const minimumDate = () => {
+  const day=londonDay();
+  const d=new Date(day+"T12:00:00Z");
+  d.setUTCDate(d.getUTCDate()+7);
+  return d.toISOString().slice(0,10);
+};
+const validRequestedDate=(value,delivery)=> {
+  if(typeof value!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(value)||value<minimumDate())return false;
+  const d=new Date(value+"T12:00:00Z");
+  return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===value&&(!delivery||[2,3,4].includes(d.getUTCDay()));
+};
+const validPostcode = str => /^(?:GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i.test(str);
+const stripeRequest = async(env,path,options={})=>{
+  const response=await fetch("https://api.stripe.com/v1/"+path,{
+    ...options,
+    headers:{"authorization":"Bearer "+env.STRIPE_SECRET_KEY,
+      ...options.headers}
+  });
+  const raw=await response.text();
+  let parsed;
+  try{parsed=JSON.parse(raw)}catch{parsed={error:{message:"Stripe returned an invalid response."}}}
+  if(!response.ok){
+    const failure=new Error(parsed.error?.message||"Stripe request failed");
+    failure.stripeStatus=response.status;
+    throw failure;
+  }
+  return parsed;
+};
+const ready=env=>env.PAYMENTS_ENABLED==="true"&&typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_");
+const put=(params,key,value)=>params.append(key,String(value));
+const createSession=async(request,env)=>{
+  if(!ready(env))return issue("Secure Stripe sandbox checkout is being configured. Please use the existing enquiry form for now.",503);
+  if(request.headers.get("content-type")?.split(";")[0]!=="application/json")return issue("Send JSON.");
+  const length=Number(request.headers.get("content-length")||0);
+  if(length>8192)return issue("Request too large.",413);
+  let input;
+  try{const text=await request.text();if(text.length>8192)return issue("Request too large.",413);input=JSON.parse(text)}
+  catch{return issue("Invalid checkout details.")}
+  if(!input||typeof input!=="object"||Array.isArray(input))return issue("Invalid checkout details.");
+  const pack=String(input.pack);
+  const count=Number(input.quantity);
+  const frequency=String(input.frequency||"once");
+  const method=String(input.method||"");
+  const delivery=method==="delivery";
+  const customerName=String(input.name||"").trim();
+  const email=String(input.email||"").trim();
+  const whatsapp=String(input.whatsapp||"").trim();
+  const date=String(input.date||"");
+  const postcode=String(input.postcode||"").trim().toUpperCase().replace(/\s+/g," ");
+  const promo=String(input.code||"").trim().toUpperCase();
+  if(!Object.hasOwn(PRICE_PENCE,pack)||!Number.isInteger(count)||count<1||count>10||!GOOD_FREQUENCIES.has(frequency))return issue("Choose a valid pack, quantity and frequency.");
+  if(method!=="pickup"&&!delivery)return issue("Choose collection or delivery.");
+  if(customerName.length<2||customerName.length>100||!/^.{2,100}$/u.test(customerName))return issue("Please enter your full name.");
+  if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return issue("Enter a valid email address.");
+  if(whatsapp&&(whatsapp.length>28||!/^\+?[\d\s()\-]{7,28}$/.test(whatsapp)))return issue("Please check your WhatsApp number.");
+  if(!validRequestedDate(date,delivery))return issue("Choose a valid date at least seven days ahead; delivery is usually Tuesday–Thursday.");
+  if(delivery&&!validPostcode(postcode))return issue("Enter a valid UK postcode for delivery.");
+  if(promo&&promo!=="SPROUT")return issue("That promotional code is not recognised.");
+  if(promo&&frequency!=="once")return issue("SPROUT applies only to one-time orders.");
+
+  const amount=PRICE_PENCE[pack],subtotal=amount*count;
+  const discounted=promo==="SPROUT"&&frequency==="once";
+  const chargedGoods=discounted?subtotal-Math.round(subtotal*.2):subtotal;
+  const recurring=frequency==="weekly"?{interval:"week",interval_count:1}:frequency==="fortnightly"?{interval:"week",interval_count:2}:null;
+  const form=new URLSearchParams();
+  const siteOrigin=new URL(request.url).origin;
+  put(form,"mode",recurring?"subscription":"payment");
+  put(form,"success_url",siteOrigin+"/checkout-success.html?session_id={CHECKOUT_SESSION_ID}");
+  put(form,"cancel_url",siteOrigin+"/checkout.html?cancelled=1");
+  put(form,"customer_email",email);
+  put(form,"client_reference_id",crypto.randomUUID());
+  put(form,"billing_address_collection","auto");
+  put(form,"payment_method_collection","always");
+  put(form,"locale","en-GB");
+  put(form,"line_items[0][price_data][currency]","gbp");
+  put(form,"line_items[0][price_data][product_data][name]","MicroSprouts broccoli sprouts "+pack+"g");
+  put(form,"line_items[0][price_data][product_data][description]",discounted?"SPROUT 20% discount included":"Fresh broccoli sprouts, grown in London");
+  put(form,"line_items[0][price_data][unit_amount]",discounted?chargedGoods:amount);
+  put(form,"line_items[0][quantity]",discounted?1:count);
+  if(recurring){
+    put(form,"line_items[0][price_data][recurring][interval]",recurring.interval);
+    put(form,"line_items[0][price_data][recurring][interval_count]",recurring.interval_count);
+  }
+  if(delivery){
+    put(form,"line_items[1][price_data][currency]","gbp");
+    put(form,"line_items[1][price_data][product_data][name]","London local delivery");
+    put(form,"line_items[1][price_data][unit_amount]",DELIVERY_PENCE);
+    put(form,"line_items[1][quantity]",1);
+    if(recurring){
+      put(form,"line_items[1][price_data][recurring][interval]",recurring.interval);
+      put(form,"line_items[1][price_data][recurring][interval_count]",recurring.interval_count);
+    }
+  }
+  const metadata={name:customerName,email,whatsapp,pack,quantity:String(count),
+    frequency,method,preferred_date:date,postcode:delivery?postcode:"",
+    promo:discounted?"SPROUT":"",subtotal_pence:String(subtotal),
+    delivery_pence:String(delivery?DELIVERY_PENCE:0),
+    total_pence:String(chargedGoods+(delivery?DELIVERY_PENCE:0))};
+  for(const [k,v] of Object.entries(metadata))put(form,"metadata["+k+"]",v);
+  if(recurring){
+    for(const [k,v] of Object.entries(metadata))put(form,"subscription_data[metadata]["+k+"]",v);
+    put(form,"subscription_data[description]","MicroSprouts "+pack+"g x "+count+" "+frequency);
+  }else{
+    for(const [k,v] of Object.entries(metadata))put(form,"payment_intent_data[metadata]["+k+"]",v);
+  }
+  try{
+    const response=await stripeRequest(env,"checkout/sessions",{method:"POST",body:form,
+      headers:{"content-type":"application/x-www-form-urlencoded","idempotency-key":crypto.randomUUID()}});
+    if(response.mode!==(recurring?"subscription":"payment")||!response.url?.startsWith("https://checkout.stripe.com/"))throw Error("Unexpected Stripe response");
+    return json({url:response.url});
+  }catch(e){
+    console.error("Sandbox Stripe session failure",e.stripeStatus||500);
+    return issue("Stripe checkout could not start. Please try again.",502);
+  }
+};
+const verifySession=async(request,env)=>{
+  if(!ready(env))return issue("Checkout verification is not yet enabled.",503);
+  const id=new URL(request.url).searchParams.get("session_id");
+  if(!id||!SESS_RE.test(id))return issue("Invalid checkout session.");
+  try{
+    const session=await stripeRequest(env,"checkout/sessions/"+encodeURIComponent(id));
+    const paid=session.payment_status==="paid";
+    const meta=session.metadata||{};
+    if(!paid)return json({paid:false});
+    const expected=Number(meta.total_pence);
+    const actual=Number(session.amount_total);
+    if(!Number.isSafeInteger(expected)||expected<1||actual!==expected||session.currency!=="gbp")return issue("Payment details could not be verified.",409);
+    return json({paid:true,reference:session.client_reference_id||session.id,
+      pack:meta.pack,quantity:meta.quantity,frequency:meta.frequency,
+      method:meta.method,date:meta.preferred_date,
+      postcode:meta.postcode||"",name:meta.name,
+      total_pence:actual});
+  }catch{return issue("Unable to verify this payment. Please check again.",502)}
+};
+const encoder=new TextEncoder();
+const secureEqual=(a,b)=>{
+  if(a.length!==b.length)return false;
+  let diff=0;for(let i=0;i<a.length;i++)diff|=a.charCodeAt(i)^b.charCodeAt(i);
+  return diff===0;
+};
+const verifySignature=async(payload,header,secret)=>{
+  if(!secret||!header)return false;
+  const parts=Object.fromEntries(header.split(",").map(piece=>piece.split("=",2)));
+  const timestamp=Number(parts.t);
+  if(!Number.isInteger(timestamp)||Math.abs(Date.now()/1000-timestamp)>300)return false;
+  const mac=await crypto.subtle.sign("HMAC",await crypto.subtle.importKey("raw",encoder.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]),encoder.encode(parts.t+"."+payload));
+  const hex=Array.from(new Uint8Array(mac),b=>b.toString(16).padStart(2,"0")).join("");
+  return header.split(",").some(piece=>piece.startsWith("v1=")&&secureEqual(piece.slice(3),hex));
+};
+const webhook=async(request,env)=>{
+  if(!ready(env)||!env.STRIPE_WEBHOOK_SECRET)return issue("Webhook not configured.",503);
+  const payload=await request.text();
+  if(payload.length>1024*1024)return issue("Payload too large.",413);
+  if(!await verifySignature(payload,request.headers.get("stripe-signature"),env.STRIPE_WEBHOOK_SECRET))return issue("Invalid signature.",400);
+  let event;try{event=JSON.parse(payload)}catch{return issue("Invalid event JSON.")}
+  // Stripe remains the payment and subscription system of record. Avoid PII in logs.
+  if(["checkout.session.completed","checkout.session.async_payment_succeeded","invoice.paid","invoice.payment_failed",
+    "customer.subscription.updated","customer.subscription.deleted"].includes(event.type)){
+    console.log("Verified Stripe event",event.type,event.id);
+  }
+  return json({received:true});
+};
+export default {
+  async fetch(request,env){
+    const path=new URL(request.url).pathname;
+    if(path==="/api/checkout/status"&&request.method==="GET")
+      return json({enabled:ready(env),mode:ready(env)?"test":"not-configured",
+        minimum_date:minimumDate()});
+    if(path==="/api/checkout/session"&&request.method==="POST")return createSession(request,env);
+    if(path==="/api/checkout/verify"&&request.method==="GET")return verifySession(request,env);
+    if(path==="/api/stripe/webhook"&&request.method==="POST")return webhook(request,env);
+    if(path.startsWith("/api/"))return issue("Not found",404);
+    return env.ASSETS.fetch(request);
+  }
+};
