@@ -78,6 +78,57 @@ a{color:inherit}
 .benefit-eyebrow{font-size:13px;letter-spacing:.05em;font-weight:700;margin-bottom:8px}
 .benefit-card h3{font-size:clamp(25px,2.5vw,35px);line-height:1.02;letter-spacing:-.035em;margin-bottom:9px;max-width:360px}
 .benefit-card p{font-size:14px;line-height:1.36;max-width:345px}
+
+/* Approved centred explanatory card: same editorial family, smaller true sprout leaves. */
+.benefit-card--sulforaphane{
+ grid-column:1/-1;
+ justify-self:center;
+ width:min(100%,860px);
+ height:172px;
+ padding:19px 32px;
+ background:#eaf0dd;
+}
+.benefit-card--sulforaphane::after{
+ background:linear-gradient(90deg,#eaf0dd 0%,#eaf0dd 50%,#eaf0dddb 62%,#eaf0dd05 100%);
+}
+.benefit-card--sulforaphane .benefit-bg{
+ width:47%;
+ object-position:center 45%;
+}
+.benefit-card--sulforaphane .benefit-eyebrow{
+ position:relative;
+ z-index:1;
+ font-size:11px;
+ margin-bottom:5px;
+}
+.benefit-card--sulforaphane h3{
+ position:relative;
+ z-index:1;
+ font-size:clamp(26px,2.65vw,34px);
+ max-width:none;
+ margin-bottom:7px;
+}
+.benefit-card--sulforaphane p{
+ position:relative;
+ z-index:1;
+ font-size:13px;
+ line-height:1.42;
+ max-width:500px;
+}
+@media(max-width:770px){
+ .benefit-card--sulforaphane{width:100%;min-height:194px;height:auto;padding:23px 27px}
+ .benefit-card--sulforaphane .benefit-bg{width:53%}
+ .benefit-card--sulforaphane p{max-width:72%}
+}
+@media(max-width:520px){
+ .benefit-card--sulforaphane{grid-column:1;min-height:218px;padding:22px 23px}
+ .benefit-card--sulforaphane .benefit-bg{width:75%;opacity:.75}
+ .benefit-card--sulforaphane::after{
+  background:linear-gradient(90deg,#eaf0dd 0%,#eaf0ddf5 60%,#eaf0ddc8 87%,#eaf0dd50 100%);
+ }
+ .benefit-card--sulforaphane h3{font-size:30px;line-height:1.06}
+ .benefit-card--sulforaphane p{max-width:100%;font-size:13px;line-height:1.45}
+}
 .order-section{background:#f6f7ef;padding:92px 24px}
 .order-inner{max-width:1010px;margin:auto;display:grid;grid-template-columns:.85fr 1.15fr;gap:65px}
 .order-copy h2{font-size:46px;line-height:1.08;letter-spacing:-.035em;margin-bottom:16px}
