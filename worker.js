@@ -1,3 +1,4 @@
+import {ensureCatalog,findPortal,priceLookupKey,PRODUCT_DEFINITIONS} from "./stripe-catalog.js";
 /* MicroSprouts server-side Stripe Checkout API. Cloudflare Worker, no secrets in source.
  * Set STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET and PAYMENTS_ENABLED in Worker secrets.
  * With PAYMENTS_ENABLED unset, storefront remains enquiry-only and Stripe sessions cannot start.
@@ -82,6 +83,14 @@ const createSession=async(request,env)=>{
   const discounted=promo==="SPROUT"&&frequency==="once";
   const chargedGoods=discounted?subtotal-Math.round(subtotal*.2):subtotal;
   const recurring=frequency==="weekly"?{interval:"week",interval_count:1}:frequency==="fortnightly"?{interval:"week",interval_count:2}:null;
+  // Provision fixed products and reusable prices in the SAME Stripe environment as
+  // the test API key stored in Cloudflare. Stripe Price IDs are not portable.
+  let catalog;
+  try{catalog=await ensureCatalog((path,options)=>stripeRequest(env,path,options));}
+  catch(error){
+    console.error("Stripe catalogue setup failed:",error.stripeStatus||error.message||"unexpected");
+    return issue("The Stripe sandbox catalogue could not be prepared. Please try later.",503);
+  }
   const form=new URLSearchParams();
   const siteOrigin=new URL(request.url).origin;
   put(form,"mode",recurring?"subscription":"payment");
@@ -92,25 +101,20 @@ const createSession=async(request,env)=>{
   put(form,"billing_address_collection","auto");
   if(recurring)put(form,"payment_method_collection","always");
   put(form,"locale","en-GB");
-  put(form,"line_items[0][price_data][currency]","gbp");
-  put(form,"line_items[0][price_data][product_data][name]","MicroSprouts broccoli sprouts "+pack+"g");
-  put(form,"line_items[0][price_data][product_data][description]",discounted?"SPROUT 20% discount included":"Fresh broccoli sprouts, grown in London");
-  put(form,"line_items[0][price_data][unit_amount]",discounted?chargedGoods:amount);
-  put(form,"line_items[0][quantity]",discounted?1:count);
-  if(recurring){
-    put(form,"line_items[0][price_data][recurring][interval]",recurring.interval);
-    put(form,"line_items[0][price_data][recurring][interval_count]",recurring.interval_count);
-  }
+  // Reusable Stripe Prices, not inline price_data.
+  const product=PRODUCT_DEFINITIONS.find(p=>p.grams===Number(pack));
+  const packPrice=catalog.prices[priceLookupKey(product,frequency)];
+  if(!packPrice)return issue("This sprouts price is not available.",503);
+  put(form,"line_items[0][price]",packPrice);
+  put(form,"line_items[0][quantity]",count);
   if(delivery){
-    put(form,"line_items[1][price_data][currency]","gbp");
-    put(form,"line_items[1][price_data][product_data][name]","London local delivery");
-    put(form,"line_items[1][price_data][unit_amount]",DELIVERY_PENCE);
+    const deliveryProduct=PRODUCT_DEFINITIONS.find(p=>p.kind==="delivery");
+    const deliveryPrice=catalog.prices[priceLookupKey(deliveryProduct,frequency)];
+    if(!deliveryPrice)return issue("This delivery price is not available.",503);
+    put(form,"line_items[1][price]",deliveryPrice);
     put(form,"line_items[1][quantity]",1);
-    if(recurring){
-      put(form,"line_items[1][price_data][recurring][interval]",recurring.interval);
-      put(form,"line_items[1][price_data][recurring][interval_count]",recurring.interval_count);
-    }
   }
+  if(discounted)put(form,"discounts[0][coupon]",catalog.coupon);
   const metadata={name:customerName,email,whatsapp,pack,quantity:String(count),
     frequency,method,preferred_date:date,postcode:delivery?postcode:"",
     promo:discounted?"SPROUT":"",subtotal_pence:String(subtotal),
@@ -152,6 +156,15 @@ const verifySession=async(request,env)=>{
       total_pence:actual});
   }catch{return issue("Unable to verify this payment. Please check again.",502)}
 };
+const getPortalLogin=async(env)=>{
+  if(!ready(env))return issue("Customer portal is unavailable until Stripe is configured.",503);
+  try{
+    const portal=await findPortal((path,options)=>stripeRequest(env,path,options));
+    const url=portal?.login_page?.url;
+    if(!url||!url.startsWith("https://billing.stripe.com/"))return issue("Customer portal is not configured yet.",503);
+    return json({url});
+  }catch{return issue("Unable to open the customer portal at present.",502)}
+};
 const encoder=new TextEncoder();
 const secureEqual=(a,b)=>{
   if(a.length!==b.length)return false;
@@ -188,6 +201,7 @@ export default {
         minimum_date:minimumDate()});
     if(path==="/api/checkout/session"&&request.method==="POST")return createSession(request,env);
     if(path==="/api/checkout/verify"&&request.method==="GET")return verifySession(request,env);
+    if(path==="/api/checkout/portal"&&request.method==="GET")return getPortalLogin(env);
     if(path==="/api/stripe/webhook"&&request.method==="POST")return webhook(request,env);
     if(path.startsWith("/api/"))return issue("Not found",404);
     return env.ASSETS.fetch(request);
