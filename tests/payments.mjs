@@ -24,9 +24,19 @@ let res=await api("/api/checkout/status");
 const initialStatus=await res.json();
 check("Checkout remains off without sandbox runtime settings",initialStatus.enabled===false);
 check("Disabled state identifies missing runtime values without revealing credentials",
-  initialStatus.checks?.payment_toggle_enabled===false&&
+  initialStatus.checks?.activation==="sandbox_credentials"&&
   initialStatus.checks?.sandbox_key_available===false&&
   initialStatus.checks?.webhook_secret_available===false);
+const sandboxOnly={...envOn};
+delete sandboxOnly.PAYMENTS_ENABLED;
+res=await api("/api/checkout/status",{},sandboxOnly);
+const sandboxReadyStatus=await res.json();
+check("Sandbox works when build omits optional enable toggle",
+  sandboxReadyStatus.enabled===true&&sandboxReadyStatus.mode==="test");
+res=await api("/api/checkout/status",{}, {...sandboxOnly,PAYMENTS_ENABLED:"false"});
+check("Explicit runtime disable switch prevents checkout",(await res.json()).enabled===false);
+res=await api("/api/checkout/status",{}, {...envOn,STRIPE_SECRET_KEY:"sk_live_not_permitted"});
+check("Live secret keys can never enable this test Worker",(await res.json()).enabled===false);
 res=await submit(customer,envOff);
 check("Missing test credentials prevents any checkout",res.status===503);
 res=await api("/index.html");
