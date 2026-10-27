@@ -1,7 +1,7 @@
-import {ensureCatalog,findPortal,priceLookupKey,PRODUCT_DEFINITIONS} from "./stripe-catalog.js";
+import {ensureCatalog,ensurePortal,findPortal,priceLookupKey,PRODUCT_DEFINITIONS} from "./stripe-catalog.js";
 /* MicroSprouts server-side Stripe Checkout API. Cloudflare Worker, no secrets in source.
- * Set STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET and PAYMENTS_ENABLED in Worker secrets.
- * With PAYMENTS_ENABLED unset, storefront remains enquiry-only and Stripe sessions cannot start.
+ * STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET must be runtime encrypted secrets.
+ * Only sandbox (sk_test_) payments are accepted; PAYMENTS_ENABLED=false disables checkout.
  */
 const PRICE_PENCE = Object.freeze({ "200":999, "500":1699 });
 const DELIVERY_PENCE = 230;
@@ -43,6 +43,8 @@ const stripeRequest = async(env,path,options={})=>{
   if(!response.ok){
     const failure=new Error(parsed.error?.message||"Stripe request failed");
     failure.stripeStatus=response.status;
+    failure.stripeCode=parsed.error?.code||parsed.error?.type||null;
+    failure.stripeParam=parsed.error?.param||null;
     throw failure;
   }
   return parsed;
@@ -92,10 +94,16 @@ const createSession=async(request,env)=>{
   // Provision fixed products and reusable prices in the SAME Stripe environment as
   // the test API key stored in Cloudflare. Stripe Price IDs are not portable.
   let catalog;
-  try{catalog=await ensureCatalog((path,options)=>stripeRequest(env,path,options));}
+  try{catalog=await ensureCatalog((path,options)=>stripeRequest(env,path,options),{promo:discounted});}
   catch(error){
-    console.error("Stripe catalogue setup failed:",error.stripeStatus||error.message||"unexpected");
-    return issue("The Stripe sandbox catalogue could not be prepared. Please try later.",503);
+    const safeStage=typeof error.stage==="string"&&/^[a-z0-9_]{1,75}$/i.test(error.stage)?error.stage:"unknown";
+    const safeCode=typeof error.stripeCode==="string"&&/^[a-z0-9_]{1,65}$/i.test(error.stripeCode)?error.stripeCode:null;
+    const safeParam=typeof error.stripeParam==="string"&&/^[a-z0-9_\[\].]{1,90}$/i.test(error.stripeParam)?error.stripeParam:null;
+    const stripeStatus=Number.isInteger(error.stripeStatus)?error.stripeStatus:null;
+    console.error("Stripe catalogue setup failed",safeStage,stripeStatus,safeCode,safeParam);
+    return json({error:"Stripe sandbox catalogue setup failed. No payment has been taken.",
+      setup_stage:safeStage,stripe_http_status:stripeStatus,stripe_error_code:safeCode,
+      stripe_error_param:safeParam},503);
   }
   const form=new URLSearchParams();
   const siteOrigin=new URL(request.url).origin;
@@ -165,7 +173,10 @@ const verifySession=async(request,env)=>{
 const getPortalLogin=async(env)=>{
   if(!ready(env))return issue("Customer portal is unavailable until Stripe is configured.",503);
   try{
-    const portal=await findPortal((path,options)=>stripeRequest(env,path,options));
+    const stripe=(path,options)=>stripeRequest(env,path,options);
+    // Portal setup runs independently. A checkout can succeed even if Billing
+    // portal configuration is unavailable in a particular Stripe test account.
+    const portal=await findPortal(stripe)||await ensurePortal(stripe);
     const url=portal?.login_page?.url;
     if(!url||!url.startsWith("https://billing.stripe.com/"))return issue("Customer portal is not configured yet.",503);
     return json({url});
