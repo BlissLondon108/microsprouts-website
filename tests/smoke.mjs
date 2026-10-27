@@ -59,4 +59,26 @@ check("All new locally hosted images exist", [sprouts,science].every(markup => [
 check("New menu script parses", (()=>{try{new vm.Script(pagesJs);return true}catch{return false}})());
 check("Interior pages include responsive navigation and compact mobile layouts", pagesCss.includes(".interior-head.menu-open .comp-nav-links") && pagesCss.includes("@media(max-width:520px)") && css.includes("Five-item navigation"));
 
+// Checkout, recurring subscription offer and photo accessibility.
+const paymentCheckout=read("checkout.html");
+const paymentClient=read("checkout.js");
+const catalog=read("stripe-catalog.js");
+check("Homepage uses the new Single Pack name with Family Pack preserved",
+  html.includes('>Single Pack</span>')&&html.includes('>Family Pack</span>')&&!html.includes('>Week Supply</span>'));
+check("Product hero has replaced the former glass photo with a stone-plate shot",
+  html.includes('id="hero-photo" src="assets/single-plate.webp"')&&
+  html.includes('stone plate')&&!html.includes('data-asset="week" src="assets/week.webp"'));
+const singlePhoto=path.join(root,"assets/single-plate.webp");
+const familyPhoto=path.join(root,"assets/family-plate.webp");
+check("Matched pack photos exist as distinct WebP assets",
+  fs.existsSync(singlePhoto)&&fs.existsSync(familyPhoto)&&
+  fs.readFileSync(singlePhoto).toString("base64")!==fs.readFileSync(familyPhoto).toString("base64"));
+check("Checkout shows both interactive pack photos and visible subscription savings",
+  ["data-pack-choice=\"200\"","data-pack-choice=\"500\"","subscription-savings-row","subscription-perk"].every(x=>paymentCheckout.includes(x)));
+check("Recurring UI prices and complimentary delivery are reflected in the customer-facing calculator",
+  [899,1549,230].every(x=>paymentClient.includes(String(x)))&&
+  paymentClient.includes('method()==="delivery"&&!recurring?230:0'));
+check("Stripe catalogue uses new v2 recurring prices, preserving v1 one-time prices",
+  catalog.includes('?"v2":"v1"')&&catalog.includes('subscriptionAmount:899')&&catalog.includes('subscriptionAmount:1549'));
+
 console.log("\nMicroSprouts static smoke tests passed: " + total);
