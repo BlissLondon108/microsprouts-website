@@ -21,5 +21,10 @@ jobs:
           node --check comp.js
           node --check shop.js
           node --check pages.js
+          node --check worker.js
+          node --check checkout.js
+          node --check checkout-success.js
       - name: Verify webpage structure and ordering invariants
-        run: node tests/smoke.mjs
+        run: |
+          node tests/smoke.mjs
+          node tests/payments.mjs
