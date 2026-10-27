@@ -140,10 +140,10 @@
             if (key === 'macro') {
               document.querySelector('.banner')?.style.setProperty('--approved-banner-photo','url("'+url+'")');
             }
-            const packKey = activePack === '500' ? 'family' : 'week';
-            if (selectedGallery === 'pack' && key === packKey) {
-              setPhoto(url,imageAlt[key]);
-            } else if (selectedGallery === key) {
+            // Keep the new stone-plate photos as the permanent pack images.
+            // Older approved Week/Family assets may still serve growth-stage media,
+            // but they must never override a product photo.
+            if (selectedGallery === key && key !== 'week' && key !== 'family') {
               setPhoto(url,imageAlt[key]);
             }
           };
