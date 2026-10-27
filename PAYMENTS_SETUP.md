@@ -1,50 +1,72 @@
-# MicroSprouts Stripe checkout integration — sandbox rollout
+# MicroSprouts Stripe checkout — catalogue, subscriptions, customer portal (sandbox)
 
-## Current status
+## Status and environments
 
-The new payment-first checkout is available at \`/checkout.html\`, but is **disabled by default**. The public homepage intentionally continues using the established WhatsApp **enquiry** process until the Stripe sandbox has been fully tested and the business owner approves changing the public checkout. The Worker accepts **only Stripe test secret keys**. It cannot take real payments with its current configuration.
+- The MicroSprouts website hosts sandbox checkout at https://microsprouts.bhaktivedanta-london.workers.dev/checkout.html .
+- The user reported that Cloudflare's **runtime** \`/api/checkout/status\` returned \`{"enabled":true,"mode":"test"}\` on 27 October 2026. Only \`sk_test_\` secret keys are supported. **Real payments are not enabled.**
+- The homepage still links to the established WhatsApp enquiry form. It has not been switched to live paid checkout.
+- Important: Stripe's test-mode sandbox attached to a regular Stripe account and a separately named Stripe sandbox may be **different environments with separate product catalogues**. The ChatGPT-connected "MicroSprouts sandbox" has a completed catalogue, but the site may use a different test key. **Never hard-code a price ID from another Stripe environment.** The site now self-provisions the same named products/prices in the test environment authenticated by Cloudflare's secret key.
 
-Guest checkout is supported. The form collects a required name and email; WhatsApp is optional. **Customer accounts are not implemented**; adding real accounts requires authentication, access controls and a privacy-policy review. Do not display fake login/account creation UI.
+## Fixed product catalogue
 
-The one-time options use the established prices: 200g £9.99 or 500g £16.99, quantity 1–10, plus £2.30 for local delivery or free collection. \`SPROUT\` is 20% off eligible one-time goods only, not delivery. Weekly and fortnightly Stripe subscription sessions recur at the chosen pack price and repeat the £2.30 delivery fee when selected; **each charge covers the corresponding period**. Dates, growing capacity, and the final local delivery/collection times are agreed personally after verified payment.
+The Worker module \`stripe-catalog.js\` defines **three** reusable Stripe Products and **nine** reusable Prices with stable lookup keys. The amounts below are in GBP.
 
-## Exact next step — connect sandbox secrets to Cloudflare
+| Product | One-time | Weekly | Fortnightly |
+| --- | --- | --- | --- |
+| 200g broccoli sprouts | £9.99 | £9.99 per week | £9.99 every two weeks |
+| 500g broccoli sprouts | £16.99 | £16.99 per week | £16.99 every two weeks |
+| Personal London delivery | £2.30 per order | £2.30 per week | £2.30 every two weeks |
 
-1. Open the [Stripe Dashboard](https://dashboard.stripe.com/), select **MicroSprouts sandbox / Test mode**, and locate the **sandbox secret API key**. The key must begin \`sk_test_\`. Do **not** share that key in ChatGPT, GitHub or a screenshot. Never use \`sk_live_\` for testing.
-2. In your Cloudflare dashboard go to **Workers & Pages → microsprouts → Settings → Variables and Secrets** (UI names can vary).
-3. Add these three encrypted Worker secrets:
-   - \`STRIPE_SECRET_KEY\`: your \`sk_test_…\` key.
-   - \`PAYMENTS_ENABLED\`: \`true\`.
-   - \`STRIPE_WEBHOOK_SECRET\`: the signing secret \`whsec_…\` from the Stripe sandbox webhook destination set up below.
-4. In Stripe sandbox's event destinations or webhook settings, add HTTPS endpoint:
-   \`https://microsprouts.bhaktivedanta-london.workers.dev/api/stripe/webhook\`.
-   Subscribe to \`checkout.session.completed\`, \`checkout.session.async_payment_succeeded\`,
-   \`invoice.paid\`, \`invoice.payment_failed\`,
-   \`customer.subscription.updated\`, and \`customer.subscription.deleted\`.
-   Stripe will provide the separate \`whsec_\` endpoint signing secret. Store it in the Cloudflare Worker secret, not this repository.
-5. Verify \`/api/checkout/status\` returns \`{"enabled":true,"mode":"test",…}\` and make a **test-card** purchase on \`/checkout.html\`. Confirm the Stripe sandbox contains matching checkout metadata, the correct charge and recurring pricing, that \`/checkout-success.html?session_id=...\` only confirms *paid* sessions, and that WhatsApp opens with the order reference. Test checkout cancellation and retries. Run GitHub Actions smoke and payment tests.
-6. **Do not activate real payments yet.** Live activation requires a separate approved release: switch to a \`sk_live_\` secret, explicitly update the Worker to allow production, configure the live Stripe webhook and billing customer portal, test cancellation/refunds/order notifications, verify fulfilment and regulatory requirements, then link the new checkout from the homepage.
+Collection is free by appointment; delivery and growing lead time still require personal confirmation. For subscription purchases, each renewal bills the sprouts and selected delivery together.
 
-## Security and customer-experience details
+All catalog lookup keys have the stable form:
+- \`ms_broccoli_200g_once_v1\`, \`ms_broccoli_200g_weekly_v1\`, \`ms_broccoli_200g_fortnightly_v1\`
+- \`ms_broccoli_500g_once_v1\`, \`ms_broccoli_500g_weekly_v1\`, \`ms_broccoli_500g_fortnightly_v1\`
+- \`ms_delivery_london_once_v1\`, \`ms_delivery_london_weekly_v1\`, \`ms_delivery_london_fortnightly_v1\`
 
-- Do not place Stripe secret API keys, \`whsec_\` signing keys, or customer records in JS served to customers or any GitHub file.
-- Prices, subscription intervals, discount rules, lead-time constraints, names and contact fields are validated **server-side** before Stripe Checkout. The user cannot set their own price.
-- The confirmation page calls server-side \`/api/checkout/verify\` to retrieve the Stripe Checkout Session. Returning to a success URL alone does not imply payment.
-- Webhooks verify signatures and acknowledge the configured event types; Stripe itself currently stores the order and subscription metadata. This integration **does not yet persist fulfilment state, dispatch email alerts or process refunds automatically**. Before production, provide a reliable owner alert/order queue, webhook event processing and a customer-facing cancellation portal.
-- Collection is free by arrangement; Tuesday–Thursday local deliveries cost £2.30 per order, with a requested date at least seven days ahead.
-- WhatsApp is shown **only after verified payment** on the new success page. Keep the existing enquiry flow in place until authorised to switch over.
-- Do not invent availability, account credentials, delivery reservations, refund terms, health benefits, or food-safety certifications.
+For new Stripe test environments, **the first successfully validated checkout request** creates any missing fixed products/prices; later checkouts look them up and verify the configured amount, interval and active status. The provisioning process is idempotent, bounded to the fixed MicroSprouts catalogue and never uses customer-supplied price names, prices or product identifiers. This means products in the *Cloudflare-key* test account may not appear in the Dashboard until the first checkout after the latest deployment.
 
-## Useful references
+\`SPROUT\` on the site is a one-time-only discount. The Worker creates or reuses a fixed 20% Stripe coupon (\`MS_SPROUT20_V1\`) that applies **only to the two broccoli products**, not the delivery product. The checkout uses reusable Price IDs even with the coupon. The backend computes the expected discounted order amount and verifies it after Stripe confirms the payment.
 
-- Stripe Checkout Sessions: https://docs.stripe.com/api/checkout/sessions/create
-- Stripe subscription checkout: https://docs.stripe.com/billing/subscriptions/build-subscriptions
-- Stripe checkout fulfilment and webhook verification: https://docs.stripe.com/checkout/fulfillment
-- Cloudflare Worker secrets: https://developers.cloudflare.com/workers/configuration/secrets/
-- Cloudflare static assets Worker binding: https://developers.cloudflare.com/workers/static-assets/binding/
+## Subscription behaviour
 
-## Architecture
+Choose **Weekly subscription** or **Fortnightly subscription** at \`/checkout.html\`. The backend creates a hosted Stripe Checkout Session in \`mode=subscription\`, using the matching recurring Price for the selected broccoli pack, quantity and optional personal delivery. Stripe creates an actual Customer and Subscription **only after the customer completes the subscription signup and required payment**. Creating a Price or plan does not create a subscriber.
 
-\`/checkout.html\` → \`/checkout.js\` → \`POST /api/checkout/session\` (Worker validates inputs and creates Stripe test Checkout Session) → Stripe-hosted checkout → \`/checkout-success.html\` → \`GET /api/checkout/verify?session_id=...\` (Stripe API confirms paid state and exact amount) → WhatsApp to agree fulfilment.
+Customers are charged for the corresponding weekly/two-week period. Their preferred first collection or delivery date is provisional. Dates are not booked on the server and are not automatically added to a calendar.
 
-The API is routed by \`wrangler.jsonc\` \`assets.run_worker_first\` on \`/api/*\`. Other static assets remain served directly. \`.assetsignore\` excludes private backend source and build files from static publishing. Automated tests reside in \`tests/payments.mjs\` and \`tests/smoke.mjs\`.
+## Customer portal
+
+- Stripe self-service portal: \`https://microsprouts.bhaktivedanta-london.workers.dev/manage-subscription.html\`
+- Public API \`GET /api/checkout/portal\` reads the account-specific Stripe-hosted \`login_page.url\`; sign-in is handled by Stripe via an email link. No MicroSprouts password or custom account is required.
+- The configured portal includes **invoice/payment history, email and name updates, payment method updates, and subscription cancellations at the end of the current billing period**. Plan-switching is disabled because a change to the broccoli plan could leave recurring delivery prices or the growing schedule out of sync.
+- On a newly encountered test environment, the Stripe portal configuration is created together with the reusable catalogue on the first validated checkout. Its login page then becomes available through the website and on the paid-subscription confirmation page.
+- The ChatGPT-connected "MicroSprouts sandbox" has already had this configuration created and verified via its Stripe API, but **that is not proof the separate Cloudflare-key test environment already contains it**.
+
+## Safe testing procedure
+
+1. Verify GitHub Actions quality checks passed. In Cloudflare's **Settings → Runtime variables and secrets**, ensure \`STRIPE_SECRET_KEY\` and \`STRIPE_WEBHOOK_SECRET\` are saved as runtime **Secrets** and \`PAYMENTS_ENABLED\` is a runtime **Variable** set to \`true\`. Do not put keys in \`Builds → Variables and secrets\`, Github or chat.
+2. Open \`/checkout.html\` and make a **new test purchase after the catalogue deployment**. It should redirect to Stripe hosted checkout. The very first request may take longer because Stripe provisions the fixed catalogue in the configured test account.
+3. In the Stripe Dashboard test/sandbox environment **associated with the Cloudflare key**, open Product catalog. Confirm the three products and all nine prices exist, with correct amounts and intervals. Other Stripe sandboxes are isolated and will not display these prices.
+4. Test **Weekly subscription** and **Fortnightly subscription** with Stripe test card \`4242 4242 4242 4242\`, an expiry in the future and any valid CVC. Check they appear under Stripe Billing → Subscriptions and that Stripe displays the recurring line items at the expected interval.
+5. Open \`/manage-subscription.html\`; sign in using the subscriber email via Stripe's no-code portal and verify payment history, update-payment-method UI and at-period-end cancellation. Use only test subscribers.
+6. Check the paid-order success page only shows confirmation when \`GET /api/checkout/verify\` sees a paid Stripe session with the exact expected GBP total; test payment cancellation and failed payments. The WhatsApp follow-up is for scheduling, not a payment substitute.
+7. No real orders/charges should be created until the user explicitly approves live activation.
+
+## Important unfinished production work
+
+- **Order fulfilment/alerts:** Stripe webhook endpoint verifies the event signature, logs subscription/invoice/payment events, and responds. It does not yet persist orders or send owner notifications. Implement a durable and idempotent order queue (such as Cloudflare D1) and reliable owner notifications before production. Never depend on the customer actually clicking WhatsApp to learn about an order.
+- **Google Calendar:** No automatic calendar creation or renewal synchronisation has been implemented. The user's Google Calendar is connected to ChatGPT, but not to the public Worker.
+- **Customer portal in live mode:** The test portal is set up in test environment only. It and other Stripe resources need separate live-mode configuration and business owner approval before launch.
+- **Operational/legal:** Confirm fulfilment availability and subscription renewal schedules, cancellation/refund policies, UK sole-trader privacy and business details, contact information, appropriate tax treatment, legal food-labelling/food-safety duties and subscription terms. The first requested date is not a guaranteed booking.
+- **Security:** \`worker.js\` and \`stripe-catalog.js\` are not served as static assets thanks to \`.assetsignore\`; no Stripe secrets should ever be committed to GitHub. Stripe prices and discounts are server-controlled.
+
+## Technical flow
+
+\`checkout.html\` → \`checkout.js\` → Worker \`POST /api/checkout/session\` → \`ensureCatalog()\` using Cloudflare Stripe test key → reusable Stripe \`line_items[][price]\`, coupon if eligible → hosted Stripe Checkout (\`payment\` or \`subscription\`) → Stripe paid session confirmation → \`checkout-success.html\` → WhatsApp delivery/collection planning. For subscriptions, the customer can visit \`manage-subscription.html\` → \`GET /api/checkout/portal\` → Stripe secure email login.
+
+Official references:
+- https://docs.stripe.com/api/checkout/sessions/create
+- https://docs.stripe.com/billing/subscriptions/build-subscriptions
+- https://docs.stripe.com/customer-management/configure-portal
+- https://docs.stripe.com/checkout/fulfillment
+- https://developers.cloudflare.com/workers/configuration/secrets/
