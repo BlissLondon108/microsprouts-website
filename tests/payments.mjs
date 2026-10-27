@@ -42,6 +42,7 @@ check("Missing test credentials prevents any checkout",res.status===503);
 res=await api("/index.html");
 check("Public static homepage is served unmodified",await res.text()==="asset fetched");
 const products=new Map(),prices=new Map(),coupons=new Map(),portals=new Map();
+let deliberatelyFailPriceLookups=false;
 let session,sessionForm,stats={productCreates:0,priceCreates:0,couponCreates:0,portalCreates:0,checkouts:0};
 const originalFetch=globalThis.fetch;
 function parseForm(init){return new URLSearchParams(init.body)}
@@ -62,6 +63,8 @@ async function mockStripe(input,init={}){
   return response(item);
  }
  if(method==="GET"&&path==="prices"){
+  if(deliberatelyFailPriceLookups&&u.searchParams.get("lookup_keys[]")==="ms_broccoli_200g_once_v1")
+    return response({error:{code:"permission_denied",param:"lookup_keys",message:"Mock internal error must never be echoed."}},403);
   return response({data:[...prices.values()].filter(v=>v.lookup_key===u.searchParams.get("lookup_keys[]"))});
  }
  if(method==="POST"&&path==="prices"){
@@ -157,5 +160,13 @@ try{
  check("Malformed Stripe session IDs cannot verify",res.status===400);
  res=await api("/api/stripe/webhook",{method:"POST",headers:{"stripe-signature":"t=1,v1=bad"},body:"{}"},envOn);
  check("Unsigned or outdated webhook messages are rejected",res.status===400);
+ deliberatelyFailPriceLookups=true;
+ res=await submit(customer);
+ const failedCatalogue=await res.json();
+ check("Failed Stripe catalogue lookup identifies safe step and HTTP status",
+   res.status===503&&failedCatalogue.setup_stage==="price_ms_broccoli_200g_once_v1"&&failedCatalogue.stripe_http_status===403&&failedCatalogue.stripe_error_code==="permission_denied");
+ check("Stripe failure never exposes API secrets or raw error messages",
+   !JSON.stringify(failedCatalogue).includes("sk_test_")&&!JSON.stringify(failedCatalogue).includes("Mock internal error"));
+ deliberatelyFailPriceLookups=false;
 }finally{globalThis.fetch=originalFetch}
 console.log("\nStripe catalogue, recurring billing and portal regression tests: "+checks+" passed.");
