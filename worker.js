@@ -90,7 +90,7 @@ const createSession=async(request,env)=>{
   put(form,"customer_email",email);
   put(form,"client_reference_id",crypto.randomUUID());
   put(form,"billing_address_collection","auto");
-  put(form,"payment_method_collection","always");
+  if(recurring)put(form,"payment_method_collection","always");
   put(form,"locale","en-GB");
   put(form,"line_items[0][price_data][currency]","gbp");
   put(form,"line_items[0][price_data][product_data][name]","MicroSprouts broccoli sprouts "+pack+"g");
