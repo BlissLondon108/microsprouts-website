@@ -4,6 +4,7 @@ import {ensureCatalog,ensurePortal,findPortal,priceLookupKey,PRODUCT_DEFINITIONS
  * Only sandbox (sk_test_) payments are accepted; PAYMENTS_ENABLED=false disables checkout.
  */
 const PRICE_PENCE = Object.freeze({ "200":999, "500":1699 });
+const SUBSCRIPTION_PRICE_PENCE = Object.freeze({ "200":899, "500":1549 });
 const DELIVERY_PENCE = 230;
 const WHATSAPP = "447386853514";
 const GOOD_FREQUENCIES = new Set(["once","weekly","fortnightly"]);
@@ -87,9 +88,12 @@ const createSession=async(request,env)=>{
   if(promo&&promo!=="SPROUT")return issue("That promotional code is not recognised.");
   if(promo&&frequency!=="once")return issue("SPROUT applies only to one-time orders.");
 
-  const amount=PRICE_PENCE[pack],subtotal=amount*count;
+  const recurringPurchase=frequency!=="once";
+  const amount=recurringPurchase?SUBSCRIPTION_PRICE_PENCE[pack]:PRICE_PENCE[pack];
+  const subtotal=amount*count;
   const discounted=promo==="SPROUT"&&frequency==="once";
   const chargedGoods=discounted?subtotal-Math.round(subtotal*.2):subtotal;
+  const deliveryCharge=delivery&&!recurringPurchase?DELIVERY_PENCE:0;
   const recurring=frequency==="weekly"?{interval:"week",interval_count:1}:frequency==="fortnightly"?{interval:"week",interval_count:2}:null;
   // Provision fixed products and reusable prices in the SAME Stripe environment as
   // the test API key stored in Cloudflare. Stripe Price IDs are not portable.
@@ -121,7 +125,7 @@ const createSession=async(request,env)=>{
   if(!packPrice)return issue("This sprouts price is not available.",503);
   put(form,"line_items[0][price]",packPrice);
   put(form,"line_items[0][quantity]",count);
-  if(delivery){
+  if(deliveryCharge){
     const deliveryProduct=PRODUCT_DEFINITIONS.find(p=>p.kind==="delivery");
     const deliveryPrice=catalog.prices[priceLookupKey(deliveryProduct,frequency)];
     if(!deliveryPrice)return issue("This delivery price is not available.",503);
@@ -132,8 +136,9 @@ const createSession=async(request,env)=>{
   const metadata={name:customerName,email,whatsapp,pack,quantity:String(count),
     frequency,method,preferred_date:date,postcode:delivery?postcode:"",
     promo:discounted?"SPROUT":"",subtotal_pence:String(subtotal),
-    delivery_pence:String(delivery?DELIVERY_PENCE:0),
-    total_pence:String(chargedGoods+(delivery?DELIVERY_PENCE:0))};
+    delivery_pence:String(deliveryCharge),
+    subscription_savings_pence:String(recurringPurchase?(PRICE_PENCE[pack]-amount)*count:0),
+    total_pence:String(chargedGoods+deliveryCharge)};
   for(const [k,v] of Object.entries(metadata))put(form,"metadata["+k+"]",v);
   if(recurring){
     for(const [k,v] of Object.entries(metadata))put(form,"subscription_data[metadata]["+k+"]",v);
