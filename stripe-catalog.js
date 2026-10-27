@@ -16,6 +16,25 @@ export const PROMO_COUPON_ID="MS_SPROUT20_V1";
 const PORTAL_NAME="MicroSprouts customer subscription portal";
 const SITE_ORIGIN="https://microsprouts.bhaktivedanta-london.workers.dev";
 
+// Machine-readable, bounded stage labels aid sandbox debugging without exposing
+// credentials, Stripe API responses, customer details, or raw error messages.
+export class CatalogSetupError extends Error {
+ constructor(stage,cause){
+  super("Stripe setup failed at "+stage);
+  this.name="CatalogSetupError";
+  this.stage=stage;
+  this.stripeStatus=cause?.stripeStatus||null;
+  this.stripeCode=cause?.stripeCode||null;
+  this.stripeParam=cause?.stripeParam||null;
+ }
+}
+async function step(label,job){
+ try{return await job()}catch(error){
+  if(error instanceof CatalogSetupError)throw error;
+  throw new CatalogSetupError(label,error);
+ }
+}
+
 const formBody=values=>{
  const data=new URLSearchParams();
  for(const [key,value] of Object.entries(values))data.append(key,String(value));
@@ -101,7 +120,7 @@ export async function findPortal(request){
    config.features?.subscription_cancel?.enabled===true&&
    config.features?.payment_method_update?.enabled===true)||null;
 }
-async function ensurePortal(request){
+export async function ensurePortal(request){
  let portal=await findPortal(request);
  if(!portal){
   const fields={
@@ -124,18 +143,23 @@ async function ensurePortal(request){
   throw new Error("Customer portal login was not enabled");
  return portal;
 }
-export async function ensureCatalog(request){
- const products=await Promise.all(PRODUCT_DEFINITIONS.map(p=>ensureProduct(request,p)));
+export async function ensureCatalog(request,{promo=false}={}){
+ const products=[];
+ // Sequential provisioning avoids bursts of writes to newly opened Stripe accounts.
+ for(const p of PRODUCT_DEFINITIONS){
+  products.push(await step("product_"+(p.grams||"delivery"),()=>ensureProduct(request,p)));
+ }
  const prices=Object.create(null);
- // Process products one at a time and their billing intervals in parallel to limit
- // the number of simultaneous Stripe requests during initial provisioning.
  for(const product of PRODUCT_DEFINITIONS){
-  const resolved=await Promise.all(BILLING_FREQUENCIES.map(frequency=>ensurePrice(request,product,frequency)));
-  for(let i=0;i<BILLING_FREQUENCIES.length;i++){
-   prices[priceLookupKey(product,BILLING_FREQUENCIES[i])]=resolved[i].id;
+  for(const frequency of BILLING_FREQUENCIES){
+   const key=priceLookupKey(product,frequency);
+   const price=await step("price_"+key,()=>ensurePrice(request,product,frequency));
+   prices[key]=price.id;
   }
  }
- const [coupon,portal]=await Promise.all([ensureCoupon(request),ensurePortal(request)]);
- return {prices,coupon:coupon.id,portal_login:portal.login_page.url,
-   product_count:products.length,price_count:Object.keys(prices).length};
+ // The catalogue is independent of Billing Customer Portal. A portal configuration
+ // error must never block a customer's payment checkout.
+ const coupon=promo?await step("coupon",()=>ensureCoupon(request)):null;
+ return {prices,coupon:coupon?.id||null,product_count:products.length,
+   price_count:Object.keys(prices).length};
 }
