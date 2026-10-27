@@ -21,7 +21,12 @@ function requestedDate(delivery=false){
 const customer={pack:"200",quantity:2,frequency:"once",method:"pickup",date:requestedDate(),
  postcode:"",code:"",name:"Test Customer",email:"test@example.com",whatsapp:""};
 let res=await api("/api/checkout/status");
-check("Checkout remains off without sandbox runtime settings",(await res.json()).enabled===false);
+const initialStatus=await res.json();
+check("Checkout remains off without sandbox runtime settings",initialStatus.enabled===false);
+check("Disabled state identifies missing runtime values without revealing credentials",
+  initialStatus.checks?.payment_toggle_enabled===false&&
+  initialStatus.checks?.sandbox_key_available===false&&
+  initialStatus.checks?.webhook_secret_available===false);
 res=await submit(customer,envOff);
 check("Missing test credentials prevents any checkout",res.status===503);
 res=await api("/index.html");
