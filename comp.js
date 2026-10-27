@@ -139,11 +139,11 @@
             document.querySelectorAll('img[data-asset="'+key+'"]').forEach(img => {
               if (img === hero) return;
               img.src = url;
-              if (imageAlt[key]) img.alt = imageAlt[key];
+              if (img.getAttribute("alt") && imageAlt[key]) img.alt = imageAlt[key];
             });
             document.querySelectorAll('.gallery-thumb[data-asset="'+key+'"] img').forEach(img => {
               img.src = url;
-              if (imageAlt[key]) img.alt = imageAlt[key];
+              if (img.getAttribute("alt") && imageAlt[key]) img.alt = imageAlt[key];
             });
             if (key === 'macro') {
               document.querySelector('.banner')?.style.setProperty('--approved-banner-photo','url("'+url+'")');
