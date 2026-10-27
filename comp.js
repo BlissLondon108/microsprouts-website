@@ -76,17 +76,9 @@
     setPhoto(url,img?.alt||'Broccoli sprouts photograph');
   }));
 
-  const details = [
-    'Day 0 — Fresh broccoli seeds are prepared for a new growing batch.',
-    'Day 1–2 — Germination begins and the earliest pale shoots emerge.',
-    'Day 3–5 — The young sprouts develop stems and their first small leaves.',
-    'Day 6+ — Sprouts can be assessed for harvest when ready.'
-  ];
   stages.forEach((btn, index) => {
     btn.addEventListener('click', () => {
       stages.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
-      const message = $('growth-detail');
-      if(message) message.textContent = details[index];
     });
     btn.addEventListener('keydown', e => {
       const move = {ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];
