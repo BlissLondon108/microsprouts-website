@@ -130,3 +130,27 @@
  .research-card__summary{font-size:14px}
  .research-card:target{margin-inline:-8px;padding-inline:8px}
 }
+
+
+/* A short, useful destination for the benefit card's meal-ideas link. */
+.diet-section{max-width:1260px;margin:0 auto 82px;padding:0 clamp(20px,4.8vw,60px);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:0;scroll-margin-top:28px}
+.diet-section__photo{border-radius:18px 0 0 18px;overflow:hidden;min-height:360px;background:#143a1d}
+.diet-section__photo img{width:100%;height:100%;object-fit:cover}
+.diet-section__content{display:flex;flex-direction:column;justify-content:center;padding:42px clamp(28px,4vw,54px);background:#e9efdb;border-radius:0 18px 18px 0}
+.diet-section__content .subpage-kicker{color:#557a42;margin-bottom:15px}
+.diet-section h2{font:400 clamp(32px,3.5vw,48px)/1.08 Georgia,"Times New Roman",serif;letter-spacing:-.035em;max-width:510px;margin-bottom:18px}
+.diet-section__intro{color:#50634f;font-size:14px;line-height:1.65;max-width:520px;margin-bottom:17px}
+.diet-ideas{padding-left:20px;margin:0;display:grid;gap:11px;color:#344d33;font-size:14px;line-height:1.62}
+.diet-ideas li{padding-left:2px}
+@media(max-width:770px){
+ .diet-section{grid-template-columns:1fr;margin-bottom:58px}
+ .diet-section__photo{min-height:265px;height:265px;border-radius:18px 18px 0 0}
+ .diet-section__content{padding:30px;border-radius:0 0 18px 18px}
+}
+@media(max-width:520px){
+ .diet-section{padding:0 18px}
+ .diet-section__photo{height:210px;min-height:210px}
+ .diet-section__content{padding:27px 24px}
+ .diet-section h2{font-size:34px}
+ .diet-ideas{font-size:13px}
+}
