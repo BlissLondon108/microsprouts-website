@@ -47,7 +47,13 @@ const stripeRequest = async(env,path,options={})=>{
   }
   return parsed;
 };
-const ready=env=>env.PAYMENTS_ENABLED==="true"&&typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_");
+// The Cloudflare GitHub build can omit ordinary runtime vars while retaining encrypted
+// Worker secrets. Sandbox checkout is authorised by the presence of BOTH sandbox secrets.
+// An explicit PAYMENTS_ENABLED=false still disables checkout; live Stripe keys never work.
+const ready=env=>
+  env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
+  typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_")&&
+  typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_");
 const put=(params,key,value)=>params.append(key,String(value));
 const createSession=async(request,env)=>{
   if(!ready(env))return issue("Secure Stripe sandbox checkout is being configured. Please use the existing enquiry form for now.",503);
@@ -200,7 +206,8 @@ export default {
       return json({enabled:ready(env),mode:ready(env)?"test":"not-configured",
         minimum_date:minimumDate(),
         checks:{
-          payment_toggle_enabled:env.PAYMENTS_ENABLED==="true",
+          activation:"sandbox_credentials",
+          explicitly_disabled:env.PAYMENTS_ENABLED==="false"||env.PAYMENTS_ENABLED===false,
           sandbox_key_available:typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_"),
           webhook_secret_available:typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")
         }});
