@@ -1,0 +1,33 @@
+{
+  "brand": "MicroSprouts",
+  "kind": "approved-illustrative-photography",
+  "assets": [
+    {
+      "name": "week.webp"
+    },
+    {
+      "name": "family.webp"
+    },
+    {
+      "name": "seeds.webp"
+    },
+    {
+      "name": "germination.webp"
+    },
+    {
+      "name": "macro.webp"
+    },
+    {
+      "name": "jar.webp"
+    },
+    {
+      "name": "woman.webp"
+    },
+    {
+      "name": "toast.webp"
+    },
+    {
+      "name": "harvest.webp"
+    }
+  ]
+}
