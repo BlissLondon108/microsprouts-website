@@ -1,0 +1,132 @@
+/* MicroSprouts interior pages — shared visual language with approved homepage. */
+.interior-head{position:relative;z-index:20;background:var(--night);color:#f7f8ef}
+.interior-head .comp-nav-links a[aria-current="page"]{color:var(--lime);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px}
+.interior-page{background:var(--cream)}
+.interior-page a:focus-visible{outline:3px solid #b7ce69;outline-offset:4px}
+.subpage-hero{color:#f8f8ed;background:radial-gradient(ellipse at 70% 35%,#174821 0%,#082f16 45%,#042611 100%);overflow:hidden}
+.subpage-hero__inner{width:min(100%,1440px);margin:0 auto;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(300px,.86fr);gap:clamp(38px,6vw,110px);align-items:center;padding:68px clamp(24px,5vw,76px) 77px}
+.subpage-kicker{font-size:11px;line-height:1.4;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#d0e4ad;margin-bottom:20px}
+.subpage-hero h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.042em;font-size:clamp(57px,6.5vw,98px);line-height:1.02;max-width:740px}
+.subpage-hero h1 em{font-style:normal;color:#d2e8ad}
+.subpage-hero__summary{font-size:clamp(16px,1.7vw,20px);line-height:1.65;max-width:530px;color:#ddebd6;margin:24px 0 28px}
+.subpage-hero__action{display:inline-flex;align-items:center;justify-content:center;gap:18px;border:1px solid #dcecc5a9;color:#f6f9ed;border-radius:100px;padding:13px 24px;text-decoration:none;font-size:14px;font-weight:700;transition:background .18s,border-color .18s}
+.subpage-hero__action:hover{background:#f8f6ed16;border-color:#e9f4d7}
+.subpage-hero__action span{font-size:20px;font-weight:400;line-height:1}
+.subpage-hero__photo{min-width:0;position:relative;border-radius:18px;overflow:hidden;background:#1b3c20;aspect-ratio:1.36;box-shadow:0 22px 54px #001b0c5e}
+.subpage-hero__photo img{width:100%;height:100%;object-fit:cover}
+.subpage-hero__photo::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#061e0d80,transparent 44%);pointer-events:none}
+.subpage-hero__photo-caption{position:absolute;z-index:1;bottom:22px;left:25px;font-family:Georgia,"Times New Roman",serif;font-size:20px;color:#fff;max-width:240px;text-shadow:0 2px 8px #001908}
+.interior-content{max-width:1400px;margin:0 auto;padding:75px clamp(20px,4.8vw,70px) 86px}
+.interior-content__intro{display:flex;align-items:end;justify-content:space-between;gap:35px;margin-bottom:34px}
+.interior-content__intro h2{font:400 clamp(38px,4vw,56px)/1.06 Georgia,"Times New Roman",serif;letter-spacing:-.035em;max-width:690px}
+.interior-content__intro p{font-size:15px;color:#526651;line-height:1.7;max-width:390px}
+.sprouts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.sprout-card{border-radius:18px;overflow:hidden;background:#fffef8;border:1px solid #e2e9db;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr);min-height:306px}
+.sprout-card__visual{height:100%;min-height:306px;position:relative;overflow:hidden}
+.sprout-card__visual img{width:100%;height:100%;object-fit:cover}
+.sprout-card__visual--broccoli{background:#052e14}
+.sprout-card__visual--broccoli img{object-position:center}
+.sprout-card__visual--radish{background:radial-gradient(ellipse at 80% 20%,#f8d7dd,#da9cb2 64%,#a66b7b 100%)}
+.sprout-card__visual--mung{background:radial-gradient(ellipse at 72% 25%,#fff0b6,#c9cf93 67%,#829461 100%)}
+.sprout-card__visual--leek{background:radial-gradient(ellipse at 72% 22%,#c9e8bc,#8fac85 68%,#54785a 100%)}
+.sprout-card__initial{position:absolute;inset:0;display:grid;place-items:center;font-family:Georgia,"Times New Roman",serif;font-size:clamp(140px,16vw,235px);font-weight:400;line-height:1;letter-spacing:-.1em;transform:translate(-4%,3%);color:#ffffff6b;text-shadow:0 0 1px #ffffff22}
+.sprout-card__visual-label{position:absolute;bottom:20px;left:21px;color:#1b2d1bd6;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.sprout-card__visual--leek .sprout-card__visual-label{color:#fff}
+.sprout-card__body{display:flex;flex-direction:column;align-items:start;padding:29px clamp(20px,2.2vw,33px)}
+.sprout-card__status{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:100px;background:#e5f0d1;color:#2b5629;font-size:11px;line-height:1;font-weight:700;letter-spacing:.012em;margin-bottom:22px}
+.sprout-card__status::before{content:"";height:6px;width:6px;background:#4c8d38;border-radius:50%}
+.sprout-card__status--enquire{background:#f2f0e5;color:#5f644e}
+.sprout-card__status--enquire::before{background:#94a083}
+.sprout-card h3{font:400 clamp(29px,2.7vw,38px)/1.07 Georgia,"Times New Roman",serif;letter-spacing:-.035em;margin-bottom:12px}
+.sprout-card__description{font-size:14px;line-height:1.6;color:#576956;max-width:300px;margin-bottom:22px}
+.sprout-card__bottom{margin-top:auto;width:100%}
+.sprout-card__details{font-size:12px;line-height:1.45;color:#536452;margin-bottom:12px}
+.sprout-card__link{display:inline-flex;align-items:center;gap:10px;color:#164d24;font-size:13px;line-height:1.45;font-weight:700;text-decoration:none;border-bottom:1px solid #164d245e;padding-bottom:3px}
+.sprout-card__link:hover{border-bottom-color:#164d24}
+.sprout-card__link span{font-size:16px;font-weight:400}
+.interior-note{margin-top:25px;font-size:13px;line-height:1.65;color:#677466}
+.page-bottom-cta{width:min(100%,1260px);margin:0 auto 88px;padding:0 clamp(20px,4.8vw,60px)}
+.page-bottom-cta__inner{display:flex;justify-content:space-between;align-items:center;gap:35px;padding:38px clamp(24px,4vw,52px);background:#e8eedb;border-radius:18px}
+.page-bottom-cta h2{font:400 clamp(28px,3vw,40px)/1.1 Georgia,"Times New Roman",serif;letter-spacing:-.03em;margin:6px 0 9px}
+.page-bottom-cta p{font-size:14px;line-height:1.6;color:#5d7057;max-width:540px}
+.page-bottom-cta a{flex:none;border-radius:100px;padding:15px 24px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:#09331a;white-space:nowrap}
+.page-bottom-cta a:hover{background:#1a5429}
+/* Research library */
+.science-hero .subpage-hero__photo{aspect-ratio:1.42}
+.science-hero .subpage-hero__photo img{object-position:48% center}
+.research-section{max-width:1100px;margin:auto;padding:75px clamp(20px,4.8vw,66px) 65px}
+.research-section__intro{display:grid;grid-template-columns:1fr minmax(0,330px);align-items:end;gap:45px;padding-bottom:29px;border-bottom:1px solid #d5decf}
+.research-section__intro h2{font:400 clamp(38px,4.4vw,56px)/1.04 Georgia,"Times New Roman",serif;letter-spacing:-.035em}
+.research-section__intro p{font-size:14px;color:#5e6d59;line-height:1.7}
+.research-list{display:flex;flex-direction:column}
+.research-card{display:grid;grid-template-columns:minmax(165px,.52fr) minmax(0,1.5fr);gap:40px;padding:43px 0 46px;border-bottom:1px solid #d5decf;scroll-margin-top:32px}
+.research-card:target{background:#eff4e3;border-radius:12px;padding-inline:20px;margin-inline:-20px}
+.research-card__meta{display:flex;flex-direction:column;gap:13px;align-items:start}
+.research-card__number{font:400 43px/1 Georgia,"Times New Roman",serif;color:#8aa279}
+.research-card__topic{font-size:11px;color:#37583b;letter-spacing:.13em;text-transform:uppercase;font-weight:700;line-height:1.5}
+.research-card h3{font:400 clamp(26px,3vw,36px)/1.15 Georgia,"Times New Roman",serif;letter-spacing:-.028em;margin-bottom:14px}
+.research-card__byline{font-size:12px;color:#536653;line-height:1.7;margin-bottom:17px}
+.research-card__summary{font-size:15px;line-height:1.75;color:#3e543e;max-width:680px;margin-bottom:20px}
+.research-card__link{display:inline-flex;align-items:center;gap:12px;background:#09331a;color:#fff;text-decoration:none;border-radius:100px;font-size:12px;font-weight:700;padding:12px 18px;transition:background .2s}
+.research-card__link:hover{background:#246032}
+.research-card__link span{font-size:16px;font-weight:400}
+.research-section__note{padding:25px 0 0;font-size:13px;line-height:1.7;max-width:730px;color:#667467}
+@media(max-width:1140px){
+ .sprout-card{grid-template-columns:minmax(0,.82fr) minmax(0,1fr)}
+ .sprout-card__body{padding:25px 19px}
+ .sprout-card__description{font-size:13px}
+ .sprout-card__visual{min-height:300px}
+}
+@media(max-width:900px){
+ .subpage-hero__inner{gap:30px;grid-template-columns:1.05fr .85fr;padding:53px 27px 59px}
+ .subpage-hero h1{font-size:clamp(50px,6.6vw,70px)}
+ .sprout-card{grid-template-columns:1fr;min-height:0}
+ .sprout-card__visual{height:200px;min-height:200px}
+ .sprout-card__body{min-height:242px;padding:25px}
+ .sprout-card__initial{font-size:196px}
+}
+@media(max-width:770px){
+ .interior-head .comp-nav{height:63px}
+ .interior-head .comp-nav-links{display:none}
+ .interior-head .menu-btn{display:block}
+ .interior-head.menu-open .comp-nav-links{display:flex;position:absolute;z-index:30;top:63px;left:0;right:0;padding:20px;background:#062f17;flex-direction:column;align-items:stretch;gap:17px;box-shadow:0 15px 20px #001e0b4d}
+ .subpage-hero__inner{grid-template-columns:1fr;padding:53px 24px 45px;gap:36px}
+ .subpage-hero h1{font-size:clamp(54px,9vw,82px)}
+ .subpage-hero__summary{font-size:17px;max-width:600px}
+ .subpage-hero__photo{aspect-ratio:1.7;max-height:320px}
+ .interior-content{padding-top:60px}
+ .interior-content__intro{align-items:start;flex-direction:column;gap:16px}
+ .page-bottom-cta__inner{flex-direction:column;align-items:start}
+ .research-section__intro{grid-template-columns:1fr;gap:15px}
+ .research-card{grid-template-columns:125px 1fr;gap:22px}
+}
+@media(max-width:520px){
+ .interior-head .comp-nav{height:58px}
+ .interior-head.menu-open .comp-nav-links{top:58px}
+ .subpage-hero__inner{padding:44px 20px 43px}
+ .subpage-hero h1{font-size:clamp(48px,13vw,64px)}
+ .subpage-kicker{font-size:10px;margin-bottom:17px}
+ .subpage-hero__summary{font-size:15px;line-height:1.6;margin:18px 0 24px}
+ .subpage-hero__photo{aspect-ratio:1.5}
+ .subpage-hero__photo-caption{font-size:17px}
+ .interior-content{padding:50px 18px 70px}
+ .interior-content__intro{margin-bottom:25px}
+ .interior-content__intro h2{font-size:40px}
+ .sprouts-grid{grid-template-columns:1fr;gap:18px}
+ .sprout-card{grid-template-columns:1fr}
+ .sprout-card__visual{height:215px;min-height:215px}
+ .sprout-card__body{min-height:0;padding:24px 25px 28px}
+ .sprout-card__status{margin-bottom:16px}
+ .sprout-card__description{font-size:14px}
+ .page-bottom-cta{margin-bottom:65px;padding:0 18px}
+ .page-bottom-cta__inner{padding:29px 25px}
+ .page-bottom-cta a{white-space:normal}
+ .research-section{padding:55px 20px 56px}
+ .research-section__intro h2{font-size:42px}
+ .research-card{grid-template-columns:1fr;gap:18px;padding:35px 0}
+ .research-card__meta{flex-direction:row;align-items:center;gap:15px}
+ .research-card__number{font-size:31px}
+ .research-card h3{font-size:29px}
+ .research-card__summary{font-size:14px}
+ .research-card:target{margin-inline:-8px;padding-inline:8px}
+}
