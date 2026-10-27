@@ -1,5 +1,6 @@
 # Never publish the backend, deployment files, or private developer files as public assets.
 worker.js
+stripe-catalog.js
 wrangler.jsonc
 .assetsignore
 .github/**
