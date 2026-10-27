@@ -66,7 +66,14 @@ form.addEventListener("submit",async e=>{
    const response=await fetch("/api/checkout/session",{method:"POST",
      headers:{"content-type":"application/json"},body:JSON.stringify(values)});
    const payload=await response.json();
-   if(!response.ok||!payload.url)throw Error(payload.error||"Checkout unavailable.");
+   if(!response.ok||!payload.url){
+     const diagnostic=typeof payload.setup_stage==="string"?
+       " (step: "+payload.setup_stage+
+       "; Stripe HTTP: "+(payload.stripe_http_status??"n/a")+
+       "; code: "+(payload.stripe_error_code??"n/a")+
+       "; field: "+(payload.stripe_error_param??"n/a")+")":"";
+     throw Error((payload.error||"Checkout unavailable.")+diagnostic);
+   }
    if(!payload.url.startsWith("https://checkout.stripe.com/"))throw Error("Invalid checkout address.");
    window.location.assign(payload.url);
  }catch(error){
