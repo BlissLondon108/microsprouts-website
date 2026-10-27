@@ -43,7 +43,7 @@ a{color:inherit}
 .package-grams{font-size:24px;font-weight:700;line-height:1}
 .package-title{font-size:14px;color:#f2f4ee}
 .package-price{font-size:23px;font-weight:700;line-height:1.3;margin-top:3px}
-.checkout-btn{border:0;background:#f5f6e9;color:#132c16;border-radius:12px;font-size:25px;font-weight:bold;min-height:54px;display:flex;gap:20px;align-items:center;justify-content:center;text-decoration:none;width:100%;transition:background .2s,transform .2s}
+.checkout-btn{border:0;background:#f5f6e9;color:#132c16;border-radius:999px;font-size:19px;font-weight:600;letter-spacing:-.015em;min-height:54px;display:flex;align-items:center;justify-content:center;text-decoration:none;width:100%;transition:background .2s,transform .2s}
 .checkout-btn:hover{background:#e6efcf;transform:translateY(-1px)}
 .delivery-highlights{display:flex;gap:25px;align-items:center;justify-content:center;margin:22px 0 0;font-size:13px;color:#f8f8f1}
 .delivery-highlights span{display:inline-flex;align-items:center;gap:12px;white-space:nowrap}
@@ -162,7 +162,7 @@ a{color:inherit}
  .package-price{font-size:20px}
  .delivery-highlights{font-size:11px;gap:7px}
  .delivery-highlights svg{width:19px;height:19px}
- .checkout-btn{font-size:22px}
+ .checkout-btn{font-size:18px}
  .banner{min-height:176px;grid-template-columns:1fr;gap:11px;padding:22px}
  .banner .separator{display:none}
  .banner h2{font-size:34px}
