@@ -9,20 +9,20 @@
 
 ## Fixed product catalogue
 
-The Worker module `stripe-catalog.js` defines **three** reusable Stripe Products and **nine** reusable Prices with stable lookup keys. The amounts below are in GBP.
+The Worker module `stripe-catalog.js` defines **three** reusable Stripe Products and **seven** current new-sale Prices (plus preserved legacy v1 recurring prices) with stable lookup keys. The amounts below are in GBP.
 
 | Product | One-time | Weekly | Fortnightly |
 | --- | --- | --- | --- |
-| 200g broccoli sprouts | £9.99 | £9.99 per week | £9.99 every two weeks |
-| 500g broccoli sprouts | £16.99 | £16.99 per week | £16.99 every two weeks |
-| Personal London delivery | £2.30 per order | £2.30 per week | £2.30 every two weeks |
+| Single Pack · 200g broccoli sprouts | £9.99 | **£8.99 per week** | **£8.99 every two weeks** |
+| Family Pack · 500g broccoli sprouts | £16.99 | **£15.49 per week** | **£15.49 every two weeks** |
+| Personal London delivery | £2.30 per order | **Free** | **Free** |
 
-Collection is free by appointment; delivery and growing lead time still require personal confirmation. For subscription purchases, each renewal bills the sprouts and selected delivery together.
+Collection is free by appointment; delivery and growing lead time still require personal confirmation. For subscriptions, each renewal bills only the discounted sprouts packs. No delivery charge is added to recurring invoices.
 
 All catalog lookup keys have the stable form:
-- `ms_broccoli_200g_once_v1`, `ms_broccoli_200g_weekly_v1`, `ms_broccoli_200g_fortnightly_v1`
-- `ms_broccoli_500g_once_v1`, `ms_broccoli_500g_weekly_v1`, `ms_broccoli_500g_fortnightly_v1`
-- `ms_delivery_london_once_v1`, `ms_delivery_london_weekly_v1`, `ms_delivery_london_fortnightly_v1`
+- `ms_broccoli_200g_once_v1`, `ms_broccoli_200g_weekly_v2`, `ms_broccoli_200g_fortnightly_v2`
+- `ms_broccoli_500g_once_v1`, `ms_broccoli_500g_weekly_v2`, `ms_broccoli_500g_fortnightly_v2`
+- `ms_delivery_london_once_v1` (one-time delivery only; subscription delivery is free)
 
 For new Stripe test environments, **the first successfully validated checkout request** creates any missing fixed products/prices; later checkouts look them up and verify the configured amount, interval and active status. The provisioning process is idempotent, bounded to the fixed MicroSprouts catalogue and never uses customer-supplied price names, prices or product identifiers. This means products in the *Cloudflare-key* test account may not appear in the Dashboard until the first checkout after the latest deployment.
 
@@ -46,7 +46,7 @@ Customers are charged for the corresponding weekly/two-week period. Their prefer
 
 1. Verify GitHub Actions quality checks passed. In Cloudflare's **Settings → Runtime variables and secrets**, ensure `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are saved as runtime **Secrets** and `PAYMENTS_ENABLED` is a runtime **Variable** set to `true`. Do not put keys in `Builds → Variables and secrets`, Github or chat.
 2. Open `/checkout.html` and make a **new test purchase after the catalogue deployment**. It should redirect to Stripe hosted checkout. The very first request may take longer because Stripe provisions the fixed catalogue in the configured test account.
-3. In the Stripe Dashboard test/sandbox environment **associated with the Cloudflare key**, open Product catalog. Confirm the three products and all nine prices exist, with correct amounts and intervals. Other Stripe sandboxes are isolated and will not display these prices.
+3. In the Stripe Dashboard test/sandbox environment **associated with the Cloudflare key**, open Product catalog. Confirm the three products and all seven new-sale prices exist, with correct amounts and intervals. Other Stripe sandboxes are isolated and will not display these prices.
 4. Test **Weekly subscription** and **Fortnightly subscription** with Stripe test card `4242 4242 4242 4242`, an expiry in the future and any valid CVC. Check they appear under Stripe Billing → Subscriptions and that Stripe displays the recurring line items at the expected interval.
 5. Open `/manage-subscription.html`; sign in using the subscriber email via Stripe's no-code portal and verify payment history, update-payment-method UI and at-period-end cancellation. Use only test subscribers.
 6. Check the paid-order success page only shows confirmation when `GET /api/checkout/verify` sees a paid Stripe session with the exact expected GBP total; test payment cancellation and failed payments. The WhatsApp follow-up is for scheduling, not a payment substitute.
@@ -70,3 +70,9 @@ Official references:
 - https://docs.stripe.com/customer-management/configure-portal
 - https://docs.stripe.com/checkout/fulfillment
 - https://developers.cloudflare.com/workers/configuration/secrets/
+
+## Updated subscription prices and pack photos
+
+From 27 October 2026, new weekly and fortnightly subscriptions use Single Pack (200g) £8.99 or Family Pack (500g) £15.49 **per billing period**, including complimentary eligible London personal delivery. One-time prices remain £9.99 and £16.99, with £2.30 delivery. New v2 recurring Stripe prices leave existing v1 subscription billing unchanged; prices do not create subscribers by themselves.
+
+The homepage and sandbox checkout now use two matched broccoli-sprout photos on beautiful dark stone plates: `assets/single-plate.webp` and `assets/family-plate.webp`. The 500g image shows a visibly bigger portion. The homepage remains a WhatsApp enquiry flow until real-payment activation is separately authorised; Google Calendar, fulfilment notifications and production subscription operations are separate tasks.
