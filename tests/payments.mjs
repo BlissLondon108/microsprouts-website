@@ -43,13 +43,6 @@ res=await api("/index.html");
 check("Public static homepage is served unmodified",await res.text()==="asset fetched");
 const products=new Map(),prices=new Map(),coupons=new Map(),portals=new Map();
 let deliberatelyFailPriceLookups=false;
- deliberatelyFailPortal=true;
- res=await submit(customer);
- check("Unavailable customer portal does not block an otherwise valid checkout",
-   res.status===200&&(await res.json()).url.startsWith("https://checkout.stripe.com/"));
- res=await api("/api/checkout/portal",{},envOn);
- check("Portal setup error is isolated to customer portal, not payments",res.status===502);
- deliberatelyFailPortal=false;
 let deliberatelyFailPortal=false;
 let session,sessionForm,stats={productCreates:0,priceCreates:0,couponCreates:0,portalCreates:0,checkouts:0};
 const originalFetch=globalThis.fetch;
@@ -179,5 +172,12 @@ try{
  check("Stripe failure never exposes API secrets or raw error messages",
    !JSON.stringify(failedCatalogue).includes("sk_test_")&&!JSON.stringify(failedCatalogue).includes("Mock internal error"));
  deliberatelyFailPriceLookups=false;
+ deliberatelyFailPortal=true;
+ res=await submit(customer);
+ check("Unavailable customer portal does not block an otherwise valid checkout",
+   res.status===200&&(await res.json()).url.startsWith("https://checkout.stripe.com/"));
+ res=await api("/api/checkout/portal",{},envOn);
+ check("Portal setup error is isolated to customer portal, not payments",res.status===502);
+ deliberatelyFailPortal=false;
 }finally{globalThis.fetch=originalFetch}
 console.log("\nStripe catalogue, recurring billing and portal regression tests: "+checks+" passed.");
