@@ -83,6 +83,7 @@ export const priceLookupKey=(product,frequency)=>{
 };
 async function ensurePrice(request,product,frequency){
  const lookup_key=priceLookupKey(product,frequency);
+ const expectedAmount=frequency==="once"?product.amount:product.subscriptionAmount;
  const query=new URLSearchParams();
  query.append("lookup_keys[]",lookup_key);
  query.set("active","true");
@@ -90,7 +91,6 @@ async function ensurePrice(request,product,frequency){
  let result=await request("prices?"+query.toString());
  let price=(result.data||[]).find(p=>p.lookup_key===lookup_key);
  if(!price){
-  const expectedAmount=frequency==="once"?product.amount:product.subscriptionAmount;
   const fields={product:product.id,currency:"gbp",unit_amount:expectedAmount,
     lookup_key,nickname:"MicroSprouts "+(product.grams?product.grams+"g":"delivery")+" "+frequency,
     "metadata[brand]":"MicroSprouts","metadata[frequency]":frequency};
