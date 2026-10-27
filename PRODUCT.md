@@ -84,3 +84,16 @@ The grower describes the methods as organic. Any formal organic-certification cl
 3. **Personal, local fulfilment:** preserve the customer-to-grower relationship and clearly distinguish collection from personal delivery.
 4. **Transparent transactions:** never suggest an enquiry is a paid or confirmed order.
 5. **Simplicity for households:** make quantities, prices, preferred dates and the next action understandable without extra explanation.
+
+## Additional Sprout Varieties and Research Pages (2026-10-27)
+
+- Primary website navigation: **Benefits**, **Growing Journey**, **More Sprouts**, **Science of Sprouts**, **FAQ**.
+- `sprouts.html` presents four varieties: broccoli, radish, mung bean and leek sprouts. It is an informational collection page, not an additional online payment system.
+- Broccoli is the currently priced product, with 200g Week Supply £9.99 and 500g Family Pack £16.99. The broccoli card links back to the existing enquiry form.
+- Radish, mung bean and leek have their own prefilled WhatsApp enquiry links. Their availability, pack sizes and prices must be confirmed personally, never invented or hardcoded as available.
+- `science.html` contains these three original references (with links and accurately scoped summaries):
+  1. Fahey, Zhang & Talalay (1997), DOI 10.1073/pnas.94.19.10367, https://pubmed.ncbi.nlm.nih.gov/9294217/
+  2. Daily intake of broccoli sprouts normalizes bowel habits in human healthy subjects (2018), https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/
+  3. Treasure, Harris & Williamson (2023), Exploring the anti-inflammatory activity of sulforaphane, https://pubmed.ncbi.nlm.nih.gov/37650498/
+- The homepage links only its third benefit card to `science.html#sulforaphane`; original study links are on the new science page rather than repeated in the first two benefit cards.
+- The science library is intentionally extensible when the owner provides additional studies. Preserve accurate titles and clearly distinguish types of evidence.
