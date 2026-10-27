@@ -38,7 +38,7 @@ Customers are charged for the corresponding weekly/two-week period. Their prefer
 
 - Stripe self-service portal: `https://microsprouts.bhaktivedanta-london.workers.dev/manage-subscription.html`
 - Public API `GET /api/checkout/portal` reads the account-specific Stripe-hosted `login_page.url`; sign-in is handled by Stripe via an email link. No MicroSprouts password or custom account is required.
-- The configured portal includes **invoice/payment history, email and name updates, payment method updates, and subscription cancellations at the end of the current billing period**. Plan-switching is disabled because a change to the broccoli plan could leave recurring delivery prices or the growing schedule out of sync.
+- The configured portal includes **invoice/payment history, payment method updates, and subscription cancellations at the end of the current billing period**. Stripe's no-code email-login portal may not allow customers to update their email address, even if that feature is enabled in the underlying portal configuration. Plan-switching is disabled because a change to the broccoli plan could leave recurring delivery prices or the growing schedule out of sync.
 - On a newly encountered test environment, the Stripe portal configuration is created together with the reusable catalogue on the first validated checkout. Its login page then becomes available through the website and on the paid-subscription confirmation page.
 - The ChatGPT-connected "MicroSprouts sandbox" has already had this configuration created and verified via its Stripe API, but **that is not proof the separate Cloudflare-key test environment already contains it**.
 
