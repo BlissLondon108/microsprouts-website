@@ -4,9 +4,9 @@
  * and a customer-portal configuration. Called only on validated checkout POSTs.
  */
 export const PRODUCT_DEFINITIONS=Object.freeze([
-  {id:"prod_microsprouts_broccoli_200g",name:"MicroSprouts Broccoli Sprouts — Week Supply 200g",amount:999,grams:200,kind:"sprouts",
+  {id:"prod_microsprouts_broccoli_200g",name:"MicroSprouts Broccoli Sprouts — Single Pack 200g",amount:999,subscriptionAmount:899,grams:200,kind:"sprouts",
    description:"200g fresh broccoli sprouts, grown in London. Collection by appointment or local delivery.",type:"good",shippable:true},
-  {id:"prod_microsprouts_broccoli_500g",name:"MicroSprouts Broccoli Sprouts — Family Pack 500g",amount:1699,grams:500,kind:"sprouts",
+  {id:"prod_microsprouts_broccoli_500g",name:"MicroSprouts Broccoli Sprouts — Family Pack 500g",amount:1699,subscriptionAmount:1549,grams:500,kind:"sprouts",
    description:"500g fresh broccoli sprouts, grown in London. Collection by appointment or local delivery.",type:"good",shippable:true},
   {id:"prod_microsprouts_delivery_london",name:"MicroSprouts Personal London Delivery",amount:230,grams:0,kind:"delivery",
    description:"Personal delivery in eligible London areas, normally Tuesday to Thursday.",type:"service",shippable:false}
@@ -60,14 +60,26 @@ async function ensureProduct(request,p){
   for(const [k,v] of Object.entries(productMetadata(p)))fields["metadata["+k+"]"]=v;
   product=await post(request,"products",fields,"product-"+p.id);
  }
- if(product.id!==p.id||product.active===false||product.name!==p.name)
+ if(product.id!==p.id||product.active===false)
   throw new Error("Unexpected or inactive MicroSprouts product: "+p.id);
+ // The former 200g product was called "Week Supply". Rename its existing
+ // Product so payments and Stripe invoices consistently say "Single Pack".
+ if(product.name!==p.name){
+  product=await post(request,"products/"+encodeURIComponent(p.id),
+    {name:p.name,description:p.description},"product-rename-v2-"+p.id);
+ }
+ if(product.name!==p.name)throw new Error("Could not update MicroSprouts product name: "+p.id);
  return product;
 }
 export const priceLookupKey=(product,frequency)=>{
  if(!BILLING_FREQUENCIES.includes(frequency))throw new Error("Unsupported billing frequency");
+ if(product.kind==="delivery"&&frequency!=="once")
+   throw new Error("Subscriptions include complimentary delivery; no recurring delivery price");
  const sku=product.kind==="delivery"?"delivery_london":"broccoli_"+product.grams+"g";
- return "ms_"+sku+"_"+frequency+"_v1";
+ // Stripe prices are immutable. v2 introduces lower recurring prices without
+ // altering subscriptions that might still reference the original v1 prices.
+ const version=product.kind==="sprouts"&&frequency!=="once"?"v2":"v1";
+ return "ms_"+sku+"_"+frequency+"_"+version;
 };
 async function ensurePrice(request,product,frequency){
  const lookup_key=priceLookupKey(product,frequency);
@@ -78,7 +90,8 @@ async function ensurePrice(request,product,frequency){
  let result=await request("prices?"+query.toString());
  let price=(result.data||[]).find(p=>p.lookup_key===lookup_key);
  if(!price){
-  const fields={product:product.id,currency:"gbp",unit_amount:product.amount,
+  const expectedAmount=frequency==="once"?product.amount:product.subscriptionAmount;
+  const fields={product:product.id,currency:"gbp",unit_amount:expectedAmount,
     lookup_key,nickname:"MicroSprouts "+(product.grams?product.grams+"g":"delivery")+" "+frequency,
     "metadata[brand]":"MicroSprouts","metadata[frequency]":frequency};
   if(frequency!=="once"){
@@ -90,7 +103,7 @@ async function ensurePrice(request,product,frequency){
  const interval=frequency==="once"?null:"week";
  const intervalCount=frequency==="once"?null:frequency==="weekly"?1:2;
  if(price.active===false||price.product!==product.id||price.currency!=="gbp"||
-    price.unit_amount!==product.amount||price.lookup_key!==lookup_key||
+    price.unit_amount!==expectedAmount||price.lookup_key!==lookup_key||
     (price.recurring?.interval||null)!==interval||
     (price.recurring?.interval_count||null)!==intervalCount)
   throw new Error("Stripe catalogue price mismatch for "+lookup_key);
@@ -151,7 +164,7 @@ export async function ensureCatalog(request,{promo=false}={}){
  }
  const prices=Object.create(null);
  for(const product of PRODUCT_DEFINITIONS){
-  for(const frequency of BILLING_FREQUENCIES){
+  for(const frequency of (product.kind==="delivery"?["once"]:BILLING_FREQUENCIES)){
    const key=priceLookupKey(product,frequency);
    const price=await step("price_"+key,()=>ensurePrice(request,product,frequency));
    prices[key]=price.id;
