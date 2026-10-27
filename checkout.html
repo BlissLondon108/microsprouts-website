@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#042b12"><meta name="robots" content="noindex">
+<title>Secure checkout preview | MicroSprouts</title>
+<link rel="stylesheet" href="comp.css"><link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="checkout.css"><script src="checkout.js" defer></script>
+</head>
+<body class="interior-page">
+<div class="interior-head"><header class="comp-nav">
+<a href="index.html#top" class="wordmark">MicroSprouts</a>
+<a class="checkout-back" href="index.html#products">← Back to broccoli sprouts</a>
+</header></div>
+<main class="checkout-page">
+<div class="checkout-heading">
+<p class="subpage-kicker">Fresh, grown with care in London</p>
+<h1 class="serif">Your checkout.</h1>
+<p>Choose your sprouts, enter your contact details and pay securely with Stripe. After payment, we'll arrange the exact time for your delivery or collection over WhatsApp.</p>
+</div>
+<div class="checkout-alert" id="checkout-state" role="status">Checking payment availability…</div>
+<div class="checkout-columns">
+<form id="stripe-checkout-form" class="order-card" novalidate>
+<h2 class="serif">Your sprouts</h2>
+<div class="order-form-grid">
+<div class="field"><label for="pack">Pack size</label><select id="pack" name="pack" required><option value="200">Week Supply · 200g · £9.99</option><option value="500">Family Pack · 500g · £16.99</option></select></div>
+<div class="field"><label for="quantity">Quantity</label><input type="number" min="1" max="10" step="1" id="quantity" name="quantity" value="1" required></div>
+</div>
+<div class="field"><label for="frequency">Purchase frequency</label><select id="frequency" name="frequency" required>
+<option value="once">One-time purchase</option>
+<option value="weekly">Weekly subscription — automatically billed each week</option>
+<option value="fortnightly">Fortnightly subscription — automatically billed every two weeks</option>
+</select></div>
+<p class="checkout-hint" id="frequency-note">One-time purchase. You pay once.</p>
+<div class="field"><span class="field-label">Collection or delivery</span>
+<div class="method-options">
+<label class="method-option"><input type="radio" name="method" value="pickup" checked><strong>Free collection</strong><small>By appointment</small></label>
+<label class="method-option"><input type="radio" name="method" value="delivery"><strong>London delivery</strong><small>+£2.30 each delivery</small></label>
+</div></div>
+<div class="order-form-grid">
+<div class="field"><label for="date">Preferred first date</label><input id="date" type="date" required><p class="checkout-hint">Subject to confirmation. Allow at least seven days.</p></div>
+<div class="field" id="postcode-field" hidden><label for="postcode">Delivery postcode</label><input id="postcode" autocomplete="postal-code" maxlength="10" placeholder="e.g. SE1 1AA"></div>
+</div>
+<div class="field"><label for="code">Promo code (optional)</label><input id="code" autocomplete="off" maxlength="20" placeholder="SPROUT"><p class="checkout-hint">SPROUT gives 20% off sprouts on eligible one-time orders.</p></div>
+<h2 class="serif checkout-subheading">Your details</h2>
+<p class="checkout-hint">You can pay as a guest. A MicroSprouts customer account is not required.</p>
+<div class="field"><label for="name">Full name <span aria-label="required">*</span></label><input id="name" autocomplete="name" maxlength="100" required></div>
+<div class="field"><label for="email">Email address <span aria-label="required">*</span></label><input id="email" type="email" autocomplete="email" maxlength="254" required><p class="checkout-hint">Required so we can contact you about your order.</p></div>
+<div class="field"><label for="whatsapp">WhatsApp number (optional)</label><input id="whatsapp" type="tel" autocomplete="tel" maxlength="28" placeholder="+44 7…"></div>
+<p class="checkout-hint">We will contact you to agree the final collection or delivery window. Your preferred date is not a guaranteed booking.</p>
+<p class="checkout-hint" id="subscription-disclosure" hidden>Subscriptions are charged automatically at the displayed price every week or every two weeks, including the delivery charge if selected. You can manage or cancel your subscription via Stripe's customer portal once enabled. The first requested fulfilment date is subject to confirmation.</p>
+<button id="pay-button" class="submit-btn" type="submit" disabled>Preparing secure checkout…</button>
+<p class="form-hint" id="checkout-message" aria-live="polite">Payment is currently unavailable while Stripe is being configured.</p>
+</form>
+<aside class="checkout-summary" aria-label="Order summary">
+<h2 class="serif">Order summary</h2>
+<div class="checkout-product"><img src="assets/approved/week.webp" alt="Fresh broccoli sprouts"><div><strong>Fresh broccoli sprouts</strong><p>Grown in small batches in London</p></div></div>
+<div class="price-row"><span>Sprouts</span><strong id="subtotal">£9.99</strong></div>
+<div class="price-row"><span>Delivery / collection</span><strong id="deliveryfee">FREE</strong></div>
+<div class="price-row" id="discount-row" hidden><span>SPROUT discount</span><strong id="discount">−£0.00</strong></div>
+<div class="price-row total"><span id="total-label">Total today</span><strong id="total">£9.99</strong></div>
+<p class="checkout-hint" id="repeat-summary">A one-time order.</p>
+<p class="checkout-hint">Secure payment is processed by Stripe. You will only be charged if you complete the Stripe payment page.</p>
+</aside>
+</div>
+</main>
+<footer class="footer"><div class="footer-inner"><strong>MicroSprouts · London</strong><span>Grown with love and care.</span><a href="index.html">Return to the shop</a></div></footer>
+</body></html>
