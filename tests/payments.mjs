@@ -112,16 +112,21 @@ try{
  })));
  check("Reusable price ID used instead of inline pricing",sessionForm.has("line_items[0][price]")&&!sessionForm.has("line_items[0][price_data][unit_amount]"));
  check("Client cannot supply their own goods price",sessionForm.get("metadata[total_pence]")==="1998"&&sessionForm.get("line_items[0][quantity]")==="2");
- check("Coupon restricted to sprouts products",coupons.get(PROMO_COUPON_ID)?.applies_to?.products?.every(id=>id!=="prod_microsprouts_delivery_london"));
- check("Customer portal login and cancellation enabled",portals.get("bpc_mock")?.login_page?.enabled&&portals.get("bpc_mock")?.features?.subscription_cancel?.enabled);
+ check("Unneeded coupon and portal are not provisioned during normal checkout",
+   stats.couponCreates===0&&stats.portalCreates===0);
  res=await api("/api/checkout/portal",{},envOn);
  check("Customer portal is accessible through secure Stripe login",(await res.json()).url===portalLogin);
+ check("Customer portal configured independently and cancellation enabled",
+   portals.get("bpc_mock")?.login_page?.enabled&&
+   portals.get("bpc_mock")?.features?.subscription_cancel?.enabled);
  const snapshot={...stats};
  res=await submit({...customer,quantity:1});
  check("Repeat checkout doesn't create duplicate products/prices",res.status===200&&stats.productCreates===snapshot.productCreates&&stats.priceCreates===snapshot.priceCreates&&stats.portalCreates===snapshot.portalCreates);
  check("Standard one-time purchase has pack quantity",sessionForm.get("mode")==="payment"&&sessionForm.get("line_items[0][quantity]")==="1");
  res=await submit({...customer,quantity:3,code:"SPROUT"});
  check("One-time SPROUT applies product-only coupon, not adjusted custom price",res.status===200&&sessionForm.get("discounts[0][coupon]")===PROMO_COUPON_ID&&sessionForm.get("line_items[0][quantity]")==="3"&&sessionForm.has("line_items[0][price]"));
+ check("SPROUT coupon created only when required and excludes delivery",
+   stats.couponCreates===1&&coupons.get(PROMO_COUPON_ID)?.applies_to?.products?.every(id=>id!=="prod_microsprouts_delivery_london"));
  check("One-time subtotal discount tracked correctly",sessionForm.get("metadata[total_pence]")==="2398");
  const weekly={...customer,frequency:"weekly",pack:"500",method:"delivery",date:requestedDate(true),postcode:"SE1 1AA"};
  res=await submit(weekly);
