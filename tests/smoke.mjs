@@ -65,33 +65,36 @@ const paymentClient=read("checkout.js");
 const catalog=read("stripe-catalog.js");
 check("Homepage uses the new Single Pack name with Family Pack preserved",
   html.includes('>Single Pack</span>')&&html.includes('>Family Pack</span>')&&!html.includes('>Week Supply</span>'));
-check("Product hero has replaced the former glass photo with a ornate porcelain-plate shot",
-  html.includes('id="hero-photo" class="is-pack-photo" src="assets/single-ornate-v3.webp"')&&
-  html.includes('ornate cream-and-gold porcelain plate')&&!html.includes('id="hero-photo" data-asset="week"'));
-check("Both pack photos show fully in the same fixed-size gallery with seamless sides",
-  css.includes("object-fit:contain;object-position:center;position:relative;z-index:1;")&&
+check("Hero displays the approved wide porcelain-plate image",
+  html.includes('id="hero-photo" class="is-pack-photo" src="assets/single-ornate-wide-v1.svg"')&&
+  html.includes('ornate cream-and-gold porcelain plate'));
+check("Wide pack photos fill unchanged gallery without side panels",
+  css.includes(".gallery-main img.is-pack-photo{object-fit:cover;object-position:center}")&&
   css.includes(".gallery-main{height:302px")&&
-  css.includes("filter:blur(15px);opacity:1")&&
-  css.includes("-webkit-mask-image:linear-gradient(to right")&&
-  css.includes("family-ornate-v3.webp")&&
-  app.includes("hero?.classList.add('is-pack-photo')")&&
-  app.includes("hero?.classList.remove('is-pack-photo')"));
+  !css.includes(".gallery-main:has(img.is-pack-photo)")&&
+  app.includes("hero?.classList.add('is-pack-photo')"));
 const singlePhoto=path.join(root,"assets/single-ornate-v3.webp");
 const familyPhoto=path.join(root,"assets/family-ornate-v3.webp");
-check("Matched pack photos exist as distinct WebP assets",
+check("Original approved product photos remain available",
   fs.existsSync(singlePhoto)&&fs.existsSync(familyPhoto)&&
   fs.readFileSync(singlePhoto).toString("base64")!==fs.readFileSync(familyPhoto).toString("base64"));
-check("Checkout pack cards and summary show complete photos without hard side borders",
-  read("checkout.css").includes("width:100%;height:158px;object-fit:contain;object-position:center;")&&
-  read("checkout.css").includes(".checkout-pack-choice[data-pack-choice=\"500\"]::before")&&
-  read("checkout.css").includes("-webkit-mask-image:linear-gradient(to right")&&
+const singleWide=read("assets/single-ornate-wide-v1.svg");
+const familyWide=read("assets/family-ornate-wide-v1.svg");
+check("New wide photos embed original product and tabletop backgrounds",
+  singleWide.includes('viewBox="0 0 2400 768"')&&
+  familyWide.includes('viewBox="0 0 2400 768"')&&
+  (singleWide.match(/data:image\/webp;base64,/g)||[]).length===2&&
+  (familyWide.match(/data:image\/webp;base64,/g)||[]).length===2&&
+  singleWide!==familyWide);
+check("Checkout pack photos fill the cards without side bars",
+  read("checkout.css").includes(".checkout-pack-choice img{width:100%;height:158px;object-fit:cover")&&
   read("checkout.css").includes(".checkout-product img{width:96px;height:91px;object-fit:contain"));
-check("Both checkout choices use final user-approved ornate plate images",
-  paymentCheckout.includes('src="assets/single-ornate-v3.webp"')&&
-  paymentCheckout.includes('src="assets/family-ornate-v3.webp"')&&
+check("Checkout displays expanded Single and Family photos",
+  paymentCheckout.includes('src="assets/single-ornate-wide-v1.svg"')&&
+  paymentCheckout.includes('src="assets/family-ornate-wide-v1.svg"')&&
+  app.includes('assets/single-ornate-wide-v1.svg')&&app.includes('assets/family-ornate-wide-v1.svg')&&
   paymentClient.includes('assets/single-ornate-v3.webp')&&
-  paymentClient.includes('assets/family-ornate-v3.webp')&&
-  app.includes('assets/single-ornate-v3.webp')&&app.includes('assets/family-ornate-v3.webp'));
+  paymentClient.includes('assets/family-ornate-v3.webp'));
 check("Checkout shows both interactive pack photos and visible subscription savings",
   ["data-pack-choice=\"200\"","data-pack-choice=\"500\"","subscription-savings-row","subscription-perk"].every(x=>paymentCheckout.includes(x)));
 check("Recurring UI prices and complimentary delivery are reflected in the customer-facing calculator",
