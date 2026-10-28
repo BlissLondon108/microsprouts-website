@@ -10,9 +10,9 @@
 <meta property="og:description" content="Fresh broccoli sprouts grown in small batches. Explore our Single Pack and Family Pack, then arrange collection or personal London delivery.">
 <title>MicroSprouts | Freshly grown in London</title>
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
-<link rel="stylesheet" href="comp.css?v=basket-preview-1">
+<link rel="stylesheet" href="comp.css?v=basket-overlay-1">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=1" defer></script>
+<script src="cart-preview.js?v=2" defer></script>
 </head>
 <body>
 <main id="top">
@@ -28,6 +28,10 @@
           <li><a href="#faq">FAQ</a></li>
         </ul>
       </nav>
+      <button type="button" class="nav-cart" id="open-cart" aria-label="Open shopping basket, 0 items" aria-haspopup="dialog" aria-controls="cart-overlay">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l2.1 11.2a2 2 0 0 0 2 1.6h9.3a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="20" r="1"/><circle cx="19" cy="20" r="1"/></svg>
+        <span class="nav-cart__count" id="nav-cart-count" aria-hidden="true">0</span>
+      </button>
       <button type="button" class="menu-btn" id="menu-toggle" aria-controls="nav-links" aria-expanded="false">Menu ☰</button>
     </header>
     <section class="hero-content" id="products" aria-labelledby="product-heading">
@@ -128,82 +132,113 @@
     <div class="sprout-showcase__intro">
       <p class="sprout-showcase__eyebrow">THE MICROSPROUTS COLLECTION</p>
       <h2 class="serif" id="sprout-showcase-title">Little sprouts, <em>big possibilities.</em></h2>
-      <p>Discover our fresh varieties. Tap a circle to add it to the basket preview below.</p>
+      <p>Discover our fresh varieties. Choose a sprout to explore its options.</p>
     </div>
     <div class="sprout-marquee" aria-label="Sprout varieties; hover or focus to pause the gentle scroll">
       <div class="sprout-marquee__track">
         <div class="sprout-marquee__group">
-            <button type="button" class="sprout-tile" data-cart-sku="broccoli-200" aria-label="Add Broccoli Single Pack · 200g to basket preview">
+            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts">
               <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/week.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Single Pack · 200g</span>
-              <span class="sprout-tile__price">£9.99</span>
+              <span class="sprout-tile__subtitle">Fresh & delicate</span>
+              <span class="sprout-tile__price">From £9.99</span>
             </button>
-            <button type="button" class="sprout-tile" data-cart-sku="broccoli-500" aria-label="Add Broccoli Family Pack · 500g to basket preview">
-              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/family.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Family Pack · 500g</span>
-              <span class="sprout-tile__price">£16.99</span>
-            </button>
-            <button type="button" class="sprout-tile" data-cart-sku="radish" aria-label="Add Radish Peppery & colourful to basket preview">
+            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts">
               <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Radish</strong>
-              <span class="sprout-tile__subtitle">Peppery & colourful</span>
-              <span class="sprout-tile__price">Price on request</span>
+              <span class="sprout-tile__subtitle">Bright & peppery</span>
+              <span class="sprout-tile__price">Ask for availability</span>
             </button>
-            <button type="button" class="sprout-tile" data-cart-sku="mung" aria-label="Add Mung bean Fresh & crunchy to basket preview">
+            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts">
               <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Mung bean</strong>
               <span class="sprout-tile__subtitle">Fresh & crunchy</span>
-              <span class="sprout-tile__price">Price on request</span>
+              <span class="sprout-tile__price">Ask for availability</span>
             </button>
-            <button type="button" class="sprout-tile" data-cart-sku="leek" aria-label="Add Leek Gentle & savoury to basket preview">
+            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts">
               <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Leek</strong>
               <span class="sprout-tile__subtitle">Gentle & savoury</span>
-              <span class="sprout-tile__price">Price on request</span>
+              <span class="sprout-tile__price">Ask for availability</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/week.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Broccoli</strong>
+              <span class="sprout-tile__subtitle">Fresh & delicate</span>
+              <span class="sprout-tile__price">From £9.99</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Radish</strong>
+              <span class="sprout-tile__subtitle">Bright & peppery</span>
+              <span class="sprout-tile__price">Ask for availability</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Mung bean</strong>
+              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
+              <span class="sprout-tile__price">Ask for availability</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Leek</strong>
+              <span class="sprout-tile__subtitle">Gentle & savoury</span>
+              <span class="sprout-tile__price">Ask for availability</span>
             </button>
         </div>
         <div class="sprout-marquee__group" aria-hidden="true">
-            <button type="button" class="sprout-tile" data-cart-sku="broccoli-200" aria-label="Add Broccoli Single Pack · 200g to basket preview" tabindex="-1">
+            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts" tabindex="-1" aria-hidden="true">
               <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/week.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Single Pack · 200g</span>
-              <span class="sprout-tile__price">£9.99</span>
+              <span class="sprout-tile__subtitle">Fresh & delicate</span>
+              <span class="sprout-tile__price">From £9.99</span>
             </button>
-            <button type="button" class="sprout-tile" data-cart-sku="broccoli-500" aria-label="Add Broccoli Family Pack · 500g to basket preview" tabindex="-1">
-              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/family.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Family Pack · 500g</span>
-              <span class="sprout-tile__price">£16.99</span>
-            </button>
-            <button type="button" class="sprout-tile" data-cart-sku="radish" aria-label="Add Radish Peppery & colourful to basket preview" tabindex="-1">
+            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts" tabindex="-1" aria-hidden="true">
               <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Radish</strong>
-              <span class="sprout-tile__subtitle">Peppery & colourful</span>
-              <span class="sprout-tile__price">Price on request</span>
+              <span class="sprout-tile__subtitle">Bright & peppery</span>
+              <span class="sprout-tile__price">Ask for availability</span>
             </button>
-            <button type="button" class="sprout-tile" data-cart-sku="mung" aria-label="Add Mung bean Fresh & crunchy to basket preview" tabindex="-1">
+            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts" tabindex="-1" aria-hidden="true">
               <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Mung bean</strong>
               <span class="sprout-tile__subtitle">Fresh & crunchy</span>
-              <span class="sprout-tile__price">Price on request</span>
+              <span class="sprout-tile__price">Ask for availability</span>
             </button>
-            <button type="button" class="sprout-tile" data-cart-sku="leek" aria-label="Add Leek Gentle & savoury to basket preview" tabindex="-1">
+            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts" tabindex="-1" aria-hidden="true">
               <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
               <strong class="sprout-tile__title">Leek</strong>
               <span class="sprout-tile__subtitle">Gentle & savoury</span>
-              <span class="sprout-tile__price">Price on request</span>
+              <span class="sprout-tile__price">Ask for availability</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/week.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Broccoli</strong>
+              <span class="sprout-tile__subtitle">Fresh & delicate</span>
+              <span class="sprout-tile__price">From £9.99</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Radish</strong>
+              <span class="sprout-tile__subtitle">Bright & peppery</span>
+              <span class="sprout-tile__price">Ask for availability</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Mung bean</strong>
+              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
+              <span class="sprout-tile__price">Ask for availability</span>
+            </button>
+            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts" tabindex="-1" aria-hidden="true">
+              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Leek</strong>
+              <span class="sprout-tile__subtitle">Gentle & savoury</span>
+              <span class="sprout-tile__price">Ask for availability</span>
             </button>
         </div>
       </div>
     </div>
-    <div class="sprout-showcase__footer">
-      <span>Broccoli packs are ready to order</span>
-      <span class="sprout-showcase__separator" aria-hidden="true">✦</span>
-      <span>Other varieties are by enquiry</span>
-      <a href="#basket">View your basket <span aria-hidden="true">↓</span></a>
-    </div>
+
   </section>
 
   <section class="faq" id="faq" aria-labelledby="faq-title">
@@ -219,6 +254,25 @@
         <details><summary>Which days do you deliver?</summary><p>Personal deliveries in selected London areas are usually available Tuesday, Wednesday and Thursday. Delivery is £2.30 for one-time orders and free with subscriptions.</p></details>
         <details><summary>Can I order sprouts regularly?</summary><p>Yes. Choose a weekly or fortnightly subscription at checkout, with lower pack prices and free London delivery. Stripe automatically bills each period, and you can manage or cancel future renewals through the secure customer portal.</p></details>
       </div>
+
+    </div>
+  </section>
+</main>
+
+  <div id="cart-overlay" class="cart-overlay" hidden>
+    <div class="cart-overlay__backdrop" data-cart-close aria-hidden="true"></div>
+    <section class="cart-overlay__panel" role="dialog" aria-modal="true" aria-labelledby="basket-title" tabindex="-1">
+      <div class="cart-overlay__top">
+        <span class="cart-overlay__brand">MICROSPROUTS <span aria-hidden="true">/</span> YOUR HARVEST</span>
+        <button type="button" class="cart-overlay__close" id="close-cart" data-cart-close aria-label="Close shopping basket">Close <span aria-hidden="true">×</span></button>
+      </div>
+      <div class="cart-overlay__content">
+        <div class="cart-overlay__story">
+          <p class="cart-overlay__eyebrow">FRESHLY GROWN IN LONDON</p>
+          <h2 class="serif">Your little<br><em>harvest.</em></h2>
+          <p>Gather your favourites and make a beautiful little selection. This is a first look at the basket — we’re still shaping its checkout.</p>
+          <img src="assets/approved/week.webp" width="512" height="340" alt="Fresh broccoli sprouts" loading="lazy" decoding="async">
+        </div>
       <aside class="basket-preview" id="basket" aria-labelledby="basket-title">
         <div class="basket-preview__header">
           <div><p class="basket-preview__eyebrow">YOUR LITTLE HARVEST</p><h3 id="basket-title">Shopping basket</h3></div>
@@ -237,9 +291,21 @@
         <a class="basket-preview__cta" href="#products">Shop broccoli with Stripe <span aria-hidden="true">↗</span></a>
         <p class="basket-preview__disclaimer">Basket design preview only — items here do not create an order or payment. Broccoli checkout above remains available.</p>
       </aside>
-    </div>
-  </section>
-</main>
+      </div>
+    </section>
+  </div>
+  <div id="sprout-picker" class="sprout-picker" hidden>
+    <div class="sprout-picker__backdrop" data-picker-close aria-hidden="true"></div>
+    <section class="sprout-picker__dialog" role="dialog" aria-modal="true" aria-labelledby="sprout-picker-title" aria-describedby="sprout-picker-description" tabindex="-1">
+      <button type="button" class="sprout-picker__close" id="close-picker" data-picker-close aria-label="Close sprout selection">×</button>
+      <p class="sprout-picker__eyebrow">CHOOSE YOUR SPROUTS</p>
+      <h2 class="serif" id="sprout-picker-title">Broccoli sprouts</h2>
+      <p id="sprout-picker-description" class="sprout-picker__description">Choose your pack size.</p>
+      <div class="sprout-picker__choices" id="sprout-picker-choices"></div>
+      <p class="sprout-picker__footnote">Your selection will appear in the basket preview. No payment is taken here.</p>
+    </section>
+  </div>
+
 <footer class="footer"><div class="footer-inner"><strong>MicroSprouts · London</strong><span>Grown with love and care.</span><a href="sprouts.html">More Sprouts</a><a href="science.html">Science of Sprouts</a><a href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer">WhatsApp 07386853514 ↗</a></div></footer>
 </body>
 </html>
