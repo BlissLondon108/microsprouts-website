@@ -9,6 +9,7 @@
       "/api/*"
     ]
   },
+  "triggers": {"crons": ["*/5 * * * *"]},
   "vars": {
     "PAYMENTS_ENABLED": "true"
   }
