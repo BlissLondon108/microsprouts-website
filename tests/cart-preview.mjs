@@ -58,7 +58,7 @@ check("Basket quantity decrement updates total",
 check("Only SKU quantities are persisted",JSON.parse(saved.get("microsprouts-basket-preview-v1"))["broccoli-200"]===1);
 for(let i=0;i<15;i++)tiles[0].listeners.click();
 check("Quantity cannot exceed 10",JSON.parse(saved.get("microsprouts-basket-preview-v1"))["broccoli-200"]===10);
-for(let i=0;i<12;i++){
+for(let i=0;i<10;i++){
   const remove=get("basket-items").children[0].children[1].children[0];
   get("basket-items").listeners.click({target:remove});
 }
