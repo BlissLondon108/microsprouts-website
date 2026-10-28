@@ -36,7 +36,20 @@ check("Sandbox works when build omits optional enable toggle",
 res=await api("/api/checkout/status",{}, {...sandboxOnly,PAYMENTS_ENABLED:"false"});
 check("Explicit runtime disable switch prevents checkout",(await res.json()).enabled===false);
 res=await api("/api/checkout/status",{}, {...envOn,STRIPE_SECRET_KEY:"sk_live_not_permitted"});
-check("Live secret keys can never enable this test Worker",(await res.json()).enabled===false);
+check("Live keys without explicit readiness cannot enable checkout",(await res.json()).enabled===false);
+const liveBase={...envOff,PAYMENT_MODE:"live",LIVE_CHECKOUT_ENABLED:"true",
+ OWNER_ALERT_VERIFIED:"true",STRIPE_SECRET_KEY:"sk_live_mock_only",
+ STRIPE_WEBHOOK_SECRET:"whsec_mock",RESEND_API_KEY:"re_mock_secret_key",
+ ORDER_ALERT_TO:"owner@example.org",ORDER_ALERT_FROM:"shop@example.org"};
+res=await api("/api/checkout/status",{},liveBase);
+check("Live mode is denied until durable storage is configured",(await res.json()).enabled===false);
+const mockDatabase={prepare:()=>({first:async()=>({})})};
+res=await api("/api/checkout/status",{}, {...liveBase,ORDERS_DB:mockDatabase,OWNER_ALERT_VERIFIED:"false"});
+check("Live mode is denied until owner alerts are verified",(await res.json()).enabled===false);
+res=await api("/api/checkout/status",{}, {...liveBase,ORDERS_DB:mockDatabase});
+const liveStatus=await res.json();
+check("Verified readiness exposes live mode for public checkout",
+ liveStatus.enabled===true&&liveStatus.mode==="live"&&liveStatus.fulfillment_ready===true);
 res=await submit(customer,envOff);
 check("Missing test credentials prevents any checkout",res.status===503);
 res=await api("/index.html");
