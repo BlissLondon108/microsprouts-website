@@ -10,8 +10,9 @@
 <meta property="og:description" content="Fresh broccoli sprouts grown in small batches. Explore our Single Pack and Family Pack, then arrange collection or personal London delivery.">
 <title>MicroSprouts | Freshly grown in London</title>
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
-<link rel="stylesheet" href="comp.css?v=stable-load-1">
-<script src="comp.js?v=stable-load-1" defer></script>
+<link rel="stylesheet" href="comp.css?v=basket-preview-1">
+<script src="comp.js?v=basket-preview-1" defer></script>
+<script src="cart-preview.js?v=1" defer></script>
 </head>
 <body>
 <main id="top">
@@ -123,43 +124,119 @@
     </article>
   </section>
 
-  <section class="order-section" id="enquire" aria-labelledby="order-title">
-    <div class="order-inner">
-      <div class="order-copy">
-        <h2 class="serif" id="order-title">Fresh sprouts.<br>On your schedule.</h2>
-        <p>Choose your pack and continue to the same secure Stripe checkout as above. Select a one-time order or a weekly or fortnightly subscription, then choose free collection or London delivery.</p>
-        <p class="text-note">Please allow at least seven days for your first collection or delivery. Personal London delivery is normally Tuesday to Thursday. After payment, we'll agree an exact time with you.</p>
-      </div>
-      <div class="order-card" aria-labelledby="bottom-checkout-title">
-        <h3 id="bottom-checkout-title">Secure checkout</h3>
-        <p class="intro">The same secure checkout as the top of the page. Choose your pack here, then enter your order details and pay with Stripe.</p>
-        <div class="field">
-          <label for="bottom-pack">Pack size</label>
-          <select id="bottom-pack">
-            <option value="200">Single Pack · 200g · £9.99</option>
-            <option value="500">Family Pack · 500g · £16.99</option>
-          </select>
+  <section class="sprout-showcase" id="explore-sprouts" aria-labelledby="sprout-showcase-title">
+    <div class="sprout-showcase__intro">
+      <p class="sprout-showcase__eyebrow">THE MICROSPROUTS COLLECTION</p>
+      <h2 class="serif" id="sprout-showcase-title">Little sprouts, <em>big possibilities.</em></h2>
+      <p>Discover our fresh varieties. Tap a circle to add it to the basket preview below.</p>
+    </div>
+    <div class="sprout-marquee" aria-label="Sprout varieties; hover or focus to pause the gentle scroll">
+      <div class="sprout-marquee__track">
+        <div class="sprout-marquee__group">
+            <button type="button" class="sprout-tile" data-cart-sku="broccoli-200" aria-label="Add Broccoli Single Pack · 200g to basket preview">
+              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/week.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Broccoli</strong>
+              <span class="sprout-tile__subtitle">Single Pack · 200g</span>
+              <span class="sprout-tile__price">£9.99</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="broccoli-500" aria-label="Add Broccoli Family Pack · 500g to basket preview">
+              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/family.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Broccoli</strong>
+              <span class="sprout-tile__subtitle">Family Pack · 500g</span>
+              <span class="sprout-tile__price">£16.99</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="radish" aria-label="Add Radish Peppery & colourful to basket preview">
+              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Radish</strong>
+              <span class="sprout-tile__subtitle">Peppery & colourful</span>
+              <span class="sprout-tile__price">Price on request</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="mung" aria-label="Add Mung bean Fresh & crunchy to basket preview">
+              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Mung bean</strong>
+              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
+              <span class="sprout-tile__price">Price on request</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="leek" aria-label="Add Leek Gentle & savoury to basket preview">
+              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Leek</strong>
+              <span class="sprout-tile__subtitle">Gentle & savoury</span>
+              <span class="sprout-tile__price">Price on request</span>
+            </button>
         </div>
-        <div class="price-summary">
-          <div class="price-row"><span>Weekly or fortnightly subscription</span><strong>Save on every pack</strong></div>
-          <div class="price-row"><span>Collection</span><strong>FREE</strong></div>
-          <div class="price-row"><span>London delivery</span><strong>£2.30 · FREE for subscribers</strong></div>
+        <div class="sprout-marquee__group" aria-hidden="true">
+            <button type="button" class="sprout-tile" data-cart-sku="broccoli-200" aria-label="Add Broccoli Single Pack · 200g to basket preview" tabindex="-1">
+              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/week.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Broccoli</strong>
+              <span class="sprout-tile__subtitle">Single Pack · 200g</span>
+              <span class="sprout-tile__price">£9.99</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="broccoli-500" aria-label="Add Broccoli Family Pack · 500g to basket preview" tabindex="-1">
+              <span class="sprout-orb sprout-orb--broccoli"><img src="assets/approved/family.webp" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Broccoli</strong>
+              <span class="sprout-tile__subtitle">Family Pack · 500g</span>
+              <span class="sprout-tile__price">£16.99</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="radish" aria-label="Add Radish Peppery & colourful to basket preview" tabindex="-1">
+              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Radish</strong>
+              <span class="sprout-tile__subtitle">Peppery & colourful</span>
+              <span class="sprout-tile__price">Price on request</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="mung" aria-label="Add Mung bean Fresh & crunchy to basket preview" tabindex="-1">
+              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Mung bean</strong>
+              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
+              <span class="sprout-tile__price">Price on request</span>
+            </button>
+            <button type="button" class="sprout-tile" data-cart-sku="leek" aria-label="Add Leek Gentle & savoury to basket preview" tabindex="-1">
+              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><span class="sprout-orb__add" aria-hidden="true">+</span></span>
+              <strong class="sprout-tile__title">Leek</strong>
+              <span class="sprout-tile__subtitle">Gentle & savoury</span>
+              <span class="sprout-tile__price">Price on request</span>
+            </button>
         </div>
-        <a id="bottom-checkout-button" class="submit-btn" href="checkout.html?pack=200">Continue to secure checkout →</a>
-        <p class="form-hint" id="bottom-checkout-note" aria-live="polite">Your price, delivery choice and subscription terms are shown before payment. No charge until you complete Stripe Checkout.</p>
       </div>
+    </div>
+    <div class="sprout-showcase__footer">
+      <span>Broccoli packs are ready to order</span>
+      <span class="sprout-showcase__separator" aria-hidden="true">✦</span>
+      <span>Other varieties are by enquiry</span>
+      <a href="#basket">View your basket <span aria-hidden="true">↓</span></a>
     </div>
   </section>
 
   <section class="faq" id="faq" aria-labelledby="faq-title">
     <div class="faq-inner">
-      <h2 class="serif" id="faq-title">Frequently asked<br>questions.</h2>
-      <div>
+      <div class="faq-intro">
+        <p class="faq-eyebrow">GOOD TO KNOW</p>
+        <h2 class="serif" id="faq-title">Frequently asked<br>questions.</h2>
+        <p>Fresh answers for your fresh sprouts.</p>
+      </div>
+      <div class="faq-questions">
         <details><summary>How long do the sprouts take to grow?</summary><p>At least six days. The website requires seven days' advance notice to allow a buffer.</p></details>
         <details><summary>When can I collect my order?</summary><p>Collection can be requested on any day, subject to an agreed collection window. The location is confirmed privately.</p></details>
         <details><summary>Which days do you deliver?</summary><p>Personal deliveries in selected London areas are usually available Tuesday, Wednesday and Thursday. Delivery is £2.30 for one-time orders and free with subscriptions.</p></details>
         <details><summary>Can I order sprouts regularly?</summary><p>Yes. Choose a weekly or fortnightly subscription at checkout, with lower pack prices and free London delivery. Stripe automatically bills each period, and you can manage or cancel future renewals through the secure customer portal.</p></details>
       </div>
+      <aside class="basket-preview" id="basket" aria-labelledby="basket-title">
+        <div class="basket-preview__header">
+          <div><p class="basket-preview__eyebrow">YOUR LITTLE HARVEST</p><h3 id="basket-title">Shopping basket</h3></div>
+          <span class="basket-preview__count" id="basket-count" aria-label="0 items">0</span>
+        </div>
+        <p class="basket-preview__intro">A first look at your new basket.</p>
+        <ul id="basket-items" class="basket-preview__items">
+          <li class="basket-preview__empty">Your basket is waiting for something green. Choose a sprout above to get started.</li>
+        </ul>
+        <div class="basket-preview__total">
+          <span>Priced items subtotal</span>
+          <strong id="basket-subtotal">£0.00</strong>
+        </div>
+        <p id="basket-unpriced" class="basket-preview__unpriced" hidden>Varieties priced by enquiry are not included in this subtotal.</p>
+        <p id="basket-feedback" class="basket-preview__feedback" role="status" aria-live="polite"></p>
+        <a class="basket-preview__cta" href="#products">Shop broccoli with Stripe <span aria-hidden="true">↗</span></a>
+        <p class="basket-preview__disclaimer">Basket design preview only — items here do not create an order or payment. Broccoli checkout above remains available.</p>
+      </aside>
     </div>
   </section>
 </main>
