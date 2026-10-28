@@ -642,3 +642,12 @@ body.overlay-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
  .cart-overlay__panel{animation:none}
 }
+
+
+/* Show fallback initials only on an actual photo load error, never mid-load. */
+.sprout-orb__letter{display:none}
+.sprout-orb--photo-missing .sprout-orb__letter{display:grid}
+@media(min-width:771px) and (max-width:1100px){
+ .nav-cart{width:34px;height:34px;top:13px;right:2px}
+ .nav-cart__count{right:0}
+}
