@@ -17,6 +17,9 @@ The live catalogue now contains:
   for checkout.session.completed, checkout.session.async_payment_succeeded, invoice.paid,
   invoice.payment_failed, customer.subscription.updated, customer.subscription.deleted.
   Webhook ID: we_1UVWwCJ8HaF2s5A92H7kgpkQ.
+  The live webhook is intentionally DISABLED until its signing secret is installed in
+  Cloudflare, D1 and owner alerts are verified, and a signed event has been tested.
+  Re-enable it in Stripe before enabling customer checkout.
 
 **Still required**: Set this live endpoint's signing secret as STRIPE_WEBHOOK_SECRET
 in Cloudflare's Worker runtime; provide the corresponding live STRIPE_SECRET_KEY in
