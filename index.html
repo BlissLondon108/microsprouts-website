@@ -11,8 +11,7 @@
 <title>MicroSprouts | Freshly grown in London</title>
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
 <link rel="stylesheet" href="comp.css?v=wide-photo-1">
-<script src="shop.js" defer></script>
-<script src="comp.js?v=stripe-only-live-1" defer></script>
+<script src="comp.js?v=stripe-only-live-2" defer></script>
 </head>
 <body>
 <main id="top">
@@ -57,7 +56,7 @@
             <span class="package-info"><strong class="package-grams">500g</strong><span class="package-title">Family Pack</span><strong class="package-price">£16.99</strong></span>
           </button>
         </div>
-        <a class="checkout-btn" data-pack="200" id="checkout-button" href="#enquire" aria-label="Enquire about this pack">Enquire now</a>
+        <a class="checkout-btn" data-pack="200" id="checkout-button" href="#enquire" aria-label="View order options for this pack">View order options</a>
         <div class="delivery-highlights">
           <span><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2 9h17v15H2zM19 14h6l5 6v4H19z"/><circle cx="9" cy="26" r="3"/><circle cx="24" cy="26" r="3"/></svg>£2.30 London delivery</span>
           <i class="line" aria-hidden="true"></i>
@@ -128,39 +127,27 @@
     <div class="order-inner">
       <div class="order-copy">
         <h2 class="serif" id="order-title">Fresh sprouts.<br>On your schedule.</h2>
-        <p>Choose your pack, quantity and preferred date. I'll personally confirm availability, the collection or delivery time and payment arrangements through WhatsApp.</p>
-        <p class="text-note">Broccoli requires at least six days to grow, so please request seven days ahead. Personal delivery is normally Tuesday to Thursday. Collection is free by appointment.</p>
+        <p>Choose your pack and continue to the same secure Stripe checkout as above. Select a one-time order or a weekly or fortnightly subscription, then choose free collection or London delivery.</p>
+        <p class="text-note">Please allow at least seven days for your first collection or delivery. Personal London delivery is normally Tuesday to Thursday. After payment, we'll agree an exact time with you.</p>
       </div>
-      <form id="interest-form" class="order-card">
-        <h3>Checkout enquiry</h3>
-        <p class="intro">No payment is taken here. Your choices will be prepared as a WhatsApp enquiry.</p>
-        <div class="order-form-grid">
-          <div class="field"><label for="pack">Pack size</label><select id="pack"><option value="200">Single Pack · 200g · £9.99</option><option value="500">Family Pack · 500g · £16.99</option></select></div>
-          <div class="field"><label for="qty">Quantity</label><input type="number" id="qty" min="1" max="10" value="1" step="1" required></div>
+      <div class="order-card" aria-labelledby="bottom-checkout-title">
+        <h3 id="bottom-checkout-title">Secure checkout</h3>
+        <p class="intro">The same secure checkout as the top of the page. Choose your pack here, then enter your order details and pay with Stripe.</p>
+        <div class="field">
+          <label for="bottom-pack">Pack size</label>
+          <select id="bottom-pack">
+            <option value="200">Single Pack · 200g · £9.99</option>
+            <option value="500">Family Pack · 500g · £16.99</option>
+          </select>
         </div>
-        <div class="field"><label for="frequency">Frequency</label><select id="frequency"><option value="once">One-time</option><option value="weekly">Weekly subscription enquiry · £8.99 / £15.49</option><option value="fortnightly">Fortnightly subscription enquiry · £8.99 / £15.49</option></select></div>
-        <div class="field"><span class="field-label">How will you receive your sprouts?</span>
-          <div class="method-options">
-            <label class="method-option"><input type="radio" name="method" value="pickup" checked><strong>Free collection</strong><small>By appointment</small></label>
-            <label class="method-option"><input type="radio" name="method" value="delivery"><strong>London delivery</strong><small>£2.30 one-time · free on subscriptions</small></label>
-          </div>
-        </div>
-        <div class="order-form-grid">
-          <div class="field"><label for="date">Preferred date</label><input type="date" id="date" required></div>
-          <div class="field" id="postcode-field" hidden><label for="postcode">London postcode</label><input id="postcode" type="text" autocomplete="postal-code" maxlength="9" placeholder="e.g. SE1"></div>
-        </div>
-        <p class="form-hint" id="datehint">All dates subject to confirmation.</p>
-        <div class="field"><label for="code">Discount code (optional)</label><input id="code" type="text" placeholder="SPROUT" maxlength="20" autocomplete="off"><p class="form-hint" id="promo-hint">SPROUT gives 20% off sprouts on eligible one-time enquiries.</p><p class="form-hint">Subscription enquiries: Single Pack £8.99, Family Pack £15.49, with free London delivery. Recurring billing is available through the separate sandbox checkout while testing.</p></div>
         <div class="price-summary">
-          <div class="price-row"><span>Sprouts</span><strong id="subtotal">£9.99</strong></div>
-          <div class="price-row"><span>Collection / delivery</span><strong id="deliveryfee">FREE</strong></div>
-          <div class="price-row" id="discountline" hidden><span>SPROUT discount</span><strong id="discount">−£0.00</strong></div>
-          <div class="price-row total"><span id="enquiry-total-label">Indicative total</span><strong id="total">£9.99</strong></div>
+          <div class="price-row"><span>Weekly or fortnightly subscription</span><strong>Save on every pack</strong></div>
+          <div class="price-row"><span>Collection</span><strong>FREE</strong></div>
+          <div class="price-row"><span>London delivery</span><strong>£2.30 · FREE for subscribers</strong></div>
         </div>
-        <button class="submit-btn" type="submit">Continue to WhatsApp →</button>
-        <p class="form-hint" id="form-message" aria-live="polite">Nothing is reserved or charged until confirmed personally.</p>
-        <a id="whatsapp-fallback" class="whatsapp-fallback" href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer" hidden>Open prepared WhatsApp message ↗</a>
-      </form>
+        <button id="bottom-checkout-button" class="submit-btn" type="button" disabled>Checking checkout availability…</button>
+        <p class="form-hint" id="bottom-checkout-note" aria-live="polite">Your price, delivery choice and subscription terms are shown before payment. No charge until you complete Stripe Checkout.</p>
+      </div>
     </div>
   </section>
 
@@ -170,8 +157,8 @@
       <div>
         <details><summary>How long do the sprouts take to grow?</summary><p>At least six days. The website requires seven days' advance notice to allow a buffer.</p></details>
         <details><summary>When can I collect my order?</summary><p>Collection can be requested on any day, subject to an agreed collection window. The location is confirmed privately.</p></details>
-        <details><summary>Which days do you deliver?</summary><p>Personal deliveries in selected London areas are usually available Tuesday, Wednesday and Thursday for £2.30 per order.</p></details>
-        <details><summary>Can I order sprouts regularly?</summary><p>You can enquire about weekly or fortnightly arrangements. Automatic subscriptions and billing aren't yet available.</p></details>
+        <details><summary>Which days do you deliver?</summary><p>Personal deliveries in selected London areas are usually available Tuesday, Wednesday and Thursday. Delivery is £2.30 for one-time orders and free with subscriptions.</p></details>
+        <details><summary>Can I order sprouts regularly?</summary><p>Yes. Choose a weekly or fortnightly subscription at checkout, with lower pack prices and free London delivery. Stripe automatically bills each period, and you can manage or cancel future renewals through the secure customer portal.</p></details>
       </div>
     </div>
   </section>
