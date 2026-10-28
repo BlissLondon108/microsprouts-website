@@ -66,7 +66,8 @@ const liveConfigured=env=>
   env.PAYMENT_MODE==="live"&&env.LIVE_CHECKOUT_ENABLED==="true"&&
   env.STRIPE_NOTIFICATIONS_CONFIRMED==="true"&&
   env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
-  typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_live_");
+  typeof env.STRIPE_SECRET_KEY==="string"&&
+  (env.STRIPE_SECRET_KEY.startsWith("sk_live_")||env.STRIPE_SECRET_KEY.startsWith("rk_live_"));
 const paymentMode=async env=>liveConfigured(env)?"live":ready(env)?"test":"not-configured";
 const put=(params,key,value)=>params.append(key,String(value));
 const createSession=async(request,env)=>{
