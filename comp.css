@@ -22,16 +22,20 @@ a{color:inherit}
 .hero-content{max-width:1440px;display:grid;grid-template-columns:minmax(0,1.59fr) minmax(0,.98fr);gap:clamp(24px,3.5vw,43px);padding:0 clamp(20px,3.1vw,40px) 24px;margin:auto;align-items:start}
 .gallery-main{height:302px;background:#092c11;border-radius:14px;overflow:hidden;position:relative}
 .gallery-main img{width:100%;height:100%;object-fit:cover;object-position:center 52%;transition:opacity .22s ease,transform .4s ease}
-/* Keep both pack plates at the same level; show more of the tall Family Pack mound
-   without resizing the gallery box or changing other gallery image framing. */
-.gallery-main img.is-pack-photo{object-position:center 36%}
-/* Match the approved 200g and 500g plate photos: shift both images down
-   by the same amount inside the existing fixed-size gallery. The dishes
-   remain aligned; all other gallery photographs retain their own framing. */
-#hero-photo[src*="ornate-v3.webp"]{object-position:center 32%}
-
+/* Show each approved pack photo in full, rather than cropping it to fill
+   the wide hero. Keep the gallery's dimensions and the two plates aligned. */
+.gallery-main:has(img.is-pack-photo){background:#a9b59c}
+.gallery-main:has(img.is-pack-photo)::before{
+ content:"";position:absolute;inset:-24px;pointer-events:none;
+ background:url("assets/single-ornate-v3.webp") center/cover no-repeat;
+ filter:blur(24px);opacity:.65
+}
+.gallery-main:has(#hero-photo.is-pack-photo[src*="family-ornate-v3.webp"])::before{
+ background-image:url("assets/family-ornate-v3.webp")
+}
+.gallery-main img.is-pack-photo{object-fit:contain;object-position:center;position:relative;z-index:1}
 .gallery-main img.is-switching{opacity:.35}
-.gallery-main:hover img{transform:scale(1.015)}
+.gallery-main:hover img:not(.is-pack-photo){transform:scale(1.015)}
 .gallery-thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-top:8px}
 .gallery-thumb{padding:0;border:1.5px solid #fbfff0ad;border-radius:12px;position:relative;height:133px;overflow:hidden;background:#153e1c;transition:border-color .17s ease,transform .17s ease}
 .gallery-thumb:hover{transform:translateY(-2px)}

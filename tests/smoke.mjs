@@ -68,9 +68,10 @@ check("Homepage uses the new Single Pack name with Family Pack preserved",
 check("Product hero has replaced the former glass photo with a ornate porcelain-plate shot",
   html.includes('id="hero-photo" class="is-pack-photo" src="assets/single-ornate-v3.webp"')&&
   html.includes('ornate cream-and-gold porcelain plate')&&!html.includes('id="hero-photo" data-asset="week"'));
-check("Both pack photos share the same lowered crop and keep the gallery size unchanged",
-  css.includes(".gallery-main img.is-pack-photo{object-position:center 36%}")&&
+check("Both pack photos show fully in the same fixed-size gallery",
+  css.includes(".gallery-main img.is-pack-photo{object-fit:contain;object-position:center")&&
   css.includes(".gallery-main{height:302px")&&
+  css.includes("family-ornate-v3.webp")&&
   app.includes("hero?.classList.add('is-pack-photo')")&&
   app.includes("hero?.classList.remove('is-pack-photo')"));
 const singlePhoto=path.join(root,"assets/single-ornate-v3.webp");
@@ -78,6 +79,9 @@ const familyPhoto=path.join(root,"assets/family-ornate-v3.webp");
 check("Matched pack photos exist as distinct WebP assets",
   fs.existsSync(singlePhoto)&&fs.existsSync(familyPhoto)&&
   fs.readFileSync(singlePhoto).toString("base64")!==fs.readFileSync(familyPhoto).toString("base64"));
+check("Checkout pack cards and summary show complete photos without cropping",
+  read("checkout.css").includes(".checkout-pack-choice img{width:100%;height:158px;object-fit:contain")&&
+  read("checkout.css").includes(".checkout-product img{width:96px;height:91px;object-fit:contain"));
 check("Both checkout choices use final user-approved ornate plate images",
   paymentCheckout.includes('src="assets/single-ornate-v3.webp"')&&
   paymentCheckout.includes('src="assets/family-ornate-v3.webp"')&&

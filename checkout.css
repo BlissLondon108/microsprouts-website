@@ -22,7 +22,7 @@
 .checkout-columns .submit-btn:disabled{opacity:.5;cursor:not-allowed}
 .checkout-summary{background:#eaf0de;border-radius:17px;padding:28px;position:sticky;top:20px}
 .checkout-product{display:flex;gap:17px;align-items:center;border-bottom:1px solid #cfdcc8;padding-bottom:23px;margin-bottom:21px}
-.checkout-product img{width:96px;height:91px;object-fit:cover;border-radius:10px}
+.checkout-product img{width:96px;height:91px;object-fit:contain;background:#e8ecdc;border-radius:10px}
 .checkout-product strong{font-size:14px}
 .checkout-product p{font-size:12px;color:#5c6a56;margin-top:8px;line-height:1.5}
 .checkout-summary .price-row{display:flex;justify-content:space-between;margin:12px 0;color:#263c26;font-size:13px}
@@ -45,7 +45,8 @@
  color:#15341d;border:2px solid #dde4d5;border-radius:14px;transition:border-color .18s,transform .18s}
 .checkout-pack-choice:hover{border-color:#86a66b;transform:translateY(-1px)}
 .checkout-pack-choice[aria-pressed="true"]{border-color:#367741;box-shadow:0 0 0 1px #367741}
-.checkout-pack-choice img{width:100%;height:158px;object-fit:cover;object-position:center 36%}
+/* Keep the complete sprouts and porcelain plate visible on every pack card. */
+.checkout-pack-choice img{width:100%;height:158px;object-fit:contain;object-position:center;background:#e8ecdc}
 .checkout-pack-text{display:flex;flex-direction:column;gap:7px;padding:12px 14px 15px}
 .checkout-pack-text>strong{font-size:17px;font-weight:700}
 .checkout-pack-text small{font-size:12px;color:#527154;font-weight:normal}
