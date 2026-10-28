@@ -22,6 +22,11 @@ a{color:inherit}
 .hero-content{max-width:1440px;display:grid;grid-template-columns:minmax(0,1.59fr) minmax(0,.98fr);gap:clamp(24px,3.5vw,43px);padding:0 clamp(20px,3.1vw,40px) 24px;margin:auto;align-items:start}
 .gallery-main{height:302px;background:#092c11;border-radius:14px;overflow:hidden;position:relative}
 .gallery-main img{width:100%;height:100%;object-fit:cover;object-position:center 52%;transition:opacity .22s ease,transform .4s ease}
+/* Match the approved 200g and 500g plate photos: shift both images down
+   by the same amount inside the existing fixed-size gallery. The dishes
+   remain aligned; all other gallery photographs retain their own framing. */
+#hero-photo[src*="ornate-v3.webp"]{object-position:center 32%}
+
 .gallery-main img.is-switching{opacity:.35}
 .gallery-main:hover img{transform:scale(1.015)}
 .gallery-thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-top:8px}
