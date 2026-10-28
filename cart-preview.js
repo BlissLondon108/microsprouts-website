@@ -168,7 +168,6 @@
     const button=event.target.closest("button[data-pick-sku]");
     if(!button||!pickerChoices.contains(button))return;
     update(button.dataset.pickSku,1);
-    closePicker(false);
     openCart();
   });
   items.addEventListener("click",event=>{
