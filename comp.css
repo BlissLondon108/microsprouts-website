@@ -22,20 +22,37 @@ a{color:inherit}
 .hero-content{max-width:1440px;display:grid;grid-template-columns:minmax(0,1.59fr) minmax(0,.98fr);gap:clamp(24px,3.5vw,43px);padding:0 clamp(20px,3.1vw,40px) 24px;margin:auto;align-items:start}
 .gallery-main{height:302px;background:#092c11;border-radius:14px;overflow:hidden;position:relative}
 .gallery-main img{width:100%;height:100%;object-fit:cover;object-position:center 52%;transition:opacity .22s ease,transform .4s ease}
-/* Show each approved pack photo in full, rather than cropping it to fill
-   the wide hero. Keep the gallery's dimensions and the two plates aligned. */
+/* Keep the plate and sprout mound fully visible. Fill the widescreen gallery
+   with a photo-matched backdrop and feather the image edges into it, avoiding
+   the flat side bars caused by object-fit:contain alone. Gallery size stays fixed. */
 .gallery-main:has(img.is-pack-photo){background:#a9b59c}
 .gallery-main:has(img.is-pack-photo)::before{
  content:"";position:absolute;inset:-24px;pointer-events:none;
  background:url("assets/single-ornate-v3.webp") center/cover no-repeat;
- filter:blur(24px);opacity:.65
+ filter:blur(15px);opacity:1
 }
 .gallery-main:has(#hero-photo.is-pack-photo[src*="family-ornate-v3.webp"])::before{
  background-image:url("assets/family-ornate-v3.webp")
 }
-.gallery-main img.is-pack-photo{object-fit:contain;object-position:center;position:relative;z-index:1}
+.gallery-main img.is-pack-photo{
+ object-fit:contain;object-position:center;position:relative;z-index:1;
+ -webkit-mask-image:linear-gradient(to right,transparent 21%,#000 33%,#000 67%,transparent 79%);
+ mask-image:linear-gradient(to right,transparent 21%,#000 33%,#000 67%,transparent 79%)
+}
 .gallery-main img.is-switching{opacity:.35}
 .gallery-main:hover img:not(.is-pack-photo){transform:scale(1.015)}
+@media (min-width:771px) and (max-width:1199px){
+ .gallery-main img.is-pack-photo{
+  -webkit-mask-image:linear-gradient(to right,transparent 8%,#000 24%,#000 76%,transparent 92%);
+  mask-image:linear-gradient(to right,transparent 8%,#000 24%,#000 76%,transparent 92%)
+ }
+}
+@media (max-width:770px){
+ .gallery-main img.is-pack-photo{
+  -webkit-mask-image:linear-gradient(to right,transparent 4%,#000 17%,#000 83%,transparent 96%);
+  mask-image:linear-gradient(to right,transparent 4%,#000 17%,#000 83%,transparent 96%)
+ }
+}
 .gallery-thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-top:8px}
 .gallery-thumb{padding:0;border:1.5px solid #fbfff0ad;border-radius:12px;position:relative;height:133px;overflow:hidden;background:#153e1c;transition:border-color .17s ease,transform .17s ease}
 .gallery-thumb:hover{transform:translateY(-2px)}
