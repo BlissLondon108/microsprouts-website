@@ -66,8 +66,13 @@ const catalog=read("stripe-catalog.js");
 check("Homepage uses the new Single Pack name with Family Pack preserved",
   html.includes('>Single Pack</span>')&&html.includes('>Family Pack</span>')&&!html.includes('>Week Supply</span>'));
 check("Product hero has replaced the former glass photo with a ornate porcelain-plate shot",
-  html.includes('id="hero-photo" src="assets/single-ornate-v3.webp"')&&
+  html.includes('id="hero-photo" class="is-pack-photo" src="assets/single-ornate-v3.webp"')&&
   html.includes('ornate cream-and-gold porcelain plate')&&!html.includes('id="hero-photo" data-asset="week"'));
+check("Both pack photos share the same lowered crop and keep the gallery size unchanged",
+  css.includes(".gallery-main img.is-pack-photo{object-position:center 36%}")&&
+  css.includes(".gallery-main{height:302px")&&
+  app.includes("hero?.classList.add('is-pack-photo')")&&
+  app.includes("hero?.classList.remove('is-pack-photo')"));
 const singlePhoto=path.join(root,"assets/single-ornate-v3.webp");
 const familyPhoto=path.join(root,"assets/family-ornate-v3.webp");
 check("Matched pack photos exist as distinct WebP assets",
