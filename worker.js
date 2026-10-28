@@ -1,9 +1,9 @@
 import {ensureCatalog,ensurePortal,findPortal,priceLookupKey,PRODUCT_DEFINITIONS} from "./stripe-catalog.js";
-import {hasNotificationConfiguration,storageReady,storeStripeEvent,sendPendingAlerts} from "./fulfillment.js";
 /* MicroSprouts server-side Stripe Checkout API. Cloudflare Worker, no secrets in source.
  * STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET must be runtime encrypted secrets.
- * Sandbox by default. Live mode requires explicit flags, configured order storage
- * and verified owner notifications. PAYMENTS_ENABLED=false disables everything.
+ * Sandbox by default. Live mode uses Stripe as the sole order/payment record.
+ * Owner-confirmed Stripe emails and two release switches are required.
+ * PAYMENTS_ENABLED=false disables checkout.
  */
 const PRICE_PENCE = Object.freeze({ "200":999, "500":1699 });
 const SUBSCRIPTION_PRICE_PENCE = Object.freeze({ "200":899, "500":1549 });
@@ -60,16 +60,14 @@ const ready=env=>
   env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
   typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_")&&
   typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_");
-// Fail closed. Live keys alone never allow payment. The operator must first
-// configure D1, test owner email delivery, and explicitly enable live checkout.
+// Live API keys alone never enable payment. The account owner first confirms
+// Stripe email notifications and commits to manual order review in Stripe.
 const liveConfigured=env=>
   env.PAYMENT_MODE==="live"&&env.LIVE_CHECKOUT_ENABLED==="true"&&
-  env.OWNER_ALERT_VERIFIED==="true"&&env.PAYMENTS_ENABLED!=="false"&&
-  typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_live_")&&
-  typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")&&
-  hasNotificationConfiguration(env);
-const paymentMode=async env=>
-  liveConfigured(env)&&await storageReady(env)?"live":ready(env)?"test":"not-configured";
+  env.STRIPE_NOTIFICATIONS_CONFIRMED==="true"&&
+  env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
+  typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_live_");
+const paymentMode=async env=>liveConfigured(env)?"live":ready(env)?"test":"not-configured";
 const put=(params,key,value)=>params.append(key,String(value));
 const createSession=async(request,env)=>{
   if(await paymentMode(env)==="not-configured")return issue("Secure checkout is not configured. Please use the enquiry form for now.",503);
@@ -222,22 +220,9 @@ const webhook=async(request,env)=>{
   if(payload.length>1024*1024)return issue("Payload too large.",413);
   if(!await verifySignature(payload,request.headers.get("stripe-signature"),env.STRIPE_WEBHOOK_SECRET))return issue("Invalid signature.",400);
   let event;try{event=JSON.parse(payload)}catch{return issue("Invalid event JSON.")}
-  // In live mode never acknowledge a paid order without durable storage.
-  // Webhook errors return 503 for Stripe retries; cron also retries the alert outbox.
-  if(mode==="live"||await storageReady(env)){
-    try{
-      await storeStripeEvent(env,event,{
-        loadSubscription:id=>stripeRequest(env,"subscriptions/"+encodeURIComponent(id))
-      });
-      await sendPendingAlerts(env,5);
-    }catch(error){
-      console.error("Stripe fulfillment unavailable",String(event.type||"unknown").slice(0,80));
-      return issue("Order processing temporarily unavailable; webhook will be retried.",503);
-    }
-  }else{
-    // Existing sandbox supports test payments before D1 provisioning.
-    console.log("Sandbox Stripe event",String(event.type||"unknown").slice(0,80));
-  }
+  // Optional signed diagnostic endpoint. Stripe Dashboard remains the
+  // payment/order system of record. Owner notifications are set in Stripe.
+  console.log("Verified Stripe event",String(event.type||"unknown").slice(0,80),String(event.id||"").slice(0,100));
   return json({received:true});
 };
 export default {
@@ -246,9 +231,9 @@ export default {
     if(path==="/api/checkout/status"&&request.method==="GET"){
       const mode=await paymentMode(env);
       return json({enabled:mode!=="not-configured",mode,
-        fulfillment_ready:mode==="live",minimum_date:minimumDate(),
+        manual_order_handling:mode==="live",minimum_date:minimumDate(),
         checks:{
-          activation:mode==="live"?"live_verified":"sandbox_credentials",
+          activation:mode==="live"?"stripe_owner_confirmed":"sandbox_credentials",
           explicitly_disabled:env.PAYMENTS_ENABLED==="false"||env.PAYMENTS_ENABLED===false,
           sandbox_key_available:typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_"),
           webhook_secret_available:typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")
@@ -260,11 +245,5 @@ export default {
     if(path==="/api/stripe/webhook"&&request.method==="POST")return webhook(request,env);
     if(path.startsWith("/api/"))return issue("Not found",404);
     return env.ASSETS.fetch(request);
-  },
-  async scheduled(controller,env){
-    if(hasNotificationConfiguration(env)&&await storageReady(env)){
-      try{await sendPendingAlerts(env,10);}
-      catch{console.error("Owner notification retry incomplete");}
-    }
   }
 };
