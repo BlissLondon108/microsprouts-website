@@ -159,8 +159,12 @@
   }
   // Keep a stable coloured circular fallback if an external preview photo fails.
   document.querySelectorAll(".sprout-orb__photo").forEach(photo=>{
-    photo.addEventListener("error",()=>{photo.hidden=true;});
-    if(photo.complete&&!photo.naturalWidth)photo.hidden=true;
+    const unavailable=()=>{
+      photo.hidden=true;
+      photo.parentElement?.classList.add("sprout-orb--photo-missing");
+    };
+    photo.addEventListener("error",unavailable);
+    if(photo.complete&&!photo.naturalWidth)unavailable();
   });
   navButton?.addEventListener("click",openCart);
   cart.querySelector(".basket-preview__cta")?.addEventListener("click",()=>closeCart());
