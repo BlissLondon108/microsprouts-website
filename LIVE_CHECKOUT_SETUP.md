@@ -30,7 +30,13 @@ subscription invoices, renewals and payment failures.
 
 Under Cloudflare → Workers & Pages → `microsprouts` → Settings → Runtime
 variables and secrets, supply the **live MicroSprouts account** secret as
-an encrypted `STRIPE_SECRET_KEY` (starts with `sk_live_`).
+an encrypted `STRIPE_SECRET_KEY` (starts with `sk_live_` or `rk_live_`).
+A restricted live API key (`rk_live_`) is preferable. Give Write permission
+only to Products, Prices, Coupons, Checkout Sessions and Customer portal
+(the Worker reads and creates these through its existing Stripe catalogue and
+Checkout flow). All other permissions should start as None. If Stripe reports
+an additional required permission during controlled testing, investigate that
+specific API operation rather than granting unrestricted access.
 Do not paste it into chat, GitHub, HTML or a public variable.
 
 For the controlled launch, configure the runtime variables:
