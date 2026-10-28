@@ -41,25 +41,13 @@
 
 /* Clear, photographic Single Pack / Family Pack comparison. */
 .checkout-pack-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:0 0 20px}
-.checkout-pack-choice{display:flex;flex-direction:column;text-align:left;padding:0;overflow:hidden;position:relative;background:#f9faf3;
+.checkout-pack-choice{display:flex;flex-direction:column;text-align:left;padding:0;overflow:hidden;background:#f9faf3;
  color:#15341d;border:2px solid #dde4d5;border-radius:14px;transition:border-color .18s,transform .18s}
 .checkout-pack-choice:hover{border-color:#86a66b;transform:translateY(-1px)}
 .checkout-pack-choice[aria-pressed="true"]{border-color:#367741;box-shadow:0 0 0 1px #367741}
-/* Show the complete pack photos while blending out their side edges. */
-.checkout-pack-choice::before{
- content:"";position:absolute;top:0;left:0;right:0;height:158px;
- background-position:center;background-size:cover;pointer-events:none;
- filter:blur(12px)
-}
-.checkout-pack-choice[data-pack-choice="200"]::before{background-image:url("assets/single-ornate-v3.webp")}
-.checkout-pack-choice[data-pack-choice="500"]::before{background-image:url("assets/family-ornate-v3.webp")}
-.checkout-pack-choice img{
- width:100%;height:158px;object-fit:contain;object-position:center;
- background:transparent;position:relative;z-index:1;
- -webkit-mask-image:linear-gradient(to right,transparent 5%,#000 22%,#000 78%,transparent 95%);
- mask-image:linear-gradient(to right,transparent 5%,#000 22%,#000 78%,transparent 95%)
-}
-.checkout-pack-text{display:flex;flex-direction:column;gap:7px;padding:12px 14px 15px;position:relative;z-index:1}
+/* Wide pack photos include full porcelain plate and natural side scenery. */
+.checkout-pack-choice img{width:100%;height:158px;object-fit:cover;object-position:center}
+.checkout-pack-text{display:flex;flex-direction:column;gap:7px;padding:12px 14px 15px}
 .checkout-pack-text>strong{font-size:17px;font-weight:700}
 .checkout-pack-text small{font-size:12px;color:#527154;font-weight:normal}
 .checkout-pack-text>span{font-size:13px;line-height:1.4}
@@ -69,8 +57,7 @@
 .checkout-summary .price-row--savings strong{color:#227231}
 @media(max-width:520px){
  .checkout-pack-gallery{gap:9px}
- .checkout-pack-choice::before{height:120px}
- .checkout-pack-choice img{height:120px;-webkit-mask-image:none;mask-image:none}
+ .checkout-pack-choice img{height:120px}
  .checkout-pack-text{padding:10px 10px 13px}
  .checkout-pack-text>strong{font-size:15px}
  .checkout-pack-text>span{font-size:12px}
