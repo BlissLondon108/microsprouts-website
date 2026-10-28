@@ -41,7 +41,7 @@ Do not paste it into chat, GitHub, HTML or a public variable.
 
 For the controlled launch, configure the runtime variables:
 
-- `PAYMENT_MODE=live` — selects the Stripe live environment.
+- `PAYMENT_MODE=live` — optional descriptive setting (the `rk_live_`/`sk_live_` key selects live Stripe). A deliberate `PAYMENT_MODE=test` overrides and blocks live charging.
 - `STRIPE_NOTIFICATIONS_CONFIRMED=true` — only after verifying Stripe owner email notifications AND committing to manual order review.
 - `LIVE_CHECKOUT_ENABLED=true` — final explicit release switch, set only when all tests and operational checks are complete.
 - `PAYMENTS_ENABLED=false` — emergency stop switch; false disables payment checkout. Otherwise it can remain true/unset.
@@ -55,6 +55,11 @@ Before BOTH confirmed/enable flags are true, the public homepage still offers
 the WhatsApp enquiry form and cannot start a real charge. When live requirements
 are satisfied, the existing homepage button becomes **Checkout** and opens
 the selected pack in `checkout.html?pack=200` or `?pack=500`.
+
+The GitHub deployment now includes `keep_vars=true` in Wrangler so updates
+from GitHub preserve existing Cloudflare dashboard variables. The read-only
+`/api/checkout/preflight` no longer depends on `PAYMENT_MODE` and can
+check the detected live key while real payments remain disabled.
 
 ## Read-only key verification (no charge)
 
