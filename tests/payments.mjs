@@ -57,6 +57,10 @@ check("Least-privilege restricted live Stripe key is supported",
  restrictedStatus.enabled===true&&restrictedStatus.mode==="live");
 res=await api("/api/checkout/status",{}, {...liveBase,STRIPE_SECRET_KEY:"rk_test_wrong_environment"});
 check("Restricted test keys are refused in live mode",(await res.json()).enabled===false);
+res=await api("/api/checkout/preflight",{},envOff);
+check("Preflight cannot inspect live Stripe without live mode",(await res.json()).connection==="not_checked");
+res=await api("/api/checkout/preflight",{}, {...envOff,PAYMENT_MODE:"live",STRIPE_SECRET_KEY:"sk_test_wrong"});
+check("Preflight refuses test credentials and makes no external calls",(await res.json()).reason==="live_key_missing");
 res=await submit(customer,envOff);
 check("Missing test credentials prevents any checkout",res.status===503);
 res=await api("/index.html");
@@ -64,6 +68,7 @@ check("Public static homepage is served unmodified",await res.text()==="asset fe
 const products=new Map(),prices=new Map(),coupons=new Map(),portals=new Map();
 let deliberatelyFailPriceLookups=false;
 let deliberatelyFailPortal=false;
+let deliberatelyDenyPreflightPrices=false;
 let session,sessionForm,stats={productCreates:0,priceCreates:0,couponCreates:0,portalCreates:0,checkouts:0};
 const originalFetch=globalThis.fetch;
 function parseForm(init){return new URLSearchParams(init.body)}
@@ -84,9 +89,11 @@ async function mockStripe(input,init={}){
   return response(item);
  }
  if(method==="GET"&&path==="prices"){
-  if(deliberatelyFailPriceLookups&&u.searchParams.get("lookup_keys[]")==="ms_broccoli_200g_once_v1")
+  const keys=u.searchParams.getAll("lookup_keys[]");
+  if((deliberatelyFailPriceLookups&&keys.includes("ms_broccoli_200g_once_v1"))||
+    (deliberatelyDenyPreflightPrices&&keys.length>1))
     return response({error:{code:"permission_denied",param:"lookup_keys",message:"Mock internal error must never be echoed."}},403);
-  return response({data:[...prices.values()].filter(v=>v.lookup_key===u.searchParams.get("lookup_keys[]"))});
+  return response({data:[...prices.values()].filter(v=>keys.includes(v.lookup_key))});
  }
  if(method==="POST"&&path==="prices"){
   stats.priceCreates++;
@@ -125,6 +132,8 @@ async function mockStripe(input,init={}){
  }
  if(method==="GET"&&path==="checkout/sessions/cs_test_example")
   return response(session);
+ if(method==="GET"&&path==="checkout/sessions")
+  return response({data:[]});
  return response({error:{message:"Unexpected test Stripe path: "+method+" "+path}},404);
 }
 globalThis.fetch=mockStripe;
@@ -158,6 +167,22 @@ try{
  check("SPROUT coupon created only when required and excludes delivery",
    stats.couponCreates===1&&coupons.get(PROMO_COUPON_ID)?.applies_to?.products?.every(id=>id!=="prod_microsprouts_delivery_london"));
  check("One-time subtotal discount tracked correctly",sessionForm.get("metadata[total_pence]")==="2398");
+ const beforePreflight=stats.checkouts;
+ res=await api("/api/checkout/preflight",{}, {...liveBase,STRIPE_SECRET_KEY:"rk_live_mock"});
+ const livePreflight=await res.json();
+ check("Read-only preflight validates the existing Stripe live catalogue without taking payment",
+   livePreflight.connection==="verified_read_only"&&
+   Object.values(livePreflight.checks).every(x=>x==="ok")&&
+   livePreflight.checkout_enabled===true&&stats.checkouts===beforePreflight);
+ deliberatelyDenyPreflightPrices=true;
+ res=await api("/api/checkout/preflight",{}, {...liveBase,STRIPE_SECRET_KEY:"rk_live_mock"});
+ const deniedPreflight=await res.json();
+ check("Missing Stripe permissions are reported without exposing secrets",
+   deniedPreflight.connection==="failed"&&deniedPreflight.failed_check==="prices"&&
+   deniedPreflight.stripe_http_status===403&&
+   !JSON.stringify(deniedPreflight).includes("Mock internal error")&&
+   !JSON.stringify(deniedPreflight).includes("rk_live_mock"));
+ deliberatelyDenyPreflightPrices=false;
  const weekly={...customer,frequency:"weekly",pack:"500",method:"delivery",date:requestedDate(true),postcode:"SE1 1AA"};
  res=await submit(weekly);
  check("Weekly subscription uses cheaper 500g pack price and free delivery",
