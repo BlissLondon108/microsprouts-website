@@ -52,7 +52,7 @@ check("Sprout carousel presents four varieties, one tile per variety in each cyc
 check("Broccoli selector exposes the two real pack prices and avoids invented prices",
   cartClient.includes('options:["broccoli-200","broccoli-500"]')&&
   ["radish","mung","leek"].every(sprout=>cartClient.includes('options:["'+sprout+'"]'))&&
-  html.includes('Price on request')&&
+  cartClient.includes('Price on request')&&
   html.includes("Basket design preview only"));
 check("Marquee continues rightward across the full page and respects reduced motion",
   css.includes("@keyframes microSproutsMoveRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}")&&
