@@ -10,6 +10,7 @@
     ]
   },
   "vars": {
-    "PAYMENTS_ENABLED": "true"
+    "PAYMENTS_ENABLED": "true",
+    "PAYMENT_MODE": "live"
   }
 }
