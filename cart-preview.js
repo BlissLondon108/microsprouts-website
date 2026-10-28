@@ -157,7 +157,13 @@
     feedback.textContent=delta>0?catalogue[sku].name+" added to your basket preview.":
       catalogue[sku].name+(next?" quantity updated.":" removed from your basket preview.");
   }
+  // Keep a stable coloured circular fallback if an external preview photo fails.
+  document.querySelectorAll(".sprout-orb__photo").forEach(photo=>{
+    photo.addEventListener("error",()=>{photo.hidden=true;});
+    if(photo.complete&&!photo.naturalWidth)photo.hidden=true;
+  });
   navButton?.addEventListener("click",openCart);
+  cart.querySelector(".basket-preview__cta")?.addEventListener("click",()=>closeCart());
   document.querySelectorAll("[data-cart-close]").forEach(button=>
     button.addEventListener("click",()=>closeCart()));
   document.querySelectorAll("[data-picker-close]").forEach(button=>
