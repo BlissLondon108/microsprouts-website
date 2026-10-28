@@ -2,6 +2,29 @@
 
 STATUS: Code staged; real customer payments remain OFF until account configuration, successful end-to-end tests, and the owner's final launch approval.
 
+## Stripe live-account configuration (verified 28 October 2026)
+
+The live MicroSprouts Stripe account is connected and reports charges and payouts enabled.
+Live Stripe products, prices and subscription portal were created separately from the sandbox.
+The live catalogue now contains:
+
+- Single Pack 200g: £9.99 once, £8.99 weekly, £8.99 fortnightly.
+- Family Pack 500g: £16.99 once, £15.49 weekly, £15.49 fortnightly.
+- London delivery: £2.30 once; free on subscriptions (no recurring delivery price).
+- Coupon MS_SPROUT20_V1: 20% off broccoli products, one time.
+- Live Stripe billing portal: email login, payment method updates, invoice history and cancellation at the end of the billing period.
+- Live webhook endpoint created at https://microsprouts.bhaktivedanta-london.workers.dev/api/stripe/webhook
+  for checkout.session.completed, checkout.session.async_payment_succeeded, invoice.paid,
+  invoice.payment_failed, customer.subscription.updated, customer.subscription.deleted.
+  Webhook ID: we_1UVWwCJ8HaF2s5A92H7kgpkQ.
+
+**Still required**: Set this live endpoint's signing secret as STRIPE_WEBHOOK_SECRET
+in Cloudflare's Worker runtime; provide the corresponding live STRIPE_SECRET_KEY in
+Cloudflare runtime; create and migrate the D1 database; configure and test owner email
+notifications; confirm subscription cancellation/fulfillment behaviour; and verify
+real end-to-end webhook processing before enabling the public checkout. Never place
+Stripe secrets in GitHub or chat.
+
 ## 1. Create the order database in Cloudflare
 
 Use the owner's authenticated Cloudflare account. Create a Cloudflare D1 database in a suitable region (WEUR may be appropriate subject to a data-protection decision):
