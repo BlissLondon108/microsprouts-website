@@ -21,14 +21,24 @@ check("No duplicate IDs", ids.length === idSet.size);
 check("All in-page links resolve", [...html.matchAll(/href="#([^"]+)"/g)].every(m => idSet.has(m[1])));
 const required = ["bottom-pack","bottom-checkout-button","bottom-checkout-note","bottom-checkout-title","hero-photo","checkout-button"];
 check("Both checkout entry points and gallery controls exist", required.every(id => idSet.has(id)));
-check("Homepage routes both entry points to Stripe only after live readiness",
-  html.includes('id="checkout-button" href="#enquire"')&&
-  html.includes('id="bottom-checkout-button" class="submit-btn" type="button" disabled')&&
-  app.includes("status.mode==='live'")&&
-  app.includes("status.manual_order_handling===true")&&
+check("Both checkout links have final labels and valid URLs in initial HTML",
+  html.includes('id="checkout-button" href="checkout.html?pack=200"')&&
+  html.includes('>Checkout</a>')&&
+  html.includes('id="bottom-checkout-button" class="submit-btn" href="checkout.html?pack=200"')&&
+  html.includes('>Continue to secure checkout →</a>')&&
+  !html.includes("View order options")&&
+  !html.includes("Checking checkout availability")&&
+  !app.includes("/api/checkout/status")&&
+  !app.includes(".textContent='Checkout'"));
+check("Both checkout links follow the pack choice without a second navigation handler",
+  app.includes("checkout.href = url")&&
+  app.includes("lowerCheckout.href = url")&&
   app.includes("checkout.html?pack=")&&
-  app.includes("lowerCheckout?.addEventListener('click'")&&
-  app.includes("lowerCheckout.disabled=false"));
+  !app.includes("location.assign")&&
+  !app.includes("fetch("));
+check("Payment enforcement remains on checkout page and Worker",
+  paymentClient.includes('fetch("/api/checkout/status"')&&
+  checkoutWorker.includes('if(await paymentMode(env)==="not-configured")return issue('));
 check("Lower checkout shares top pack selection instead of opening WhatsApp",
   app.includes("setPack($('bottom-pack').value)")&&
   app.includes("lowerPack.value = pack")&&
@@ -42,6 +52,28 @@ check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).leng
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
 const localAssetPaths = [...new Set([...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m=>m[1]))];
 check("Local images exist", localAssetPaths.every(src => fs.existsSync(path.join(root, src))));
+check("Approved homepage photographs are direct, with no old-photo replacement pass",
+  html.includes('src="assets/approved/seeds.webp"')&&
+  html.includes('src="assets/approved/germination.webp"')&&
+  html.includes('src="assets/approved/jar.webp"')&&
+  html.includes('src="assets/approved/week.webp"')&&
+  html.includes('src="assets/approved/woman.webp"')&&
+  html.includes('src="assets/approved/macro.webp"')&&
+  html.includes('src="assets/approved/toast.webp"')&&
+  !html.includes("images.pexels.com")&&
+  !html.includes('src="assets/day0.svg"')&&
+  !html.includes('src="assets/day1.svg"')&&
+  !app.includes("approved/manifest.json")&&
+  !app.includes("dataset.fallbackUsed"));
+check("Main photo and gallery load without any opacity fade or banner rewrite",
+  !css.includes("is-switching")&&
+  !css.includes("transition:opacity")&&
+  css.includes('url("assets/approved/macro.webp") right 45%/cover')&&
+  !css.includes("--approved-banner-photo")&&
+  !app.includes("style.setProperty")&&
+  app.includes("image.onload")&&
+  app.includes("requestId")&&
+  !app.includes("requestAnimationFrame"));
 check("Checkout JavaScript parses", (() => { try { new vm.Script(app); new vm.Script(paymentClient); return true; } catch { return false; } })());
 check("Both product prices and delivery cost retained", [999,1699,230].every(n => paymentClient.includes(String(n))));
 check("Seven day lead and Tuesday–Thursday delivery retained",
@@ -93,7 +125,7 @@ check("Wide pack photos fill unchanged gallery without side panels",
   css.includes(".gallery-main img.is-pack-photo{object-fit:cover;object-position:center}")&&
   css.includes(".gallery-main{height:302px")&&
   !css.includes(".gallery-main:has(img.is-pack-photo)")&&
-  app.includes("hero?.classList.add('is-pack-photo')"));
+  app.includes("hero.classList.toggle('is-pack-photo', isPackPhoto)"));
 const singlePhoto=path.join(root,"assets/single-ornate-v3.webp");
 const familyPhoto=path.join(root,"assets/family-ornate-v3.webp");
 check("Original approved product photos remain available",
