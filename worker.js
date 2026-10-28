@@ -62,24 +62,26 @@ const ready=env=>
   typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_");
 // Live API keys alone never enable payment. The account owner first confirms
 // Stripe email notifications and commits to manual order review in Stripe.
-const liveConfigured=env=>
-  env.PAYMENT_MODE==="live"&&env.LIVE_CHECKOUT_ENABLED==="true"&&
-  env.STRIPE_NOTIFICATIONS_CONFIRMED==="true"&&
-  env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
+const hasLiveStripeKey=env=>
   typeof env.STRIPE_SECRET_KEY==="string"&&
   (env.STRIPE_SECRET_KEY.startsWith("sk_live_")||env.STRIPE_SECRET_KEY.startsWith("rk_live_"));
+// Stripe credentials already identify the payment environment; no plain-text
+// PAYMENT_MODE variable is needed. Both explicit owner release flags are
+// required for any real charge. Explicit PAYMENT_MODE=test remains an override.
+const liveConfigured=env=>
+  env.PAYMENT_MODE!=="test"&&env.LIVE_CHECKOUT_ENABLED==="true"&&
+  env.STRIPE_NOTIFICATIONS_CONFIRMED==="true"&&
+  env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
+  hasLiveStripeKey(env);
 const paymentMode=async env=>liveConfigured(env)?"live":ready(env)?"test":"not-configured";
 // Read-only diagnosis for the existing Cloudflare live key. This endpoint
 // never creates Checkout Sessions, Products, Prices, Coupons, or customers.
 // Responses omit Stripe objects, account information, secrets and customer data.
 const inspectLiveStripe=async env=>{
-  const key=env.STRIPE_SECRET_KEY;
-  const liveKey=typeof key==="string"&&
-    (key.startsWith("rk_live_")||key.startsWith("sk_live_"));
-  if(env.PAYMENT_MODE!=="live"||!liveKey)
-    return json({live_key_detected:liveKey,connection:"not_checked",
-      reason:env.PAYMENT_MODE!=="live"?"live_mode_not_selected":"live_key_missing",
-      checkout_enabled:false});
+  const liveKey=hasLiveStripeKey(env);
+  if(!liveKey)
+    return json({live_key_detected:false,connection:"not_checked",
+      reason:"live_key_missing",checkout_enabled:false});
   const expected=PRODUCT_DEFINITIONS.flatMap(product=>
     (product.kind==="delivery"?["once"]:["once","weekly","fortnightly"])
       .map(frequency=>({product,frequency,key:priceLookupKey(product,frequency)})));
