@@ -1,7 +1,8 @@
 /* Fixed MicroSprouts Stripe catalogue.
  * Reusable Price lookup keys are portable across Stripe test accounts, unlike price IDs.
- * Provisioning is idempotent and limited to these predefined sandbox products, prices
- * and a customer-portal configuration. Called only on validated checkout POSTs.
+ * Provisioning is idempotent and limited to the predefined MicroSprouts
+ * products and prices in the selected Stripe test or live account.
+ * Called only on validated checkout POSTs.
  */
 export const PRODUCT_DEFINITIONS=Object.freeze([
   {id:"prod_microsprouts_broccoli_200g",name:"MicroSprouts Broccoli Sprouts — Single Pack 200g",amount:999,subscriptionAmount:899,grams:200,kind:"sprouts",
@@ -110,15 +111,19 @@ async function ensurePrice(request,product,frequency){
  return price;
 }
 async function ensureCoupon(request){
- let coupon=await maybeGet(request,"coupons/"+encodeURIComponent(PROMO_COUPON_ID));
+ // In Stripe's current API applies_to is includable and excluded by default;
+ // expand it or a correctly limited coupon appears to be unrestricted.
+ const detail="coupons/"+encodeURIComponent(PROMO_COUPON_ID)+"?expand%5B%5D=applies_to";
+ let coupon=await maybeGet(request,detail);
  if(!coupon){
   const fields={id:PROMO_COUPON_ID,name:"SPROUT — 20% off broccoli sprouts",
     percent_off:20,duration:"once",
     "metadata[brand]":"MicroSprouts","metadata[promotion]":"SPROUT"};
   for(let i=0;i<2;i++)fields["applies_to[products]["+i+"]"]=PRODUCT_DEFINITIONS[i].id;
-  coupon=await post(request,"coupons",fields,"coupon-v1");
+  await post(request,"coupons",fields,"coupon-v1");
+  coupon=await maybeGet(request,detail);
  }
- const targets=coupon.applies_to?.products||[];
+ const targets=coupon?.applies_to?.products||[];
  if(coupon.valid===false||coupon.percent_off!==20||coupon.duration!=="once"||
     !PRODUCT_DEFINITIONS.slice(0,2).every(p=>targets.includes(p.id))||
     targets.includes(PRODUCT_DEFINITIONS[2].id))
