@@ -52,9 +52,9 @@ const stripeRequest = async(env,path,options={})=>{
   }
   return parsed;
 };
-// The Cloudflare GitHub build can omit ordinary runtime vars while retaining encrypted
-// Worker secrets. Sandbox checkout is authorised by the presence of BOTH sandbox secrets.
-// An explicit PAYMENTS_ENABLED=false still disables checkout; live Stripe keys never work.
+// Cloudflare deployment may omit ordinary runtime vars while retaining secrets.
+// Sandbox remains test-only; live requires owner-verified Stripe notifications,
+// deliberate release flags, and a live API key. PAYMENTS_ENABLED=false blocks both.
 const ready=env=>
   env.PAYMENT_MODE!=="live"&&
   env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
