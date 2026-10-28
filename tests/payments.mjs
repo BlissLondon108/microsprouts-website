@@ -51,6 +51,13 @@ res=await api("/api/checkout/status",{}, liveBase);
 const liveStatus=await res.json();
 check("Stripe-only live checkout requires no D1 or third-party mail service",
  liveStatus.enabled===true&&liveStatus.mode==="live"&&liveStatus.manual_order_handling===true);
+res=await api("/api/checkout/status",{}, {...liveBase,PAYMENT_MODE:undefined});
+const implicitLiveStatus=await res.json();
+check("Live key and both release flags work even when dashboard PAYMENT_MODE is absent",
+ implicitLiveStatus.enabled===true&&implicitLiveStatus.mode==="live");
+res=await api("/api/checkout/status",{}, {...liveBase,PAYMENT_MODE:"test"});
+check("Explicit test-mode override prevents a live charge",
+ (await res.json()).enabled===false);
 res=await api("/api/checkout/status",{}, {...liveBase,STRIPE_SECRET_KEY:"rk_live_restricted_mock"});
 const restrictedStatus=await res.json();
 check("Least-privilege restricted live Stripe key is supported",
@@ -180,6 +187,12 @@ try{
    livePreflight.connection==="verified_read_only"&&
    Object.values(livePreflight.checks).every(x=>x==="ok")&&
    livePreflight.checkout_enabled===true&&stats.checkouts===beforePreflight);
+ res=await api("/api/checkout/preflight",{}, {...liveBase,PAYMENT_MODE:undefined,
+   LIVE_CHECKOUT_ENABLED:undefined,STRIPE_NOTIFICATIONS_CONFIRMED:undefined});
+ const independentPreflight=await res.json();
+ check("Read-only live-key preflight succeeds without runtime mode or release flags",
+   independentPreflight.connection==="verified_read_only"&&
+   independentPreflight.checkout_enabled===false&&stats.checkouts===beforePreflight);
  deliberatelyDenyPreflightPrices=true;
  res=await api("/api/checkout/preflight",{}, {...liveBase,STRIPE_SECRET_KEY:"rk_live_mock"});
  const deniedPreflight=await res.json();
