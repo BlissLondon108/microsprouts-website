@@ -69,6 +69,75 @@ const liveConfigured=env=>
   typeof env.STRIPE_SECRET_KEY==="string"&&
   (env.STRIPE_SECRET_KEY.startsWith("sk_live_")||env.STRIPE_SECRET_KEY.startsWith("rk_live_"));
 const paymentMode=async env=>liveConfigured(env)?"live":ready(env)?"test":"not-configured";
+// Read-only diagnosis for the existing Cloudflare live key. This endpoint
+// never creates Checkout Sessions, Products, Prices, Coupons, or customers.
+// Responses omit Stripe objects, account information, secrets and customer data.
+const inspectLiveStripe=async env=>{
+  const key=env.STRIPE_SECRET_KEY;
+  const liveKey=typeof key==="string"&&
+    (key.startsWith("rk_live_")||key.startsWith("sk_live_"));
+  if(env.PAYMENT_MODE!=="live"||!liveKey)
+    return json({live_key_detected:liveKey,connection:"not_checked",
+      reason:env.PAYMENT_MODE!=="live"?"live_mode_not_selected":"live_key_missing",
+      checkout_enabled:false});
+  const expected=PRODUCT_DEFINITIONS.flatMap(product=>
+    (product.kind==="delivery"?["once"]:["once","weekly","fortnightly"])
+      .map(frequency=>({product,frequency,key:priceLookupKey(product,frequency)})));
+  const tasks=[
+    ["products",async()=>{
+      const responses=await Promise.all(PRODUCT_DEFINITIONS.map(p=>
+        stripeRequest(env,"products/"+encodeURIComponent(p.id))));
+      return responses.every((value,i)=>value.id===PRODUCT_DEFINITIONS[i].id&&
+        value.active!==false&&value.name===PRODUCT_DEFINITIONS[i].name);
+    }],
+    ["prices",async()=>{
+      const params=new URLSearchParams({limit:"100"});
+      for(const x of expected)params.append("lookup_keys[]",x.key);
+      const results=await stripeRequest(env,"prices?"+params);
+      return expected.every(x=>(results.data||[]).some(p=>
+        p.lookup_key===x.key&&p.product===x.product.id&&p.active!==false&&
+        p.currency==="gbp"&&p.unit_amount===
+          (x.frequency==="once"?x.product.amount:x.product.subscriptionAmount)&&
+        (p.recurring?.interval||null)===(x.frequency==="once"?null:"week")&&
+        (p.recurring?.interval_count||null)===(x.frequency==="once"?null:x.frequency==="weekly"?1:2)));
+    }],
+    ["discount",async()=>{
+      const coupon=await stripeRequest(env,"coupons/MS_SPROUT20_V1");
+      const targets=coupon.applies_to?.products||[];
+      return coupon.valid!==false&&coupon.percent_off===20&&coupon.duration==="once"&&
+        PRODUCT_DEFINITIONS.slice(0,2).every(p=>targets.includes(p.id))&&
+        !targets.includes(PRODUCT_DEFINITIONS[2].id);
+    }],
+    ["subscription_portal",async()=>{
+      const list=await stripeRequest(env,"billing_portal/configurations?limit=100");
+      return (list.data||[]).some(p=>p.active!==false&&
+        p.name?.startsWith("MicroSprouts customer subscription portal")&&
+        p.login_page?.enabled===true&&
+        p.features?.subscription_cancel?.enabled===true);
+    }],
+    ["checkout_session_read",async()=>{
+      const sessions=await stripeRequest(env,"checkout/sessions?limit=1");
+      return Array.isArray(sessions.data);
+    }]
+  ];
+  const checks={};
+  for(const [name,job] of tasks){
+    try{checks[name]=await job()?"ok":"mismatch"}
+    catch(error){
+      checks[name]="error";
+      // Public diagnostics intentionally report only a coarse HTTP status.
+      return json({live_key_detected:true,connection:"failed",
+        failed_check:name,stripe_http_status:!Number.isInteger(error.stripeStatus)?null:error.stripeStatus,
+        checks,checkout_enabled:false});
+    }
+    if(checks[name]!=="ok")
+      return json({live_key_detected:true,connection:"catalogue_mismatch",
+        failed_check:name,checks,checkout_enabled:false});
+  }
+  return json({live_key_detected:true,connection:"verified_read_only",checks,
+    checkout_enabled:await paymentMode(env)==="live",
+    note:"No payment or Checkout Session was created. Write permission and notifications still need testing."});
+};
 const put=(params,key,value)=>params.append(key,String(value));
 const createSession=async(request,env)=>{
   if(await paymentMode(env)==="not-configured")return issue("Secure checkout is not configured. Please use the enquiry form for now.",503);
@@ -240,6 +309,7 @@ export default {
           webhook_secret_available:typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")
         }});
     }
+    if(path==="/api/checkout/preflight"&&request.method==="GET")return inspectLiveStripe(env);
     if(path==="/api/checkout/session"&&request.method==="POST")return createSession(request,env);
     if(path==="/api/checkout/verify"&&request.method==="GET")return verifySession(request,env);
     if(path==="/api/checkout/portal"&&request.method==="GET")return getPortalLogin(env);
