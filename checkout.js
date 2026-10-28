@@ -113,7 +113,7 @@ async function status(){
    const response=await fetch("/api/checkout/status",{cache:"no-store"});
    const result=await response.json();
    enabled=response.ok&&result.enabled===true&&
-     (result.mode==="test"||(result.mode==="live"&&result.fulfillment_ready===true));
+     (result.mode==="test"||(result.mode==="live"&&result.manual_order_handling===true));
    if(result.minimum_date)date.min=result.minimum_date;
    el("checkout-state").textContent=enabled?
      (result.mode==="live"?
