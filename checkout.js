@@ -112,10 +112,13 @@ async function status(){
  try{
    const response=await fetch("/api/checkout/status",{cache:"no-store"});
    const result=await response.json();
-   enabled=response.ok&&result.enabled===true&&result.mode==="test";
+   enabled=response.ok&&result.enabled===true&&
+     (result.mode==="test"||(result.mode==="live"&&result.fulfillment_ready===true));
    if(result.minimum_date)date.min=result.minimum_date;
    el("checkout-state").textContent=enabled?
-     "Stripe sandbox checkout is ready for test payments. Real cards are not accepted here.":
+     (result.mode==="live"?
+       "Secure live Stripe checkout is ready. You will be charged only after confirming your payment at Stripe.":
+       "Stripe sandbox checkout is ready for test payments. Real cards are not accepted here."):
      "This checkout is in preparation and cannot take payments yet. The existing WhatsApp enquiry form is still available.";
  }catch{
    enabled=false;el("checkout-state").textContent="Secure checkout is not configured yet. No payment can be taken here.";
