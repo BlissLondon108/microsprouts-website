@@ -21,10 +21,9 @@ a{color:inherit}
 .menu-btn{display:none;border:1px solid #ffffff45;border-radius:8px;color:#fff;background:transparent;padding:9px;font-size:13px}
 .hero-content{max-width:1440px;display:grid;grid-template-columns:minmax(0,1.59fr) minmax(0,.98fr);gap:clamp(24px,3.5vw,43px);padding:0 clamp(20px,3.1vw,40px) 24px;margin:auto;align-items:start}
 .gallery-main{height:302px;background:#092c11;border-radius:14px;overflow:hidden;position:relative}
-.gallery-main img{width:100%;height:100%;object-fit:cover;object-position:center 52%;transition:opacity .22s ease,transform .4s ease}
+.gallery-main img{width:100%;height:100%;object-fit:cover;object-position:center 52%}
 /* Wide composite photographs: full approved sprouts and plates, no side panels. */
 .gallery-main img.is-pack-photo{object-fit:cover;object-position:center}
-.gallery-main img.is-switching{opacity:.35}
 .gallery-main:hover img:not(.is-pack-photo){transform:scale(1.015)}
 .gallery-thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-top:8px}
 .gallery-thumb{padding:0;border:1.5px solid #fbfff0ad;border-radius:12px;position:relative;height:133px;overflow:hidden;background:#153e1c;transition:border-color .17s ease,transform .17s ease}
@@ -52,7 +51,7 @@ a{color:inherit}
 .delivery-highlights svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linejoin:round}
 .delivery-highlights .line{height:22px;width:1px;background:#bed2af94}
 .trust-caption{font-size:11px;text-align:center;margin-top:10px;color:#b8c9b4}
-.banner{min-height:150px;display:grid;grid-template-columns:34% 1px 38% auto;align-items:center;gap:36px;padding:20px clamp(20px,5.5vw,68px);position:relative;background:linear-gradient(90deg,#133e16 0%,#143b16aa 63%,#14471700 100%),var(--approved-banner-photo, url("assets/macro.webp")) right 45%/cover;color:#fff}
+.banner{min-height:150px;display:grid;grid-template-columns:34% 1px 38% auto;align-items:center;gap:36px;padding:20px clamp(20px,5.5vw,68px);position:relative;background:linear-gradient(90deg,#133e16 0%,#143b16aa 63%,#14471700 100%),url("assets/approved/macro.webp") right 45%/cover;color:#fff}
 .banner::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#0b3118 0%,#163e17c4 56%,transparent 100%)}
 .banner>*{position:relative}
 .banner h2{font-size:clamp(37px,4.1vw,50px);line-height:1.01;letter-spacing:-.035em}
@@ -153,6 +152,7 @@ a{color:inherit}
 .price-row.total{font-size:20px;border-top:1px solid #d1dfc5;padding-top:13px;margin-top:12px;font-weight:700}
 .submit-btn{border:0;background:var(--night);color:#fff;border-radius:12px;width:100%;font-weight:bold;font-size:16px;padding:16px}
 .submit-btn:hover{background:#195026}
+a.submit-btn{display:block;text-align:center;text-decoration:none}
 .whatsapp-fallback{display:inline-block;margin-top:12px;color:#245c30;font-weight:bold;font-size:13px}
 .faq{background:var(--cream);padding:64px 24px 85px}
 .faq-inner{max-width:990px;margin:auto;display:grid;grid-template-columns:.8fr 1.2fr;gap:80px}
