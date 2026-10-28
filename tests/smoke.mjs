@@ -59,13 +59,25 @@ check("Marquee continues rightward across the full page and respects reduced mot
   css.includes(".sprout-marquee:focus-within .sprout-marquee__track")&&
   css.includes("prefers-reduced-motion:reduce")&&
   css.includes('.sprout-marquee__group[aria-hidden="true"]{display:none}'));
-check("Full-screen cart slides in from right and both dialogs support Escape",
-  css.includes('.cart-overlay__panel{')&&
-  css.includes('position:absolute;inset:0;background:#f6f8ef')&&
+check("Narrow cart slides from the right without displacing top navigation links",
+  css.includes('.comp-nav{position:relative}')&&
+  css.includes('.comp-nav nav{margin-left:0}')&&
+  css.includes('position:absolute;right:10px;top:10px;left:auto')&&
+  css.includes('width:clamp(265px,21.5vw,340px)')&&
+  css.includes('inset:auto 0 0 auto;top:0;right:0;bottom:0;left:auto')&&
   css.includes('@keyframes microCartEnter{from{transform:translateX(100%)}to{transform:translateX(0)}}')&&
+  css.includes('width:min(88vw,355px)')&&
   cartClient.includes('event.key==="Escape"')&&
   cartClient.includes('event.key==="Tab"')&&
   cartClient.includes('focusables(dialog)'));
+check("Carousel uses real mature-vegetable photo examples in the same circles",
+  ["8538298","6761088","7420818","4965038"].every(id=>
+    (html.match(new RegExp('pexels-photo-'+id+'\\.jpeg','g'))||[]).length===4)&&
+  (html.match(/class="sprout-orb__photo"/g)||[]).length===16&&
+  html.includes("Explore the vegetables behind our sprouts.")&&
+  css.includes('.sprout-orb .sprout-orb__photo{')&&
+  cartClient.includes('photo.addEventListener("error"')&&
+  cartClient.includes("photo.hidden=true"));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
@@ -79,7 +91,7 @@ check("Approved homepage photographs are direct, with no old-photo replacement p
   html.includes('src="assets/approved/woman.webp"')&&
   html.includes('src="assets/approved/macro.webp"')&&
   html.includes('src="assets/approved/toast.webp"')&&
-  !html.includes("images.pexels.com")&&
+  html.includes('id="hero-photo" class="is-pack-photo" src="assets/single-ornate-wide-v1.svg"')&&
   !html.includes('src="assets/day0.svg"')&&
   !html.includes('src="assets/day1.svg"')&&
   !app.includes("approved/manifest.json")&&
