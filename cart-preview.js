@@ -55,8 +55,9 @@
   const focusables=dialog=>[...dialog.querySelectorAll("button:not([disabled]),a[href],input:not([disabled]),select:not([disabled])")];
   const overlayOpen=()=>!cart.hidden||!picker.hidden;
   function openCart(){
-    if(!picker.hidden)closePicker(false);
-    previousFocus=document.activeElement;
+    const fromPicker=!picker.hidden;
+    if(fromPicker)closePicker(false);
+    if(!fromPicker)previousFocus=document.activeElement;
     cart.hidden=false;
     document.body.classList.add("overlay-open");
     navButton?.setAttribute("aria-expanded","true");
