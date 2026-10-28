@@ -2,6 +2,7 @@
   "name": "microsprouts",
   "main": "worker.js",
   "compatibility_date": "2026-10-23",
+  "keep_vars": true,
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
