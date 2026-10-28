@@ -20,46 +20,52 @@ const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
 const idSet = new Set(ids);
 check("No duplicate IDs", ids.length === idSet.size);
 check("All in-page links resolve", [...html.matchAll(/href="#([^"]+)"/g)].every(m => idSet.has(m[1])));
-const required = ["sprout-showcase-title","explore-sprouts","basket","basket-title","basket-count","basket-items","basket-subtotal","basket-unpriced","basket-feedback","hero-photo","checkout-button"];
-check("Sprout carousel and basket are present beside FAQ",required.every(id=>idSet.has(id))&&
-  html.includes('class="basket-preview" id="basket"')&&
+const required = ["sprout-showcase-title","explore-sprouts","basket","basket-title","basket-count","basket-items","basket-subtotal","basket-unpriced","basket-feedback","hero-photo","checkout-button","open-cart","nav-cart-count","cart-overlay","close-cart","sprout-picker","sprout-picker-choices","sprout-picker-title","sprout-picker-description","close-picker"];
+check("Navigation basket button and both dialogs are available",required.every(id=>idSet.has(id))&&
+  html.includes('class="nav-cart" id="open-cart"')&&
+  html.includes('class="cart-overlay" hidden')&&
+  html.includes('class="sprout-picker" hidden')&&
+  html.includes('role="dialog" aria-modal="true" aria-labelledby="basket-title"')&&
+  html.includes('role="dialog" aria-modal="true" aria-labelledby="sprout-picker-title"'));
+check("FAQ is a clean questions-only two-column layout",
   html.includes('class="faq-questions"')&&
-  html.includes('class="sprout-marquee__track"'));
-check("Second checkout removed; existing broccoli Stripe checkout preserved",
+  !html.slice(html.indexOf('<section class="faq"'),html.indexOf('</section>',html.indexOf('<section class="faq"'))).includes('class="basket-preview"')&&
+  css.includes('grid-template-columns:minmax(220px,.76fr) minmax(320px,1.24fr)'));
+check("Top Stripe checkout stays available while preview cannot create payments",
   html.includes('id="checkout-button" href="checkout.html?pack=200"')&&
-  html.includes('>Checkout</a>')&&
   !html.includes("bottom-checkout-button")&&
-  !html.includes("bottom-pack")&&
-  !html.includes("Checkout enquiry")&&
-  !html.includes("Checking checkout availability")&&
   app.includes("checkout.href = 'checkout.html?pack='")&&
-  !app.includes("/api/checkout/status")&&
-  !app.includes("location.assign")&&
-  !app.includes("fetch("));
-check("Basket is a preview, not an unverified payment integration",
-  html.includes("Basket design preview only")&&
-  html.includes("Shop broccoli with Stripe")&&
-  html.includes("Price on request")&&
+  paymentClient.includes('fetch("/api/checkout/status"')&&
+  checkoutWorker.includes('if(await paymentMode(env)==="not-configured")return issue(')&&
   !cartClient.includes("/api/checkout")&&
   !cartClient.includes("checkout.stripe.com")&&
   !cartClient.includes("fetch("));
-check("All four advertised sprout varieties can be added to basket",
-  ["broccoli-200","broccoli-500","radish","mung","leek"].every(sku=>
-    html.includes('data-cart-sku="'+sku+'"')&&cartClient.includes('"'+sku+'":'))&&
+check("Sprout carousel presents four varieties, one tile per variety in each cycle",
+  ["broccoli","radish","mung","leek"].every(sprout=>
+    (html.match(new RegExp('data-sprout-choice="'+sprout+'"','g'))||[]).length===4)&&
+  !html.includes('data-cart-sku=')&&
   (html.match(/class="sprout-marquee__group"/g)||[]).length===2&&
   html.includes('class="sprout-marquee__group" aria-hidden="true"')&&
-  html.includes('src="cart-preview.js?v=1"'));
-check("Circular movement is left to right, pauses for interaction, and respects reduced motion",
+  !html.includes('sprout-showcase__footer')&&
+  !html.includes('Broccoli packs are ready to order')&&
+  !html.includes('View your basket <span'));
+check("Broccoli selector exposes the two real pack prices and avoids invented prices",
+  cartClient.includes('options:["broccoli-200","broccoli-500"]')&&
+  ["radish","mung","leek"].every(sprout=>cartClient.includes('options:["'+sprout+'"]'))&&
+  html.includes('Price on request')&&
+  html.includes("Basket design preview only"));
+check("Marquee continues rightward across the full page and respects reduced motion",
   css.includes("@keyframes microSproutsMoveRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}")&&
   css.includes(".sprout-marquee:focus-within .sprout-marquee__track")&&
   css.includes("prefers-reduced-motion:reduce")&&
   css.includes('.sprout-marquee__group[aria-hidden="true"]{display:none}'));
-check("Basket has mobile layout and FAQ is a three-column desktop composition",
-  css.includes("grid-template-columns:minmax(175px,.85fr) minmax(260px,1.23fr) minmax(300px,1.13fr)")&&
-  css.includes(".faq-intro,.faq-questions,.basket-preview{grid-column:1;grid-row:auto}"));
-check("Payment enforcement remains on existing checkout and Worker",
-  paymentClient.includes('fetch("/api/checkout/status"')&&
-  checkoutWorker.includes('if(await paymentMode(env)==="not-configured")return issue('));
+check("Full-screen cart slides in from right and both dialogs support Escape",
+  css.includes('.cart-overlay__panel{')&&
+  css.includes('position:absolute;inset:0;background:#f6f8ef')&&
+  css.includes('@keyframes microCartEnter{from{transform:translateX(100%)}to{transform:translateX(0)}}')&&
+  cartClient.includes('event.key==="Escape"')&&
+  cartClient.includes('event.key==="Tab"')&&
+  cartClient.includes('focusables(dialog)'));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
