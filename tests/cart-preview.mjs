@@ -29,6 +29,7 @@ class FakeElement{
     return null;
   }
   querySelectorAll(){return this.children}
+  querySelector(selector){return selector===".basket-preview__cta"?basketLink:null}
   focus(){document.activeElement=this}
 }
 const ids=[
@@ -42,6 +43,9 @@ const tiles=kinds.map(kind=>{
   const button=new FakeElement("button");button.dataset.sproutChoice=kind;return button
 });
 const storage=new Map();
+const basketLink=new FakeElement("a");
+const photos=Array.from({length:4},()=>new FakeElement("img"));
+for(const photo of photos){photo.complete=false;photo.naturalWidth=180}
 document={
   getElementById:id=>dom.get(id)||null,
   createElement:tag=>new FakeElement(tag),
@@ -53,6 +57,7 @@ document={
     if(selector==="[data-sprout-choice]")return tiles;
     if(selector==="[data-cart-close]")return [dom.get("close-cart")];
     if(selector==="[data-picker-close]")return [dom.get("close-picker")];
+    if(selector===".sprout-orb__photo")return photos;
     return [];
   }
 };
@@ -74,6 +79,10 @@ const select=(kind,index=0)=>{
   get("sprout-picker-choices").listeners.click({target:choice});
 };
 check("Navigation basket starts empty",count()==="0"&&amount()==="£0.00"&&get("nav-cart-count").textContent==="0");
+photos[0].listeners.error();
+check("If an external mature vegetable photo fails, its circular fallback appears",photos[0].hidden===true);
+photos[1].complete=true;photos[1].naturalWidth=0;
+check("Image fallback is checked during initialisation",source.includes("photo.complete&&!photo.naturalWidth"));
 get("open-cart").focus();get("open-cart").listeners.click();
 check("Cart opens as an overlay and locks background scrolling",
   get("cart-overlay").hidden===false&&
@@ -84,6 +93,10 @@ check("Escape closes cart, unlocks scrolling, and restores focus",
   get("cart-overlay").hidden===true&&
   !document.body.classList.contains("overlay-open")&&
   document.activeElement===get("open-cart"));
+get("open-cart").listeners.click();
+basketLink.listeners.click();
+check("Shop broccoli link closes drawer so chosen checkout is visible",
+  get("cart-overlay").hidden===true&&!document.body.classList.contains("overlay-open"));
 const broccoli=tiles[0];broccoli.focus();broccoli.listeners.click();
 check("Broccoli displays precisely 200g and 500g choices before adding anything",
   get("sprout-picker-choices").children.length===2&&
