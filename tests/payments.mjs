@@ -105,7 +105,13 @@ async function mockStripe(input,init={}){
  }
  if(method==="GET"&&path.startsWith("coupons/")){
   const item=coupons.get(decodeURIComponent(path.slice("coupons/".length)));
-  return item?response(item):response({error:{message:"Not found"}},404);
+  if(!item)return response({error:{message:"Not found"}},404);
+  // Stripe's modern API omits applies_to unless explicitly expanded.
+  if(!u.searchParams.getAll("expand[]").includes("applies_to")){
+   const {applies_to,...withoutExpansion}=item;
+   return response(withoutExpansion);
+  }
+  return response(item);
  }
  if(method==="POST"&&path==="coupons"){
   stats.couponCreates++;
