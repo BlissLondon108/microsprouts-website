@@ -8,6 +8,7 @@ const html = read("index.html");
 const css = read("comp.css");
 const app = read("comp.js");
 const cartClient = read("cart-preview.js");
+const carouselClient = read("carousel-interaction.js");
 const paymentClient = read("checkout.js");
 const checkoutWorker = read("worker.js");
 let total = 0;
@@ -59,6 +60,20 @@ check("Marquee continues rightward across the full page and respects reduced mot
   css.includes(".sprout-marquee:focus-within .sprout-marquee__track")&&
   css.includes("prefers-reduced-motion:reduce")&&
   css.includes('.sprout-marquee__group[aria-hidden="true"]{display:none}'));
+check("Moving sprout carousel is swipeable by touch, mouse, trackpad and keyboard",
+  html.includes("Discover distinctive flavours and natural goodness in every sprout.")&&
+  html.includes("Swipe left or right to explore")&&
+  html.includes('src="carousel-interaction.js?v=1"')&&
+  css.includes("touch-action:pan-y")&&
+  css.includes(".sprout-marquee.is-dragging")&&
+  carouselClient.includes('marquee.addEventListener("pointerdown"')&&
+  carouselClient.includes('marquee.addEventListener("pointermove"')&&
+  carouselClient.includes('marquee.addEventListener("pointerup"')&&
+  carouselClient.includes('marquee.addEventListener("pointercancel"')&&
+  carouselClient.includes('marquee.addEventListener("wheel"')&&
+  carouselClient.includes('marquee.addEventListener("keydown"')&&
+  carouselClient.includes("event.stopImmediatePropagation()")&&
+  !carouselClient.includes("Stripe"));
 check("Narrow cart slides from the right without displacing top navigation links",
   css.includes('.comp-nav{position:relative}')&&
   css.includes('.comp-nav nav{margin-left:0}')&&
@@ -105,7 +120,7 @@ check("Main photo and gallery load without any opacity fade or banner rewrite",
   app.includes("image.onload")&&
   app.includes("requestId")&&
   !app.includes("requestAnimationFrame"));
-check("Checkout and basket JavaScript parse", (() => { try { new vm.Script(app); new vm.Script(cartClient); new vm.Script(paymentClient); return true; } catch { return false; } })());
+check("Checkout and basket JavaScript parse", (() => { try { new vm.Script(app); new vm.Script(cartClient); new vm.Script(carouselClient); new vm.Script(paymentClient); return true; } catch { return false; } })());
 check("Both product prices and delivery cost retained", [999,1699,230].every(n => paymentClient.includes(String(n))));
 check("Seven day lead and Tuesday–Thursday delivery retained",
   checkoutWorker.includes("d.setUTCDate(d.getUTCDate()+7)")&&
