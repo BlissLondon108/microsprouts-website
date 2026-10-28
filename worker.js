@@ -102,7 +102,7 @@ const inspectLiveStripe=async env=>{
         (p.recurring?.interval_count||null)===(x.frequency==="once"?null:x.frequency==="weekly"?1:2)));
     }],
     ["discount",async()=>{
-      const coupon=await stripeRequest(env,"coupons/MS_SPROUT20_V1");
+      const coupon=await stripeRequest(env,"coupons/MS_SPROUT20_V1?expand%5B%5D=applies_to");
       const targets=coupon.applies_to?.products||[];
       return coupon.valid!==false&&coupon.percent_off===20&&coupon.duration==="once"&&
         PRODUCT_DEFINITIONS.slice(0,2).every(p=>targets.includes(p.id))&&
