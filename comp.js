@@ -1,5 +1,4 @@
-/* MicroSprouts product gallery and homepage checkout CTAs.
-   Both CTAs use the same verified live Stripe checkout page. */
+/* MicroSprouts product gallery and existing secure broccoli checkout. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -38,24 +37,17 @@
     // Keep gallery selection synced with the chosen pack.
     buttons.forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.pack === pack)));
     const checkout = $('checkout-button');
-    const lowerCheckout = $('bottom-checkout-button');
-    const url = 'checkout.html?pack=' + encodeURIComponent(pack);
     if (checkout) {
       checkout.dataset.pack = pack;
-      checkout.href = url;
+      checkout.href = 'checkout.html?pack=' + encodeURIComponent(pack);
     }
-    if (lowerCheckout) lowerCheckout.href = url;
     thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'));
     setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on an ornate cream-and-gold porcelain plate, ' + pack + ' gram ' + packLabels[pack].name + ' option', true);
-    const lowerPack = $('bottom-pack');
-    if (lowerPack) lowerPack.value = pack;
   }
 
   buttons.forEach(btn => btn.addEventListener('click', () => setPack(btn.dataset.pack)));
-  $('bottom-pack')?.addEventListener('change', () => setPack($('bottom-pack').value));
-  // Checkout labels and real links are already present in HTML on first
-  // paint. The secure checkout page and Worker enforce payment availability;
-  // no extra status fetch or text rewrite is needed here.
+  // Checkout label and real link are already present in HTML on first
+  // paint. The checkout page and Worker enforce payment availability.
   thumbs.forEach(btn => btn.addEventListener('click', () => {
     const img = btn.querySelector('img');
     const src = img?.getAttribute('src');
