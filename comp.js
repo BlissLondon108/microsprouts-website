@@ -58,13 +58,31 @@
     const pack = $('pack').value;
     if (pack !== activePack) setPack(pack, false);
   });
-  $('checkout-button')?.addEventListener('click', () => {
-    const select = $('pack');
-    if (select) {
-      select.value = activePack;
-      select.dispatchEvent(new Event('change',{ bubbles: true }));
-    }
-  });
+  // Public checkout opens only after Worker confirms safe LIVE payments.
+  // Sandbox test cards are never presented to public customers.
+  const checkoutButton=$('checkout-button');
+  if(checkoutButton){
+    fetch('/api/checkout/status',{cache:'no-store'})
+      .then(r=>r.ok?r.json():null)
+      .then(status=>{
+        if(status?.enabled===true&&status.mode==='live'&&status.fulfillment_ready===true){
+          checkoutButton.dataset.live='true';
+          checkoutButton.textContent='Checkout';
+          checkoutButton.setAttribute('aria-label','Continue to secure checkout');
+        }
+      }).catch(()=>{});
+    checkoutButton.addEventListener('click',event=>{
+      const select=$('pack');
+      if(select){
+        select.value=activePack;
+        select.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      if(checkoutButton.dataset.live==='true'){
+        event.preventDefault();
+        location.assign('checkout.html?pack='+encodeURIComponent(activePack));
+      }
+    });
+  }
 
   const map = { seeds:'assets/day0.svg',germination:'assets/day1.svg',macro:'assets/macro.webp',tray:'assets/tray.webp' };
   thumbs.forEach(btn => btn.addEventListener('click', () => {
