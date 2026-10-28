@@ -582,8 +582,8 @@ body.overlay-open{overflow:hidden}
 .comp-nav{position:relative}
 .comp-nav nav{margin-left:0}
 .nav-cart{
- position:absolute;right:1px;top:9px;left:auto;
- margin:0;width:40px;height:40px;z-index:4
+ position:absolute;right:10px;top:10px;left:auto;
+ margin:0;width:38px;height:38px;z-index:4
 }
 .menu-btn{margin-left:0}
 .sprout-orb__letter{
