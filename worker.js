@@ -1,7 +1,9 @@
 import {ensureCatalog,ensurePortal,findPortal,priceLookupKey,PRODUCT_DEFINITIONS} from "./stripe-catalog.js";
+import {hasNotificationConfiguration,storageReady,storeStripeEvent,sendPendingAlerts} from "./fulfillment.js";
 /* MicroSprouts server-side Stripe Checkout API. Cloudflare Worker, no secrets in source.
  * STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET must be runtime encrypted secrets.
- * Only sandbox (sk_test_) payments are accepted; PAYMENTS_ENABLED=false disables checkout.
+ * Sandbox by default. Live mode requires explicit flags, configured order storage
+ * and verified owner notifications. PAYMENTS_ENABLED=false disables everything.
  */
 const PRICE_PENCE = Object.freeze({ "200":999, "500":1699 });
 const SUBSCRIPTION_PRICE_PENCE = Object.freeze({ "200":899, "500":1549 });
@@ -54,12 +56,23 @@ const stripeRequest = async(env,path,options={})=>{
 // Worker secrets. Sandbox checkout is authorised by the presence of BOTH sandbox secrets.
 // An explicit PAYMENTS_ENABLED=false still disables checkout; live Stripe keys never work.
 const ready=env=>
+  env.PAYMENT_MODE!=="live"&&
   env.PAYMENTS_ENABLED!=="false"&&env.PAYMENTS_ENABLED!==false&&
   typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_")&&
   typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_");
+// Fail closed. Live keys alone never allow payment. The operator must first
+// configure D1, test owner email delivery, and explicitly enable live checkout.
+const liveConfigured=env=>
+  env.PAYMENT_MODE==="live"&&env.LIVE_CHECKOUT_ENABLED==="true"&&
+  env.OWNER_ALERT_VERIFIED==="true"&&env.PAYMENTS_ENABLED!=="false"&&
+  typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_live_")&&
+  typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")&&
+  hasNotificationConfiguration(env);
+const paymentMode=async env=>
+  liveConfigured(env)&&await storageReady(env)?"live":ready(env)?"test":"not-configured";
 const put=(params,key,value)=>params.append(key,String(value));
 const createSession=async(request,env)=>{
-  if(!ready(env))return issue("Secure Stripe sandbox checkout is being configured. Please use the existing enquiry form for now.",503);
+  if(await paymentMode(env)==="not-configured")return issue("Secure checkout is not configured. Please use the enquiry form for now.",503);
   if(request.headers.get("content-type")?.split(";")[0]!=="application/json")return issue("Send JSON.");
   const length=Number(request.headers.get("content-length")||0);
   if(length>8192)return issue("Request too large.",413);
@@ -105,7 +118,7 @@ const createSession=async(request,env)=>{
     const safeParam=typeof error.stripeParam==="string"&&/^[a-z0-9_\[\].]{1,90}$/i.test(error.stripeParam)?error.stripeParam:null;
     const stripeStatus=Number.isInteger(error.stripeStatus)?error.stripeStatus:null;
     console.error("Stripe catalogue setup failed",safeStage,stripeStatus,safeCode,safeParam);
-    return json({error:"Stripe sandbox catalogue setup failed. No payment has been taken.",
+    return json({error:"Stripe catalogue setup failed. No payment has been taken.",
       setup_stage:safeStage,stripe_http_status:stripeStatus,stripe_error_code:safeCode,
       stripe_error_param:safeParam},503);
   }
@@ -152,12 +165,12 @@ const createSession=async(request,env)=>{
     if(response.mode!==(recurring?"subscription":"payment")||!response.url?.startsWith("https://checkout.stripe.com/"))throw Error("Unexpected Stripe response");
     return json({url:response.url});
   }catch(e){
-    console.error("Sandbox Stripe session failure",e.stripeStatus||500);
+    console.error("Stripe checkout session failure",e.stripeStatus||500);
     return issue("Stripe checkout could not start. Please try again.",502);
   }
 };
 const verifySession=async(request,env)=>{
-  if(!ready(env))return issue("Checkout verification is not yet enabled.",503);
+  if(await paymentMode(env)==="not-configured")return issue("Checkout verification is not yet enabled.",503);
   const id=new URL(request.url).searchParams.get("session_id");
   if(!id||!SESS_RE.test(id))return issue("Invalid checkout session.");
   try{
@@ -176,7 +189,7 @@ const verifySession=async(request,env)=>{
   }catch{return issue("Unable to verify this payment. Please check again.",502)}
 };
 const getPortalLogin=async(env)=>{
-  if(!ready(env))return issue("Customer portal is unavailable until Stripe is configured.",503);
+  if(await paymentMode(env)==="not-configured")return issue("Customer portal is unavailable until Stripe is configured.",503);
   try{
     const stripe=(path,options)=>stripeRequest(env,path,options);
     // Portal setup runs independently. A checkout can succeed even if Billing
@@ -203,35 +216,55 @@ const verifySignature=async(payload,header,secret)=>{
   return header.split(",").some(piece=>piece.startsWith("v1=")&&secureEqual(piece.slice(3),hex));
 };
 const webhook=async(request,env)=>{
-  if(!ready(env)||!env.STRIPE_WEBHOOK_SECRET)return issue("Webhook not configured.",503);
+  const mode=await paymentMode(env);
+  if(mode==="not-configured"||!env.STRIPE_WEBHOOK_SECRET)return issue("Webhook not configured.",503);
   const payload=await request.text();
   if(payload.length>1024*1024)return issue("Payload too large.",413);
   if(!await verifySignature(payload,request.headers.get("stripe-signature"),env.STRIPE_WEBHOOK_SECRET))return issue("Invalid signature.",400);
   let event;try{event=JSON.parse(payload)}catch{return issue("Invalid event JSON.")}
-  // Stripe remains the payment and subscription system of record. Avoid PII in logs.
-  if(["checkout.session.completed","checkout.session.async_payment_succeeded","invoice.paid","invoice.payment_failed",
-    "customer.subscription.updated","customer.subscription.deleted"].includes(event.type)){
-    console.log("Verified Stripe event",event.type,event.id);
+  // In live mode never acknowledge a paid order without durable storage.
+  // Webhook errors return 503 for Stripe retries; cron also retries the alert outbox.
+  if(mode==="live"||await storageReady(env)){
+    try{
+      await storeStripeEvent(env,event,{
+        loadSubscription:id=>stripeRequest(env,"subscriptions/"+encodeURIComponent(id))
+      });
+      await sendPendingAlerts(env,5);
+    }catch(error){
+      console.error("Stripe fulfillment unavailable",String(event.type||"unknown").slice(0,80));
+      return issue("Order processing temporarily unavailable; webhook will be retried.",503);
+    }
+  }else{
+    // Existing sandbox supports test payments before D1 provisioning.
+    console.log("Sandbox Stripe event",String(event.type||"unknown").slice(0,80));
   }
   return json({received:true});
 };
 export default {
   async fetch(request,env){
     const path=new URL(request.url).pathname;
-    if(path==="/api/checkout/status"&&request.method==="GET")
-      return json({enabled:ready(env),mode:ready(env)?"test":"not-configured",
-        minimum_date:minimumDate(),
+    if(path==="/api/checkout/status"&&request.method==="GET"){
+      const mode=await paymentMode(env);
+      return json({enabled:mode!=="not-configured",mode,
+        fulfillment_ready:mode==="live",minimum_date:minimumDate(),
         checks:{
-          activation:"sandbox_credentials",
+          activation:mode==="live"?"live_verified":"sandbox_credentials",
           explicitly_disabled:env.PAYMENTS_ENABLED==="false"||env.PAYMENTS_ENABLED===false,
           sandbox_key_available:typeof env.STRIPE_SECRET_KEY==="string"&&env.STRIPE_SECRET_KEY.startsWith("sk_test_"),
           webhook_secret_available:typeof env.STRIPE_WEBHOOK_SECRET==="string"&&env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")
         }});
+    }
     if(path==="/api/checkout/session"&&request.method==="POST")return createSession(request,env);
     if(path==="/api/checkout/verify"&&request.method==="GET")return verifySession(request,env);
     if(path==="/api/checkout/portal"&&request.method==="GET")return getPortalLogin(env);
     if(path==="/api/stripe/webhook"&&request.method==="POST")return webhook(request,env);
     if(path.startsWith("/api/"))return issue("Not found",404);
     return env.ASSETS.fetch(request);
+  },
+  async scheduled(controller,env){
+    if(hasNotificationConfiguration(env)&&await storageReady(env)){
+      try{await sendPendingAlerts(env,10);}
+      catch{console.error("Owner notification retry incomplete");}
+    }
   }
 };
