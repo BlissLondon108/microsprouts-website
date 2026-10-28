@@ -89,7 +89,7 @@ check("Carousel uses real mature-vegetable photo examples in the same circles",
   ["8538298","6761088","7420818","4965038"].every(id=>
     (html.match(new RegExp('pexels-photo-'+id+'\\.jpeg','g'))||[]).length===4)&&
   (html.match(/class="sprout-orb__photo"/g)||[]).length===16&&
-  html.includes("Explore the vegetables behind our sprouts.")&&
+  html.includes("Discover distinctive flavours and natural goodness in every sprout.")&&
   css.includes('.sprout-orb .sprout-orb__photo{')&&
   cartClient.includes('photo.addEventListener("error"')&&
   cartClient.includes("photo.hidden=true"));
