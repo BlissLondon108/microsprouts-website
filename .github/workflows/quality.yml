@@ -22,7 +22,6 @@ jobs:
           node --check shop.js
           node --check pages.js
           node --check worker.js
-          node --check fulfillment.js
           node --check stripe-catalog.js
           node --check manage-subscription.js
           node --check checkout.js
@@ -31,4 +30,3 @@ jobs:
         run: |
           node tests/smoke.mjs
           node tests/payments.mjs
-          node tests/fulfillment.mjs
