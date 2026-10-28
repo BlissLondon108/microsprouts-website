@@ -651,3 +651,21 @@ body.overlay-open{overflow:hidden}
  .nav-cart{width:34px;height:34px;top:13px;right:2px}
  .nav-cart__count{right:0}
 }
+
+
+/* Visitors can swipe/drag the continuously moving sprout collection themselves.
+   Vertical page scrolling is preserved on touchscreens. */
+.sprout-marquee{
+ touch-action:pan-y;
+ overscroll-behavior-x:contain;
+ cursor:grab;
+ user-select:none;
+ -webkit-user-select:none;
+}
+.sprout-marquee.is-dragging{cursor:grabbing}
+.sprout-marquee.is-dragging .sprout-tile{cursor:grabbing}
+.sprout-marquee .sprout-orb__photo{
+ pointer-events:none;
+ -webkit-user-drag:none;
+ user-select:none;
+}
