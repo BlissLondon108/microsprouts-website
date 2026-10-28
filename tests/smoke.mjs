@@ -20,6 +20,11 @@ check("No duplicate IDs", ids.length === idSet.size);
 check("All in-page links resolve", [...html.matchAll(/href="#([^"]+)"/g)].every(m => idSet.has(m[1])));
 const required = ["interest-form","pack","qty","frequency","date","postcode","postcode-field","code","subtotal","deliveryfee","discountline","discount","total","datehint","promo-hint","form-message","whatsapp-fallback","hero-photo","checkout-button"];
 check("Enquiry fields and gallery controls exist", required.every(id => idSet.has(id)));
+check("Homepage routes to payment only after live fulfillment readiness",
+  html.includes('id="checkout-button" href="#enquire"')&&
+  app.includes("status.mode==='live'")&&
+  app.includes("status.fulfillment_ready===true")&&
+  app.includes("checkout.html?pack="));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
