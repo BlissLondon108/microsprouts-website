@@ -1,5 +1,5 @@
-/* MicroSprouts approved-comp presentation.
-   Existing shop.js remains the source of truth for prices, dates and WhatsApp enquiries. */
+/* MicroSprouts product gallery and homepage checkout CTAs.
+   Both CTAs use the same verified live Stripe checkout page. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -35,7 +35,7 @@
     '200': { name: 'Single Pack', price: '£9.99', image: 'assets/single-ornate-wide-v1.svg' },
     '500': { name: 'Family Pack', price: '£16.99', image: 'assets/family-ornate-wide-v1.svg' }
   };
-  function setPack(pack, updateForm = true) {
+  function setPack(pack) {
     if (!packLabels[pack]) return;
     activePack = pack;
     selectedGallery = 'pack';
@@ -44,42 +44,52 @@
     const checkout = $('checkout-button');
     if (checkout) checkout.dataset.pack = pack;
     thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'));
-    const assetKey = pack === '500' ? 'family' : 'week';
     setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on an ornate cream-and-gold porcelain plate, ' + pack + ' gram ' + packLabels[pack].name + ' option');
-    const select = $('pack');
-    if (updateForm && select) {
-      select.value = pack;
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    }
+    const lowerPack = $('bottom-pack');
+    if (lowerPack) lowerPack.value = pack;
   }
 
   buttons.forEach(btn => btn.addEventListener('click', () => setPack(btn.dataset.pack)));
-  $('pack')?.addEventListener('change', () => {
-    const pack = $('pack').value;
-    if (pack !== activePack) setPack(pack, false);
-  });
-  // Public checkout opens only after Worker confirms safe LIVE payments.
-  // Sandbox test cards are never presented to public customers.
+  $('bottom-pack')?.addEventListener('change', () => setPack($('bottom-pack').value));
+  // Both homepage purchase buttons use the same checkout.html route and
+  // never offer checkout until the Worker reports verified live readiness.
   const checkoutButton=$('checkout-button');
-  if(checkoutButton){
+  const lowerCheckout=$('bottom-checkout-button');
+  const lowerNote=$('bottom-checkout-note');
+  const checkoutUrl=()=> 'checkout.html?pack='+encodeURIComponent(activePack);
+  if(checkoutButton||lowerCheckout){
     fetch('/api/checkout/status',{cache:'no-store'})
       .then(r=>r.ok?r.json():null)
       .then(status=>{
-        if(status?.enabled===true&&status.mode==='live'&&status.manual_order_handling===true){
-          checkoutButton.dataset.live='true';
-          checkoutButton.textContent='Checkout';
-          checkoutButton.setAttribute('aria-label','Continue to secure checkout');
+        const live=status?.enabled===true&&status.mode==='live'&&status.manual_order_handling===true;
+        if(live){
+          if(checkoutButton){
+            checkoutButton.dataset.live='true';
+            checkoutButton.textContent='Checkout';
+            checkoutButton.setAttribute('aria-label','Continue to secure checkout');
+          }
+          if(lowerCheckout){
+            lowerCheckout.dataset.live='true';
+            lowerCheckout.disabled=false;
+            lowerCheckout.textContent='Continue to secure checkout →';
+          }
+        }else if(lowerCheckout){
+          lowerCheckout.textContent='Checkout temporarily unavailable';
+          if(lowerNote)lowerNote.textContent='Online orders are temporarily unavailable. Please try again later.';
         }
-      }).catch(()=>{});
-    checkoutButton.addEventListener('click',event=>{
-      const select=$('pack');
-      if(select){
-        select.value=activePack;
-        select.dispatchEvent(new Event('change',{bubbles:true}));
-      }
+      }).catch(()=>{
+        if(lowerCheckout)lowerCheckout.textContent='Checkout temporarily unavailable';
+        if(lowerNote)lowerNote.textContent='Could not confirm checkout availability. Please refresh the page.';
+      });
+    checkoutButton?.addEventListener('click',event=>{
       if(checkoutButton.dataset.live==='true'){
         event.preventDefault();
-        location.assign('checkout.html?pack='+encodeURIComponent(activePack));
+        location.assign(checkoutUrl());
+      }
+    });
+    lowerCheckout?.addEventListener('click',()=>{
+      if(lowerCheckout.dataset.live==='true'&&!lowerCheckout.disabled){
+        location.assign(checkoutUrl());
       }
     });
   }
