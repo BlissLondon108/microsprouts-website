@@ -23,7 +23,7 @@
     };
     image.onerror = () => {
       if (current !== requestId) return;
-      const fallback = activePack === '500' ? 'assets/family-plate.webp' : 'assets/single-plate.webp';
+      const fallback = activePack === '500' ? 'assets/family-ornate-v3.webp' : 'assets/single-ornate-v3.webp';
       hero.src = fallback;
       hero.alt = 'Fresh broccoli sprouts arranged on a natural stone plate';
       hero.classList.remove('is-switching');
@@ -32,8 +32,8 @@
   }
 
   const packLabels = {
-    '200': { name: 'Single Pack', price: '£9.99', image: 'assets/single-plate.webp' },
-    '500': { name: 'Family Pack', price: '£16.99', image: 'assets/family-plate.webp' }
+    '200': { name: 'Single Pack', price: '£9.99', image: 'assets/single-ornate-v3.webp' },
+    '500': { name: 'Family Pack', price: '£16.99', image: 'assets/family-ornate-v3.webp' }
   };
   function setPack(pack, updateForm = true) {
     if (!packLabels[pack]) return;
@@ -44,7 +44,7 @@
     if (checkout) checkout.dataset.pack = pack;
     thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'));
     const assetKey = pack === '500' ? 'family' : 'week';
-    setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on a stone plate, ' + pack + ' gram ' + packLabels[pack].name + ' option');
+    setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on an ornate cream-and-gold porcelain plate, ' + pack + ' gram ' + packLabels[pack].name + ' option');
     const select = $('pack');
     if (updateForm && select) {
       select.value = pack;

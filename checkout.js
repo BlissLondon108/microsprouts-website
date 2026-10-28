@@ -47,8 +47,8 @@ function update(){
  if(recurring&&code.value.trim())code.value="";
  el("summary-product-title").textContent=(pack.value==="500"?"Family Pack · 500g":"Single Pack · 200g")+" × "+n;
  const photo=el("summary-photo");
- photo.src=pack.value==="500"?"assets/family-plate.webp":"assets/single-plate.webp";
- photo.alt=(pack.value==="500"?"Family Pack":"Single Pack")+" broccoli sprouts on a stone plate";
+ photo.src=pack.value==="500"?"assets/family-ornate-v3.webp":"assets/single-ornate-v3.webp";
+ photo.alt=(pack.value==="500"?"Family Pack":"Single Pack")+" broccoli sprouts on an ornate porcelain plate";
  form.querySelectorAll("[data-pack-choice]").forEach(button=>
    button.setAttribute("aria-pressed",String(button.dataset.packChoice===pack.value)));
  el("checkout-message").textContent=enabled?

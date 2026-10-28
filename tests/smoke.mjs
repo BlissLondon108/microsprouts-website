@@ -65,14 +65,20 @@ const paymentClient=read("checkout.js");
 const catalog=read("stripe-catalog.js");
 check("Homepage uses the new Single Pack name with Family Pack preserved",
   html.includes('>Single Pack</span>')&&html.includes('>Family Pack</span>')&&!html.includes('>Week Supply</span>'));
-check("Product hero has replaced the former glass photo with a stone-plate shot",
-  html.includes('id="hero-photo" src="assets/single-plate.webp"')&&
-  html.includes('stone plate')&&!html.includes('id="hero-photo" data-asset="week"'));
-const singlePhoto=path.join(root,"assets/single-plate.webp");
-const familyPhoto=path.join(root,"assets/family-plate.webp");
+check("Product hero has replaced the former glass photo with a ornate porcelain-plate shot",
+  html.includes('id="hero-photo" src="assets/single-ornate-v3.webp"')&&
+  html.includes('ornate cream-and-gold porcelain plate')&&!html.includes('id="hero-photo" data-asset="week"'));
+const singlePhoto=path.join(root,"assets/single-ornate-v3.webp");
+const familyPhoto=path.join(root,"assets/family-ornate-v3.webp");
 check("Matched pack photos exist as distinct WebP assets",
   fs.existsSync(singlePhoto)&&fs.existsSync(familyPhoto)&&
   fs.readFileSync(singlePhoto).toString("base64")!==fs.readFileSync(familyPhoto).toString("base64"));
+check("Both checkout choices use final user-approved ornate plate images",
+  paymentCheckout.includes('src="assets/single-ornate-v3.webp"')&&
+  paymentCheckout.includes('src="assets/family-ornate-v3.webp"')&&
+  paymentClient.includes('assets/single-ornate-v3.webp')&&
+  paymentClient.includes('assets/family-ornate-v3.webp')&&
+  app.includes('assets/single-ornate-v3.webp')&&app.includes('assets/family-ornate-v3.webp'));
 check("Checkout shows both interactive pack photos and visible subscription savings",
   ["data-pack-choice=\"200\"","data-pack-choice=\"500\"","subscription-savings-row","subscription-perk"].every(x=>paymentCheckout.includes(x)));
 check("Recurring UI prices and complimentary delivery are reflected in the customer-facing calculator",
