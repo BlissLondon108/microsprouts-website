@@ -19,6 +19,7 @@ jobs:
       - name: Validate JavaScript syntax
         run: |
           node --check comp.js
+          node --check cart-preview.js
           node --check pages.js
           node --check worker.js
           node --check stripe-catalog.js
@@ -28,4 +29,5 @@ jobs:
       - name: Verify webpage structure and ordering invariants
         run: |
           node tests/smoke.mjs
+          node tests/cart-preview.mjs
           node tests/payments.mjs
