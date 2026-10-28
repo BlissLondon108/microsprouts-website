@@ -65,7 +65,7 @@
     fetch('/api/checkout/status',{cache:'no-store'})
       .then(r=>r.ok?r.json():null)
       .then(status=>{
-        if(status?.enabled===true&&status.mode==='live'&&status.fulfillment_ready===true){
+        if(status?.enabled===true&&status.mode==='live'&&status.manual_order_handling===true){
           checkoutButton.dataset.live='true';
           checkoutButton.textContent='Checkout';
           checkoutButton.setAttribute('aria-label','Continue to secure checkout');
