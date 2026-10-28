@@ -38,18 +38,19 @@ check("Explicit runtime disable switch prevents checkout",(await res.json()).ena
 res=await api("/api/checkout/status",{}, {...envOn,STRIPE_SECRET_KEY:"sk_live_not_permitted"});
 check("Live keys without explicit readiness cannot enable checkout",(await res.json()).enabled===false);
 const liveBase={...envOff,PAYMENT_MODE:"live",LIVE_CHECKOUT_ENABLED:"true",
- OWNER_ALERT_VERIFIED:"true",STRIPE_SECRET_KEY:"sk_live_mock_only",
- STRIPE_WEBHOOK_SECRET:"whsec_mock",RESEND_API_KEY:"re_mock_secret_key",
- ORDER_ALERT_TO:"owner@example.org",ORDER_ALERT_FROM:"shop@example.org"};
-res=await api("/api/checkout/status",{},liveBase);
-check("Live mode is denied until durable storage is configured",(await res.json()).enabled===false);
-const mockDatabase={prepare:()=>({first:async()=>({})})};
-res=await api("/api/checkout/status",{}, {...liveBase,ORDERS_DB:mockDatabase,OWNER_ALERT_VERIFIED:"false"});
-check("Live mode is denied until owner alerts are verified",(await res.json()).enabled===false);
-res=await api("/api/checkout/status",{}, {...liveBase,ORDERS_DB:mockDatabase});
+ STRIPE_NOTIFICATIONS_CONFIRMED:"true",STRIPE_SECRET_KEY:"sk_live_mock_only"};
+res=await api("/api/checkout/status",{}, {...liveBase,STRIPE_NOTIFICATIONS_CONFIRMED:"false"});
+check("Owner must confirm Stripe payment email before launch",(await res.json()).enabled===false);
+res=await api("/api/checkout/status",{}, {...liveBase,LIVE_CHECKOUT_ENABLED:"false"});
+check("Release switch must be explicit",(await res.json()).enabled===false);
+res=await api("/api/checkout/status",{}, {...liveBase,PAYMENTS_ENABLED:"false"});
+check("Emergency stop disables live checkout",(await res.json()).enabled===false);
+res=await api("/api/checkout/status",{}, {...liveBase,STRIPE_SECRET_KEY:"sk_test_wrong"});
+check("Test Stripe key cannot enable live charging",(await res.json()).enabled===false);
+res=await api("/api/checkout/status",{}, liveBase);
 const liveStatus=await res.json();
-check("Verified readiness exposes live mode for public checkout",
- liveStatus.enabled===true&&liveStatus.mode==="live"&&liveStatus.fulfillment_ready===true);
+check("Stripe-only live checkout requires no D1 or third-party mail service",
+ liveStatus.enabled===true&&liveStatus.mode==="live"&&liveStatus.manual_order_handling===true);
 res=await submit(customer,envOff);
 check("Missing test credentials prevents any checkout",res.status===503);
 res=await api("/index.html");
