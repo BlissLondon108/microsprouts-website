@@ -39,6 +39,7 @@
     if (!packLabels[pack]) return;
     activePack = pack;
     selectedGallery = 'pack';
+    hero?.classList.add('is-pack-photo');
     buttons.forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.pack === pack)));
     const checkout = $('checkout-button');
     if (checkout) checkout.dataset.pack = pack;
@@ -71,6 +72,7 @@
     const url = approved.get(name) || btn.dataset.url || map[name];
     selectedGallery = name;
     if (!url) return;
+    hero?.classList.remove('is-pack-photo');
     thumbs.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
     const img = btn.querySelector('img');
     setPhoto(url,img?.alt||'Broccoli sprouts photograph');
