@@ -1,7 +1,7 @@
 /* MicroSprouts sprout carousel: automatic movement + direct gestures.
  * Uses the existing CSS marquee animation as the single source of position,
  * so touch, mouse and trackpad interaction does not restart the animation.
- * No Stripe or shopping-cart logic lives here.
+ * This module never creates payments or modifies the shopping basket.
  */
 (() => {
   "use strict";
