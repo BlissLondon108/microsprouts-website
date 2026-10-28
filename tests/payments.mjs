@@ -51,6 +51,12 @@ res=await api("/api/checkout/status",{}, liveBase);
 const liveStatus=await res.json();
 check("Stripe-only live checkout requires no D1 or third-party mail service",
  liveStatus.enabled===true&&liveStatus.mode==="live"&&liveStatus.manual_order_handling===true);
+res=await api("/api/checkout/status",{}, {...liveBase,STRIPE_SECRET_KEY:"rk_live_restricted_mock"});
+const restrictedStatus=await res.json();
+check("Least-privilege restricted live Stripe key is supported",
+ restrictedStatus.enabled===true&&restrictedStatus.mode==="live");
+res=await api("/api/checkout/status",{}, {...liveBase,STRIPE_SECRET_KEY:"rk_test_wrong_environment"});
+check("Restricted test keys are refused in live mode",(await res.json()).enabled===false);
 res=await submit(customer,envOff);
 check("Missing test credentials prevents any checkout",res.status===503);
 res=await api("/index.html");
