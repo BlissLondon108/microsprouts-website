@@ -7,6 +7,7 @@ const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const html = read("index.html");
 const css = read("comp.css");
 const app = read("comp.js");
+const cartClient = read("cart-preview.js");
 const paymentClient = read("checkout.js");
 const checkoutWorker = read("worker.js");
 let total = 0;
@@ -19,34 +20,46 @@ const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
 const idSet = new Set(ids);
 check("No duplicate IDs", ids.length === idSet.size);
 check("All in-page links resolve", [...html.matchAll(/href="#([^"]+)"/g)].every(m => idSet.has(m[1])));
-const required = ["bottom-pack","bottom-checkout-button","bottom-checkout-note","bottom-checkout-title","hero-photo","checkout-button"];
-check("Both checkout entry points and gallery controls exist", required.every(id => idSet.has(id)));
-check("Both checkout links have final labels and valid URLs in initial HTML",
+const required = ["sprout-showcase-title","explore-sprouts","basket","basket-title","basket-count","basket-items","basket-subtotal","basket-unpriced","basket-feedback","hero-photo","checkout-button"];
+check("Sprout carousel and basket are present beside FAQ",required.every(id=>idSet.has(id))&&
+  html.includes('class="basket-preview" id="basket"')&&
+  html.includes('class="faq-questions"')&&
+  html.includes('class="sprout-marquee__track"'));
+check("Second checkout removed; existing broccoli Stripe checkout preserved",
   html.includes('id="checkout-button" href="checkout.html?pack=200"')&&
   html.includes('>Checkout</a>')&&
-  html.includes('id="bottom-checkout-button" class="submit-btn" href="checkout.html?pack=200"')&&
-  html.includes('>Continue to secure checkout →</a>')&&
-  !html.includes("View order options")&&
+  !html.includes("bottom-checkout-button")&&
+  !html.includes("bottom-pack")&&
+  !html.includes("Checkout enquiry")&&
   !html.includes("Checking checkout availability")&&
+  app.includes("checkout.href = 'checkout.html?pack='")&&
   !app.includes("/api/checkout/status")&&
-  !app.includes(".textContent='Checkout'"));
-check("Both checkout links follow the pack choice without a second navigation handler",
-  app.includes("checkout.href = url")&&
-  app.includes("lowerCheckout.href = url")&&
-  app.includes("checkout.html?pack=")&&
   !app.includes("location.assign")&&
   !app.includes("fetch("));
-check("Payment enforcement remains on checkout page and Worker",
+check("Basket is a preview, not an unverified payment integration",
+  html.includes("Basket design preview only")&&
+  html.includes("Shop broccoli with Stripe")&&
+  html.includes("Price on request")&&
+  !cartClient.includes("/api/checkout")&&
+  !cartClient.includes("checkout.stripe.com")&&
+  !cartClient.includes("fetch("));
+check("All four advertised sprout varieties can be added to basket",
+  ["broccoli-200","broccoli-500","radish","mung","leek"].every(sku=>
+    html.includes('data-cart-sku="'+sku+'"')&&cartClient.includes('"'+sku+'":'))&&
+  (html.match(/class="sprout-marquee__group"/g)||[]).length===1&&
+  html.includes('class="sprout-marquee__group" aria-hidden="true"')&&
+  html.includes('src="cart-preview.js?v=1"'));
+check("Circular movement is left to right, pauses for interaction, and respects reduced motion",
+  css.includes("@keyframes microSproutsMoveRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}")&&
+  css.includes(".sprout-marquee:focus-within .sprout-marquee__track")&&
+  css.includes("prefers-reduced-motion:reduce")&&
+  css.includes('.sprout-marquee__group[aria-hidden="true"]{display:none}'));
+check("Basket has mobile layout and FAQ is a three-column desktop composition",
+  css.includes("grid-template-columns:minmax(175px,.85fr) minmax(260px,1.23fr) minmax(300px,1.13fr)")&&
+  css.includes(".faq-intro,.faq-questions,.basket-preview{grid-column:1;grid-row:auto}"));
+check("Payment enforcement remains on existing checkout and Worker",
   paymentClient.includes('fetch("/api/checkout/status"')&&
   checkoutWorker.includes('if(await paymentMode(env)==="not-configured")return issue('));
-check("Lower checkout shares top pack selection instead of opening WhatsApp",
-  app.includes("setPack($('bottom-pack').value)")&&
-  app.includes("lowerPack.value = pack")&&
-  !html.includes("Checkout enquiry")&&
-  !html.includes("Continue to WhatsApp")&&
-  !html.includes("interest-form")&&
-  !html.includes('src="shop.js"')&&
-  !app.includes("wa.me/"));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
@@ -74,7 +87,7 @@ check("Main photo and gallery load without any opacity fade or banner rewrite",
   app.includes("image.onload")&&
   app.includes("requestId")&&
   !app.includes("requestAnimationFrame"));
-check("Checkout JavaScript parses", (() => { try { new vm.Script(app); new vm.Script(paymentClient); return true; } catch { return false; } })());
+check("Checkout and basket JavaScript parse", (() => { try { new vm.Script(app); new vm.Script(cartClient); new vm.Script(paymentClient); return true; } catch { return false; } })());
 check("Both product prices and delivery cost retained", [999,1699,230].every(n => paymentClient.includes(String(n))));
 check("Seven day lead and Tuesday–Thursday delivery retained",
   checkoutWorker.includes("d.setUTCDate(d.getUTCDate()+7)")&&
