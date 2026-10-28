@@ -46,7 +46,7 @@ check("Basket is a preview, not an unverified payment integration",
 check("All four advertised sprout varieties can be added to basket",
   ["broccoli-200","broccoli-500","radish","mung","leek"].every(sku=>
     html.includes('data-cart-sku="'+sku+'"')&&cartClient.includes('"'+sku+'":'))&&
-  (html.match(/class="sprout-marquee__group"/g)||[]).length===1&&
+  (html.match(/class="sprout-marquee__group"/g)||[]).length===2&&
   html.includes('class="sprout-marquee__group" aria-hidden="true"')&&
   html.includes('src="cart-preview.js?v=1"'));
 check("Circular movement is left to right, pauses for interaction, and respects reduced motion",
