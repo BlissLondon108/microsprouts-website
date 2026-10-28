@@ -56,6 +56,25 @@ the WhatsApp enquiry form and cannot start a real charge. When live requirements
 are satisfied, the existing homepage button becomes **Checkout** and opens
 the selected pack in `checkout.html?pack=200` or `?pack=500`.
 
+## Read-only key verification (no charge)
+
+Before final activation, open:
+
+https://microsprouts.bhaktivedanta-london.workers.dev/api/checkout/preflight
+
+This safely checks the already-installed LIVE Stripe key against the expected
+three products, seven prices, SPROUT coupon, live billing portal and
+Checkout Session *read* permission. It never creates any Checkout Session,
+payment, customer, invoice or subscription, and it never returns credentials.
+
+A successful result contains `connection: "verified_read_only"` and
+each check marked `"ok"`. This does **not** prove write access for creating
+Checkout Sessions, successful receipt delivery, or owner email delivery.
+If a check returns `"error"`, review that specific operation and restricted
+key permission in Stripe, rather than granting unrestricted key access.
+Public diagnostics reveal only a coarse HTTP status, not the Stripe
+response, credentials, transactions or customer information.
+
 ## Step 3 — Controlled validation before launch
 
 - Confirm the Cloudflare Worker sees the intended live configuration:
