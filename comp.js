@@ -23,7 +23,7 @@
     };
     image.onerror = () => {
       if (current !== requestId) return;
-      const fallback = activePack === '500' ? 'assets/family-ornate-v3.webp' : 'assets/single-ornate-v3.webp';
+      const fallback = activePack === '500' ? 'assets/family-ornate-wide-v1.svg' : 'assets/single-ornate-wide-v1.svg';
       hero.src = fallback;
       hero.alt = 'Fresh broccoli sprouts arranged on a natural stone plate';
       hero.classList.remove('is-switching');
@@ -32,8 +32,8 @@
   }
 
   const packLabels = {
-    '200': { name: 'Single Pack', price: '£9.99', image: 'assets/single-ornate-v3.webp' },
-    '500': { name: 'Family Pack', price: '£16.99', image: 'assets/family-ornate-v3.webp' }
+    '200': { name: 'Single Pack', price: '£9.99', image: 'assets/single-ornate-wide-v1.svg' },
+    '500': { name: 'Family Pack', price: '£16.99', image: 'assets/family-ornate-wide-v1.svg' }
   };
   function setPack(pack, updateForm = true) {
     if (!packLabels[pack]) return;
