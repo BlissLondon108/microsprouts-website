@@ -125,7 +125,11 @@ async function status(){
      "This checkout is in preparation and cannot take payments yet. The existing WhatsApp enquiry form is still available.";
  }catch{
    enabled=false;el("checkout-state").textContent="Secure checkout is not configured yet. No payment can be taken here.";
- }finally{update();}
+ }finally{
+   update();
+   if(chosen.get("checkout_cancelled")==="1"||chosen.get("cancelled")==="1")
+     el("checkout-state").textContent="Stripe checkout was cancelled. You have not been charged here. Review your selection below and try again when ready.";
+ }
 }
 update();status();
 })();
