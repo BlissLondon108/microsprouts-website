@@ -143,9 +143,9 @@ check("Main photo and gallery load without any opacity fade or banner rewrite",
   !app.includes("requestAnimationFrame"));
 check("Checkout and basket JavaScript parse", (() => { try { new vm.Script(app); new vm.Script(cartClient); new vm.Script(carouselClient); new vm.Script(paymentClient); return true; } catch { return false; } })());
 check("Both product prices and delivery cost retained", [999,1699,230].every(n => paymentClient.includes(String(n))));
-check("Seven day lead and Tuesday–Thursday delivery retained",
+check("Seven day lead and Tuesday–Friday London shipping retained",
   checkoutWorker.includes("d.setUTCDate(d.getUTCDate()+7)")&&
-  checkoutWorker.includes("[2,3,4]"));
+  checkoutWorker.includes("[2,3,4,5]"));
 check("Retains customer support WhatsApp but no WhatsApp ordering form",
   html.includes('href="https://wa.me/447386853514"')&&
   !html.includes('whatsapp-fallback')&&
