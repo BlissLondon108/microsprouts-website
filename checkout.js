@@ -83,12 +83,11 @@ function validate(v){
  if(!v.date||v.date<date.min)return "Choose a preferred date at least seven days ahead.";
  const d=new Date(v.date+"T12:00:00Z");
  if(Number.isNaN(d.getTime())||d.toISOString().slice(0,10)!==v.date)return "Please select a valid date.";
- if(v.method==="delivery"&&![2,3,4,5].includes(d.getUTCDay()))return "Shipping dates are Tuesday to Friday.";
- if(v.method==="delivery"&&(!/^(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(v.postcode)||
-   !/^(?:EC|NW|SW|SE|WC|BR|CR|DA|EN|HA|IG|KT|RM|SM|TW|UB|E|N|W)\d/i.test(v.postcode)))
-   return "Please enter an eligible London postcode.";
- if(v.method==="delivery"&&(v.address.length<8||v.address.length>160||v.city.toLowerCase()!=="london"))
-   return "Please enter your full London street address and city.";
+ if(![2,3,4,5].includes(d.getUTCDay()))return "Choose an available Tuesday–Friday date.";
+ if(v.method==="delivery"&&!/^(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(v.postcode))
+   return "Please enter a valid UK postcode.";
+ if(v.method==="delivery"&&(v.address.length<8||v.address.length>160||
+   v.city.length<2||v.city.length>80))return "Enter a full UK shipping address and city.";
  if(v.code&&v.code!=="SPROUT")return "This promo code is not recognised.";
  if(v.code&&v.frequency!=="once")return "SPROUT applies only to one-time purchases.";
  return "";
