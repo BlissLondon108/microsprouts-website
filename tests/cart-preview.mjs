@@ -131,7 +131,7 @@ check("Opening nav basket doesn't add broccoli or start checkout",
 el("close-cart").listeners.click();
 el("basket-start").listeners.click();
 check("Clicking Add broccoli sprouts explicitly creates a removable draft",
- !el("basket-empty").hidden&&!el("basket-remove-entry").hidden&&
+ el("basket-empty").hidden&&!el("basket-remove-entry").hidden&&
  el("basket-other-items").children[0]===el("basket-current-item")&&
  !stages[0].hidden);
 el("basket-remove-entry").listeners.click();
