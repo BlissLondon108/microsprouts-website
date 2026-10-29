@@ -17,8 +17,18 @@ class Fake {
  get textContent(){return this._text+this.children.map(x=>x.textContent).join("")}
  addEventListener(k,fn){this.listeners[k]=fn}
  setAttribute(k,v){this.attributes[k]=String(v)}
- append(...nodes){for(const node of nodes)node.parentElement=this;this.children.push(...nodes)}
- replaceChildren(...nodes){this.children=[...nodes];for(const node of nodes)node.parentElement=this;this._text=""}
+ append(...nodes){
+  for(const node of nodes){
+   if(node.parentElement)node.parentElement.children=
+     node.parentElement.children.filter(x=>x!==node);
+   node.parentElement=this;this.children.push(node);
+  }
+ }
+ replaceChildren(...nodes){
+  for(const old of this.children)old.parentElement=null;
+  this.children=[];this._text="";
+  this.append(...nodes);
+ }
  focus(){document.activeElement=this}
  getClientRects(){return [1]}
  closest(sel){
@@ -53,6 +63,9 @@ const ids=[
 ];
 const elements=new Map(ids.map(id=>[id,new Fake(id)]));
 const el=id=>elements.get(id);
+// Simulate real document connectivity: removing the reusable editor from
+// its parent makes getElementById fail until the editor is reattached.
+el("basket-other-items").append(el("basket-current-item"));
 el("cart-overlay").hidden=true;
 el("checkout-button").dataset.pack="500";
 el("checkout-button").dataset.frequency="once";
@@ -93,7 +106,11 @@ saved.set("microsprouts-basket-entries-v2",JSON.stringify({entries:[
 const sessionStorage={getItem:key=>saved.get(key)||null,setItem:(key,value)=>saved.set(key,value)};
 document={
  activeElement:null,events:{},body:new Fake("body"),
- getElementById:id=>el(id)||null,
+ getElementById:id=>{
+  if(id==="basket-current-item"&&
+     !el("basket-other-items").children.includes(el("basket-current-item")))return null;
+  return el(id)||null;
+ },
  createElement:tag=>new Fake(tag),
  addEventListener(k,fn){this.events[k]=fn},
  querySelectorAll(sel){
@@ -116,8 +133,9 @@ const fetch=async(url,options={})=>{
 vm.runInNewContext(source,{document,sessionStorage,fetch,location:{search:""},
  window:{location:{assign(url){paymentUrl=url}}},URLSearchParams,Date,Intl});
 await new Promise(resolve=>setTimeout(resolve,0));
-check("Nav basket opens truly empty, ignoring old v2 placeholder",
- el("basket-other-items").children.length===0&&
+check("Nav basket opens truly empty while retaining its hidden editor in DOM",
+ el("basket-other-items").children.length===1&&
+ el("basket-other-items").children[0]===el("basket-current-item")&&
  !el("basket-empty").hidden&&
  el("basket-other-items").hidden&&
  el("nav-cart-count").textContent==="0"&&
@@ -126,21 +144,34 @@ check("Nav basket opens truly empty, ignoring old v2 placeholder",
 el("open-cart").listeners.click();
 check("Opening nav basket doesn't add broccoli or start checkout",
  !el("cart-overlay").hidden&&
- el("basket-other-items").children.length===0&&
+ el("basket-other-items").children.length===1&&
+ el("basket-other-items").hidden&&
  el("nav-cart-count").textContent==="0");
 el("close-cart").listeners.click();
 el("basket-start").listeners.click();
-check("Clicking Add broccoli sprouts explicitly creates a removable draft",
- el("basket-empty").hidden&&!el("basket-remove-entry").hidden&&
+check("Clicking Add broccoli sprouts immediately reveals editor and updates badge",
+ el("basket-empty").hidden&&!el("basket-other-items").hidden&&
+ !el("basket-remove-entry").hidden&&
  el("basket-other-items").children[0]===el("basket-current-item")&&
+ document.getElementById("basket-current-item")===el("basket-current-item")&&
+ el("nav-cart-count").textContent==="1"&&
+ el("basket-total").textContent==="—"&&
  !stages[0].hidden);
 el("basket-remove-entry").listeners.click();
-check("Removing last unconfigured pack returns to truly empty basket",
- el("basket-other-items").children.length===0&&
+check("Removing last unconfigured pack returns to empty without detaching editor",
+ el("basket-other-items").children.length===1&&
+ el("basket-other-items").children[0]===el("basket-current-item")&&
+ document.getElementById("basket-current-item")===el("basket-current-item")&&
  !el("basket-empty").hidden&&
  el("nav-cart-count").textContent==="0");
 el("checkout-button").focus();
 el("checkout-button").listeners.click({preventDefault(){}});
+check("Hero add-to-basket immediately opens visible product with live badge",
+ !el("cart-overlay").hidden&&
+ !el("basket-other-items").hidden&&
+ el("nav-cart-count").textContent==="1"&&
+ el("basket-current-price").textContent==="£16.99"&&
+ el("basket-empty").hidden);
 packs[1].listeners.click();orders[1].listeners.click();methods[1].listeners.click();
 check("First item is 500g weekly UK shipping with an expanded price",
  el("basket-total").textContent==="£15.49"&&
@@ -238,10 +269,17 @@ check("Shipping is charged only once across multiple one-time packs",
  el("basket-other-items").children[0].children[1].children[1].children[1].textContent==="+ £2.30 shipping");
 el("basket-remove-entry").listeners.click();
 el("basket-remove-entry").listeners.click();
-check("Removing all packs leaves a truly empty basket",
+check("Removing all packs leaves an empty basket with reusable editor intact",
  el("nav-cart-count").textContent==="0"&&
  el("basket-total").textContent==="—"&&
- !el("basket-empty").hidden&&el("basket-pay").hidden);
+ !el("basket-empty").hidden&&el("basket-pay").hidden&&
+ document.getElementById("basket-current-item")===el("basket-current-item"));
+el("basket-start").listeners.click();
+check("Adding again after emptying works without refresh",
+ el("nav-cart-count").textContent==="1"&&
+ el("basket-empty").hidden&&
+ !el("basket-other-items").hidden&&
+ document.getElementById("basket-current-item")===el("basket-current-item"));
 document.events.keydown({key:"Escape",preventDefault(){}});
 check("Escape closes basket",el("cart-overlay").hidden);
 photo.listeners.error();
