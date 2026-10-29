@@ -126,6 +126,7 @@
    el("basket-other-items").hidden=isEmpty;
    el("basket-shared-details").hidden=isEmpty;
    if(isEmpty){
+     el("basket-remove-entry").hidden=true;
      el("basket-other-items").replaceChildren();
      el("basket-items-control").hidden=true;
      el("basket-stage").hidden=true;
@@ -155,7 +156,7 @@
    renderOther();
    el("basket-items-control").hidden=!complete(entry);
    el("basket-add-another").disabled=state.entries.length>=10;
-   el("basket-remove-entry").hidden=state.entries.length===1&&!entry.pack;
+   el("basket-remove-entry").hidden=false;
    const count=state.entries.filter(i=>i.pack).length;
    setText("nav-cart-count",String(count));
    trigger.setAttribute("aria-label","Open shopping basket, "+count+(count===1?" pack":" packs"));
