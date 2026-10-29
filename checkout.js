@@ -67,6 +67,9 @@ form.querySelectorAll("[data-pack-choice]").forEach(button=>
  }));
 const chosen=new URL(location.href).searchParams;
 if(["200","500"].includes(chosen.get("pack")))pack.value=chosen.get("pack");
+// Order cards can preselect one-time or weekly without changing the existing
+// checkout controls or the backend's permitted billing frequencies.
+if(["once","weekly"].includes(chosen.get("frequency")))frequency.value=chosen.get("frequency");
 if(chosen.get("cancelled")==="1")el("checkout-state").textContent="Payment cancelled. You have not been charged here. You can review your details below.";
 function validate(v){
  if(!["200","500"].includes(v.pack)||!Number.isInteger(v.quantity)||v.quantity<1||v.quantity>10)return "Choose between 1 and 10 packs.";
