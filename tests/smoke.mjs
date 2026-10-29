@@ -39,8 +39,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=6"')&&
- html.includes('href="basket-flow.css?v=2"'));
+ html.includes('src="cart-preview.js?v=7"')&&
+ html.includes('href="basket-flow.css?v=3"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -72,10 +72,13 @@ check("Multi-entry basket shows due-today and weekly renewal totals with correct
  cartClient.includes('state.method==="delivery"')===false&&
  checkoutWorker.includes('entries.some(item=>item.method==="delivery"&&item.frequency==="once")?DELIVERY_PENCE:0')&&
  cartClient.includes('calc()'));
-check("Shared contact details remain compact with secure Stripe handoff",
+check("London shipping and compact address/contact fields are present",
  html.includes('id="basket-name"')&&html.includes('id="basket-email"')&&
  html.includes('id="basket-date"')&&html.includes('id="basket-postcode"')&&
- html.includes('id="basket-code"')&&
+ html.includes('id="basket-address"')&&html.includes('id="basket-city"')&&
+ !html.includes('id="basket-code"')&&
+ !html.includes('id="basket-whatsapp"')&&
+ !html.includes('basket-flow__optional')&&
  html.includes('id="checkout-button" aria-label="Open shopping basket')&&
  html.includes('data-cart-open data-frequency="once"')&&
  html.includes('data-cart-open data-frequency="weekly"')&&
@@ -83,6 +86,21 @@ check("Shared contact details remain compact with secure Stripe handoff",
  flowCss.includes('width:min(480px,100vw)')&&
  flowCss.includes('.basket-flow__previous-item')&&
  cartClient.includes('event.key==="Escape"'));
+check("Shipping weekday selection and server safeguards agree",
+ html.includes('<select id="basket-date"')&&
+ html.includes('data-flow-method="delivery"><strong>Shipping</strong>')&&
+ cartClient.includes('if(shipping&&![2,3,4,5].includes(weekday))continue;')&&
+ checkoutWorker.includes('(!delivery||[2,3,4,5].includes(d.getUTCDay()))')&&
+ checkoutWorker.includes('const validShippingAddress=')&&
+ checkoutWorker.includes('shipping_address:hasDelivery?address:""')&&
+ read("checkout.html").includes('id="shipping-address-fields"')&&
+ read("checkout.js").includes('el("shipping-address-fields").hidden=method()!=="delivery"'));
+check("Sprout packs are visually separated by broccoli-green backgrounds",
+ html.includes('id="basket-current-item"')&&
+ flowCss.includes('.basket-flow__previous-item{')&&
+ flowCss.includes('border-bottom:4px solid')&&
+ flowCss.includes('.basket-flow__current{')&&
+ flowCss.includes('.basket-flow__field--name'));
 check("Three order choices remain above manual sprout gallery",
  html.indexOf('id="order-options"')<html.indexOf('id="explore-sprouts"')&&
  html.indexOf('id="explore-sprouts"')<html.indexOf('id="faq"')&&
