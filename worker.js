@@ -31,9 +31,18 @@ const minimumDate = () => {
 const validRequestedDate=(value,delivery)=> {
   if(typeof value!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(value)||value<minimumDate())return false;
   const d=new Date(value+"T12:00:00Z");
-  return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===value&&(!delivery||[2,3,4].includes(d.getUTCDay()));
+  return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===value&&(!delivery||[2,3,4,5].includes(d.getUTCDay()));
 };
 const validPostcode = str => /^(?:GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i.test(str);
+// London-only launch: postcode area is a coarse coverage gate; precise
+// suitability is agreed before fulfilment. Do not charge the London rate
+// for arbitrary nationwide addresses.
+const validLondonPostcode=str=>validPostcode(str)&&
+  /^(?:EC|NW|SW|SE|WC|BR|CR|DA|EN|HA|IG|KT|RM|SM|TW|UB|E|N|W)\d/i.test(str);
+const validShippingAddress=(address,city,postcode)=>
+  address.length>=8&&address.length<=160&&
+  !/[<>\x00-\x1F]/.test(address)&&
+  /^london$/i.test(city)&&validLondonPostcode(postcode);
 const stripeRequest = async(env,path,options={})=>{
   const response=await fetch("https://api.stripe.com/v1/"+path,{
     ...options,
@@ -166,14 +175,17 @@ const createBasketSession=async(input,request,env)=>{
   const whatsapp=String(input.whatsapp||"").trim();
   const date=String(input.date||"");
   const postcode=String(input.postcode||"").trim().toUpperCase().replace(/\s+/g," ");
+  const address=String(input.address||"").trim();
+  const city=String(input.city||"").trim();
   const promo=String(input.code||"").trim().toUpperCase();
   if(name.length<2||name.length>100)return issue("Please enter your full name.");
   if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return issue("Enter a valid email address.");
   if(whatsapp&&(whatsapp.length>28||!/^\+?[\d\s()\-]{7,28}$/.test(whatsapp)))
     return issue("Please check your WhatsApp number.");
   if(!validRequestedDate(date,hasDelivery))
-    return issue("Choose a valid date at least seven days ahead; delivery is usually Tuesday–Thursday.");
-  if(hasDelivery&&!validPostcode(postcode))return issue("Enter a valid UK postcode for delivery.");
+    return issue("Choose a date at least seven days ahead. London shipping is Tuesday to Friday.");
+  if(hasDelivery&&!validShippingAddress(address,city,postcode))
+    return issue("Enter a London street address, city and eligible postcode for shipping.");
   if(promo&&promo!=="SPROUT")return issue("That promotional code is not recognised.");
   if(promo&&hasWeekly)return issue("SPROUT applies only to baskets with one-time orders.");
   const goods=entries.reduce((sum,item)=>sum+
@@ -237,6 +249,7 @@ const createBasketSession=async(input,request,env)=>{
     frequency:hasWeekly?(hasOnce?"mixed":"weekly"):"once",
     method:entries.every(x=>x.method===first.method)?first.method:"mixed",
     preferred_date:date,postcode:hasDelivery?postcode:"",
+    shipping_address:hasDelivery?address:"",shipping_city:hasDelivery?city:"",
     promo:discount?"SPROUT":"",
     subtotal_pence:String(goods),
     delivery_pence:String(deliveryCharge),
@@ -300,14 +313,17 @@ const createSession=async(request,env)=>{
   const whatsapp=String(input.whatsapp||"").trim();
   const date=String(input.date||"");
   const postcode=String(input.postcode||"").trim().toUpperCase().replace(/\s+/g," ");
+  const address=String(input.address||"").trim();
+  const city=String(input.city||"").trim();
   const promo=String(input.code||"").trim().toUpperCase();
   if(!Object.hasOwn(PRICE_PENCE,pack)||!Number.isInteger(count)||count<1||count>10||!GOOD_FREQUENCIES.has(frequency))return issue("Choose a valid pack, quantity and frequency.");
   if(method!=="pickup"&&!delivery)return issue("Choose collection or delivery.");
   if(customerName.length<2||customerName.length>100||!/^.{2,100}$/u.test(customerName))return issue("Please enter your full name.");
   if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return issue("Enter a valid email address.");
   if(whatsapp&&(whatsapp.length>28||!/^\+?[\d\s()\-]{7,28}$/.test(whatsapp)))return issue("Please check your WhatsApp number.");
-  if(!validRequestedDate(date,delivery))return issue("Choose a valid date at least seven days ahead; delivery is usually Tuesday–Thursday.");
-  if(delivery&&!validPostcode(postcode))return issue("Enter a valid UK postcode for delivery.");
+  if(!validRequestedDate(date,delivery))return issue("Choose a valid date at least seven days ahead; London shipping runs Tuesday to Friday.");
+  if(delivery&&!validShippingAddress(address,city,postcode))
+    return issue("Enter your full London shipping address, city and eligible postcode.");
   if(promo&&promo!=="SPROUT")return issue("That promotional code is not recognised.");
   if(promo&&frequency!=="once")return issue("SPROUT applies only to one-time orders.");
 
@@ -364,6 +380,7 @@ const createSession=async(request,env)=>{
   if(discounted)put(form,"discounts[0][coupon]",catalog.coupon);
   const metadata={name:customerName,email,whatsapp,pack,quantity:String(count),
     frequency,method,preferred_date:date,postcode:delivery?postcode:"",
+    shipping_address:delivery?address:"",shipping_city:delivery?city:"",
     promo:discounted?"SPROUT":"",subtotal_pence:String(subtotal),
     delivery_pence:String(deliveryCharge),
     subscription_savings_pence:String(recurringPurchase?(PRICE_PENCE[pack]-amount)*count:0),
