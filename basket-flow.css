@@ -1,0 +1,103 @@
+/* MicroSprouts progressive basket: one concise decision at a time. */
+.cart-overlay__panel.basket-flow{
+ display:flex;flex-direction:column;overflow:hidden;
+ width:min(480px,100vw);left:auto;right:0;top:0;bottom:0;
+ background:#fdfdf9;color:#153323
+}
+.basket-flow .cart-overlay__top{
+ flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+ padding:17px 23px 15px;background:#fdfdf9;border-bottom:1px solid #e4e9de;
+ gap:16px
+}
+.basket-flow .cart-overlay__brand{font-size:10px;font-weight:700;letter-spacing:.14em;color:#517557}
+.basket-flow .basket-drawer-title{font-size:29px;margin:5px 0 0;line-height:1.1;color:#113822}
+.basket-flow .cart-overlay__close{flex:0 0 auto;background:#f1f4ed;border:0}
+.basket-flow__form{
+ display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden
+}
+.basket-flow__body{padding:24px 23px 20px;flex:1;overflow-y:auto;overscroll-behavior:contain}
+.basket-flow__product{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.basket-flow__product img{
+ height:74px;width:74px;flex:0 0 74px;object-fit:cover;border-radius:14px;background:#e8efdb
+}
+.basket-flow__product strong{display:block;font-family:Georgia,serif;font-size:24px;font-weight:400;letter-spacing:-.025em}
+.basket-flow__product p{font-size:12px;color:#69806b;line-height:1.5;margin-top:6px}
+.basket-flow__selections{display:flex;flex-wrap:wrap;gap:7px;margin:-3px 0 15px}
+.basket-flow__selections:empty{display:none}
+.basket-flow__selections button{
+ padding:7px 11px;border:1px solid #d8e4d5;background:#f2f7ec;border-radius:100px;
+ color:#245e36;font-size:11px;font-weight:600;white-space:nowrap
+}
+.basket-flow__selections button:hover{background:#e0efda}
+.basket-flow__stage{min-height:137px}
+.basket-flow__stage h3{
+ color:#1b4027;font-size:15px;font-weight:750;margin:3px 0 14px;letter-spacing:-.005em
+}
+.basket-flow__choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.basket-flow__choice{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:5px;min-height:95px;padding:13px 8px;border-radius:14px;
+ border:1px solid #d7e2d2;background:#f8faf5;color:#183c24;
+ transition:transform .15s ease,border-color .15s ease,background .15s ease
+}
+.basket-flow__choice strong{font-size:18px;font-weight:700;line-height:1.2}
+.basket-flow__choice span{font-size:12px;color:#4f6e56;line-height:1.3}
+.basket-flow__choice small{font-size:13px;font-weight:750;color:#1e6232}
+.basket-flow__choice:hover,.basket-flow__choice:focus-visible{
+ background:#eaf4e4;border-color:#619e6a;transform:translateY(-1px)
+}
+.basket-flow__items{
+ border-top:1px solid #e7ede2;margin-top:22px;padding-top:14px;
+ display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+ font-size:12px;color:#617563
+}
+.basket-flow__items button{
+ border:0;background:none;color:#1c6435;font-size:12px;
+ font-weight:750;padding:5px 2px;text-decoration:underline;text-underline-offset:3px
+}
+.basket-flow__items button:disabled{opacity:.38;cursor:default}
+.basket-flow__items #basket-remove-one{color:#8a5d5d}
+.basket-flow__fields{display:grid;grid-template-columns:1fr 1fr;gap:13px 11px}
+.basket-flow__fields label{
+ display:flex;flex-direction:column;gap:7px;color:#25432d;
+ font-size:12px;font-weight:700;min-width:0
+}
+.basket-flow__fields label:has(#basket-name),
+.basket-flow__fields label:has(#basket-email){grid-column:span 2}
+.basket-flow__fields input{
+ width:100%;min-width:0;min-height:42px;border:1px solid #cad7c8;border-radius:9px;
+ padding:10px 11px;background:#fff;color:#163421;font-size:13px
+}
+.basket-flow__fields input:focus-visible{outline:2px solid #528e55;outline-offset:1px}
+.basket-flow__optional{border-top:1px solid #e4ebdf;margin-top:17px;padding-top:13px}
+.basket-flow__optional summary{cursor:pointer;color:#46714d;font-size:12px;font-weight:650}
+.basket-flow__optional .basket-flow__fields{margin-top:14px}
+.basket-flow__optional .basket-flow__fields label{grid-column:span 2}
+.basket-flow__hint{color:#6e806f;font-size:11px;line-height:1.55;margin-top:15px}
+.basket-flow__footer{
+ flex:0 0 auto;background:#f7f9f1;border-top:1px solid #e1e8dd;
+ padding:18px 23px max(18px,env(safe-area-inset-bottom))
+}
+.basket-flow__total{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.basket-flow__total span{display:block;font-size:12px;font-weight:750}
+.basket-flow__total small{display:block;font-size:11px;color:#697e6b;line-height:1.5;margin-top:5px}
+.basket-flow__total strong{font-size:25px;white-space:nowrap;font-weight:800;letter-spacing:-.03em}
+.basket-flow__pay{
+ width:100%;min-height:49px;border-radius:12px;margin-top:15px;
+ background:#0b3a24;color:#fff;border:0;font-size:14px;font-weight:750
+}
+.basket-flow__pay:hover:not(:disabled){background:#1e6040}
+.basket-flow__pay:disabled{opacity:.55;cursor:not-allowed}
+.basket-flow__back{
+ display:block;background:transparent;border:0;color:#65806d;
+ font-size:12px;margin:13px auto 0;padding:3px 10px
+}
+.basket-flow__error{color:#a03d29;font-size:12px;line-height:1.5;margin-top:12px}
+@media(max-width:520px){
+ .cart-overlay__panel.basket-flow{width:100vw}
+ .basket-flow .cart-overlay__top{padding:15px 18px 13px}
+ .basket-flow__body{padding:20px 18px 14px}
+ .basket-flow__footer{padding:15px 18px max(15px,env(safe-area-inset-bottom))}
+ .basket-flow__fields{gap:10px}
+}
+@media(prefers-reduced-motion:reduce){.basket-flow__choice{transition:none}}
