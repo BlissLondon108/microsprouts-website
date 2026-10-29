@@ -14,7 +14,7 @@
  const state={entries:[makeEntry(1)],activeId:1,stage:"pack",nextId:2};
  const storeKey="microsprouts-basket-entries-v2";
  let enabled=false,working=false,returnFocus=null;
- let minimumDate="",calendarWeek="";
+ let minimumDate="",dateOffset=0;
  const money=p=>"£"+(p/100).toFixed(2);
  const setText=(id,value)=>{el(id).textContent=value};
  const active=()=>state.entries.find(entry=>entry.id===state.activeId)||state.entries[0];
@@ -130,6 +130,9 @@
    trigger.setAttribute("aria-label","Open shopping basket, "+count+(count===1?" pack":" packs"));
    setText("basket-pack-200-price",money(prices[entry.frequency||"once"]["200"]));
    setText("basket-pack-500-price",money(prices[entry.frequency||"once"]["500"]));
+   const currentPrice=el("basket-current-price");
+   currentPrice.hidden=!entry.pack;
+   if(entry.pack)currentPrice.textContent=money(prices[entry.frequency||"once"][entry.pack]);
    setText("basket-delivery-price",entry.frequency==="weekly"?"UK · Free":"UK · £2.30");
    const amounts=calc();
    setText("basket-total",count?money(amounts.due):"—");
@@ -247,7 +250,8 @@
  const isoDate=day=>day.toISOString().slice(0,10);
  const fullLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",
    weekday:"long",day:"numeric",month:"long",year:"numeric"});
- const monthLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",month:"short",year:"numeric"});
+ const monthLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",month:"long",year:"numeric"});
+ const shortMonth=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",month:"short"});
  const weekdayLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",weekday:"short"});
  const allowedDay=day=>[2,3,4,5].includes(day.getUTCDay());
  const maxDate=()=>{
@@ -255,39 +259,45 @@
    end.setUTCDate(end.getUTCDate()+90);
    return isoDate(end);
  };
- const weekStart=day=>{
-   const monday=new Date(day.getTime());
-   monday.setUTCDate(monday.getUTCDate()-(monday.getUTCDay()+6)%7);
-   return monday;
- };
- const shiftWeek=(value,offset)=>{
-   const day=new Date(value+"T12:00:00Z");
-   day.setUTCDate(day.getUTCDate()+7*offset);
-   return isoDate(day);
- };
- const firstAvailableWeek=()=>{
-   const day=new Date(minimumDate+"T12:00:00Z");
-   // If the seven-day lead falls on a weekend, begin with next Tuesday.
-   while(!allowedDay(day))day.setUTCDate(day.getUTCDate()+1);
-   return isoDate(weekStart(day));
+ function availableDates(){
+   if(!minimumDate)return [];
+   const dates=[],first=new Date(minimumDate+"T12:00:00Z");
+   const limit=maxDate();
+   // Walk actual available dates rather than calendar weeks, so the strip
+   // always shows four choices even when the earliest week has only 1-2 left.
+   for(let i=0;i<=90;i++){
+     const day=new Date(first.getTime());
+     day.setUTCDate(first.getUTCDate()+i);
+     if(isoDate(day)>limit)break;
+     if(allowedDay(day))dates.push(isoDate(day));
+   }
+   return dates;
+ }
+ const dateFromISO=value=>new Date(value+"T12:00:00Z");
+ const headingFor=dates=>{
+   const first=dateFromISO(dates[0]),last=dateFromISO(dates.at(-1));
+   if(first.getUTCFullYear()===last.getUTCFullYear()&&
+      first.getUTCMonth()===last.getUTCMonth())
+     return monthLabel.format(first);
+   if(first.getUTCFullYear()===last.getUTCFullYear())
+     return shortMonth.format(first)+" – "+shortMonth.format(last)+" "+first.getUTCFullYear();
+   return shortMonth.format(first)+" "+first.getUTCFullYear()+" – "+
+     shortMonth.format(last)+" "+last.getUTCFullYear();
  };
  function renderCalendar(){
-   if(!minimumDate)return;
-   const firstWeek=firstAvailableWeek();
-   if(!calendarWeek||calendarWeek<firstWeek)calendarWeek=firstWeek;
+   const dates=availableDates();
+   if(!dates.length)return;
+   const lastStart=Math.max(0,dates.length-4);
+   dateOffset=Math.max(0,Math.min(dateOffset,lastStart));
+   const shown=dates.slice(dateOffset,dateOffset+4);
    const selected=el("basket-date").value;
-   el("basket-calendar-prev").disabled=calendarWeek<=firstWeek;
-   el("basket-calendar-next").disabled=shiftWeek(calendarWeek,1)>maxDate();
+   el("basket-calendar-prev").disabled=dateOffset===0;
+   el("basket-calendar-next").disabled=dateOffset>=lastStart;
+   setText("basket-calendar-month",headingFor(shown));
    const grid=el("basket-calendar-grid");
    grid.replaceChildren();
-   const monday=new Date(calendarWeek+"T12:00:00Z");
-   setText("basket-calendar-month","Week of "+fullLabel.format(monday));
-   // A week always contains four availability chips in one horizontal row.
-   for(const offset of [1,2,3,4]){
-     const day=new Date(monday.getTime());
-     day.setUTCDate(monday.getUTCDate()+offset);
-     const value=isoDate(day);
-     if(value<minimumDate||value>maxDate())continue;
+   for(const value of shown){
+     const day=dateFromISO(value);
      const button=appendNode(grid,"button","basket-flow__calendar-day");
      button.type="button";
      button.dataset.calendarDate=value;
@@ -296,25 +306,26 @@
      if(value===selected)button.classList.add("is-selected");
      appendNode(button,"span","basket-flow__date-weekday",weekdayLabel.format(day));
      appendNode(button,"strong","basket-flow__date-number",String(day.getUTCDate()));
-     appendNode(button,"span","basket-flow__date-month",monthLabel.format(day).split(" ")[0]);
+     appendNode(button,"span","basket-flow__date-month",shortMonth.format(day));
    }
    setText("basket-date-label",selected?
-     "Selected: "+fullLabel.format(new Date(selected+"T12:00:00Z")):
-     "Choose an available date from Tuesday to Friday");
+     "Selected: "+fullLabel.format(dateFromISO(selected)):
+     "Choose one of the next available Tuesday–Friday dates");
  }
  function validDate(value){
    if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||!minimumDate||
       value<minimumDate||value>maxDate())return false;
-   const day=new Date(value+"T12:00:00Z");
+   const day=dateFromISO(value);
    return !Number.isNaN(day.getTime())&&isoDate(day)===value&&allowedDay(day);
  }
  el("basket-calendar-prev").addEventListener("click",()=>{
-   if(calendarWeek<=firstAvailableWeek())return;
-   calendarWeek=shiftWeek(calendarWeek,-1);renderCalendar();
+   dateOffset=Math.max(0,dateOffset-4);
+   renderCalendar();
  });
  el("basket-calendar-next").addEventListener("click",()=>{
-   if(shiftWeek(calendarWeek,1)>maxDate())return;
-   calendarWeek=shiftWeek(calendarWeek,1);renderCalendar();
+   const max=Math.max(0,availableDates().length-4);
+   dateOffset=Math.min(max,dateOffset+4);
+   renderCalendar();
  });
  el("basket-calendar-grid").addEventListener("click",event=>{
    const button=event.target.closest("button[data-calendar-date]");
