@@ -9,8 +9,8 @@ export const PRODUCT_DEFINITIONS=Object.freeze([
    description:"200g fresh broccoli sprouts, grown in London. Collection by appointment or local delivery.",type:"good",shippable:true},
   {id:"prod_microsprouts_broccoli_500g",name:"MicroSprouts Broccoli Sprouts — Family Pack 500g",amount:1699,subscriptionAmount:1549,grams:500,kind:"sprouts",
    description:"500g fresh broccoli sprouts, grown in London. Collection by appointment or local delivery.",type:"good",shippable:true},
-  {id:"prod_microsprouts_delivery_london",name:"MicroSprouts London Shipping",amount:230,grams:0,kind:"delivery",
-   description:"Shipping within eligible London areas, Tuesday to Friday.",type:"service",shippable:false}
+  {id:"prod_microsprouts_delivery_london",name:"MicroSprouts UK Shipping",amount:230,grams:0,kind:"delivery",
+   description:"UK shipping, preferred dates Tuesday to Friday.",type:"service",shippable:false}
 ]);
 export const BILLING_FREQUENCIES=Object.freeze(["once","weekly","fortnightly"]);
 export const PROMO_COUPON_ID="MS_SPROUT20_V1";
