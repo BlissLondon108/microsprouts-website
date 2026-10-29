@@ -261,3 +261,97 @@
  .basket-flow__calendar-nav strong{min-width:97px}
  .basket-flow__calendar-day{font-size:11px}
 }
+
+
+/* Product cards stay in creation order; the entire collapsed card reopens it. */
+.basket-flow__previous-item{position:relative;cursor:pointer;gap:11px}
+.basket-flow__previous-item:hover{border-color:#82b17f;background:#eaf5e5}
+.basket-flow__previous-item:focus-visible{outline:2px solid #316d42;outline-offset:3px}
+.basket-flow__previous-head{
+ display:flex;align-items:center;justify-content:space-between;gap:9px;
+ padding-right:1px;min-width:0
+}
+.basket-flow__previous-name{
+ font-family:Georgia,"Times New Roman",serif;font-weight:500;
+ font-size:clamp(17px,3.8vw,21px);letter-spacing:-.025em;line-height:1.12;
+ flex:1;min-width:0
+}
+.basket-flow__previous-price{
+ position:static;font-size:clamp(20px,4.2vw,25px);
+ font-weight:800;letter-spacing:-.035em;line-height:1;
+ color:#143a25;white-space:nowrap
+}
+.basket-flow__mini-remove{
+ position:absolute;top:6px;right:7px;
+ width:28px;height:28px;display:grid;place-items:center;
+ border-radius:50%;padding:0;font-size:24px;line-height:1;
+ z-index:2
+}
+.basket-flow__mini-remove:hover{background:#e0eada}
+.basket-flow__previous-chips{padding-right:30px}
+.basket-flow__back{display:none!important}
+/* The compact date strip and shared contact fields anchor just above the
+   fixed price/Stripe footer, never inside an individual product card. */
+.basket-flow__form{min-height:0}
+.basket-flow__body{flex:1 1 auto;min-height:0;overflow-y:auto}
+.basket-flow__shared{
+ flex:0 1 auto;min-height:0;max-height:min(50vh,305px);
+ overflow-y:auto;overscroll-behavior:contain;
+ margin:0;padding:0 18px;background:#fdfdf9
+}
+.basket-flow__shared:has(>section[hidden]){display:none}
+.basket-flow__shared>section{
+ border-top:1px solid #e1ebdd;padding:13px 0 10px
+}
+.basket-flow__shared h3{font-size:13px;margin:0 0 10px}
+.basket-flow__footer{flex:0 0 auto;margin-top:0;padding-top:19px;padding-bottom:max(21px,env(safe-area-inset-bottom))}
+.basket-flow__calendar{
+ padding:8px 9px;margin:0 0 12px;
+ border-radius:12px;background:#f3f8ef
+}
+.basket-flow__calendar-strip{
+ display:grid;grid-template-columns:auto 25px minmax(0,1fr) 25px;
+ gap:5px;align-items:center
+}
+.basket-flow__calendar-caption{
+ font-weight:750;font-size:11px;color:#385c3d;white-space:nowrap
+}
+.basket-flow__calendar-arrow{
+ display:grid;place-items:center;width:25px;height:30px;
+ border:0;background:transparent;color:#245334;
+ font-size:24px;border-radius:8px;padding:0;line-height:1
+}
+.basket-flow__calendar-arrow:hover:not(:disabled){background:#e0eedb}
+.basket-flow__calendar-arrow:disabled{opacity:.25;cursor:default}
+.basket-flow__calendar-grid{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:4px;min-width:0;align-items:stretch
+}
+.basket-flow__calendar-day{
+ display:flex;align-items:center;justify-content:center;gap:3px;
+ min-height:36px;min-width:0;aspect-ratio:auto;
+ padding:3px 2px;border-radius:9px;
+ border:1px solid #d8e5d2;background:white;
+ font-size:11px;color:#214d32;white-space:nowrap
+}
+.basket-flow__date-weekday{font-size:10px;font-weight:550}
+.basket-flow__date-number{font-size:13px;font-weight:750}
+.basket-flow__date-month{display:none}
+.basket-flow__calendar-day.is-selected,
+.basket-flow__calendar-day[aria-pressed="true"]{
+ border-color:#153f27;background:#153f27;color:#fff
+}
+.basket-flow__visually-hidden{
+ position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+ overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0
+}
+@media(max-width:520px){
+ .basket-flow__shared{padding:0 12px;max-height:min(48vh,300px)}
+ .basket-flow__calendar{padding:8px 6px}
+ .basket-flow__calendar-strip{gap:3px;grid-template-columns:auto 23px minmax(0,1fr) 23px}
+ .basket-flow__calendar-arrow{width:23px}
+ .basket-flow__calendar-grid{gap:3px}
+ .basket-flow__date-weekday{font-size:9px}
+ .basket-flow__date-number{font-size:12px}
+ .basket-flow__calendar-day{min-height:34px;gap:2px}
+}
