@@ -404,3 +404,14 @@
  .basket-flow__date-month{font-size:8px}
  .basket-flow__calendar-day{min-height:37px;gap:2px}
 }
+
+
+/* Selected broccoli cards have the same top-right removal control as collapsed cards. */
+.basket-flow__current{position:relative}
+.basket-flow__current-remove{
+ position:absolute;top:6px;right:7px;z-index:3;
+ width:28px;height:28px;display:grid;place-items:center
+}
+.basket-flow__current .basket-flow__selections{padding-right:27px}
+.basket-flow__current .basket-flow__selections button:focus-visible,
+.basket-flow__current-remove:focus-visible{outline:2px solid #2b7442;outline-offset:2px}
