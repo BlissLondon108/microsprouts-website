@@ -28,7 +28,7 @@ const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","c
  "basket-details-label","basket-total","basket-pay","basket-date","basket-calendar-grid",
  "basket-calendar-month","basket-calendar-prev","basket-calendar-next","basket-date-label",
  "basket-name","basket-email","basket-other-items","basket-add-another","basket-shared-details",
- "basket-remove-entry","basket-back","sprout-scroll","order-options","explore-sprouts"];
+ "basket-remove-entry","sprout-scroll","order-options","explore-sprouts"];
 check("Multi-entry basket keeps the four minimal decision stages",
  required.every(id=>idSet.has(id))&&
  ["pack","order","delivery","details"].every(stage=>
@@ -40,8 +40,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=8"')&&
- html.includes('href="basket-flow.css?v=4"'));
+ html.includes('src="cart-preview.js?v=9"')&&
+ html.includes('href="basket-flow.css?v=5"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -89,13 +89,14 @@ check("Universal customer details appear once, outside per-product cards",
  !app.includes("checkout.href = 'checkout.html?pack='")&&
  flowCss.includes('width:min(480px,100vw)')&&
  cartClient.includes('event.key==="Escape"'));
-check("The calendar opens inline and makes only Tuesday–Friday selectable",
+check("One-row calendar offers only Tuesday–Friday across browsable weeks",
  html.includes('class="basket-flow__calendar"')&&
  html.includes('id="basket-calendar-grid"')&&
  html.includes('id="basket-calendar-prev"')&&
  html.includes('id="basket-calendar-next"')&&
  cartClient.includes('const allowedDay=day=>[2,3,4,5].includes(day.getUTCDay())')&&
- cartClient.includes('button.disabled=!available')&&
+ cartClient.includes('for(const offset of [1,2,3,4])')&&
+ cartClient.includes('if(value<minimumDate||value>maxDate())continue;')&&
  cartClient.includes('renderCalendar()')&&
  checkoutWorker.includes('[2,3,4,5].includes(d.getUTCDay())'));
 check("Stripe collects a single UK shipping address for all delivery entries",
@@ -106,6 +107,29 @@ check("Stripe collects a single UK shipping address for all delivery entries",
  read("checkout.js").includes('Enter a full UK shipping address and city.')&&
  read("checkout.html").includes('id="shipping-address-fields"')&&
  read("checkout.js").includes('el("shipping-address-fields").hidden=method()!=="delivery"'));
+check("A tap anywhere on a minimized pack expands it without reordering",
+ html.includes('id="basket-current-item"')&&
+ !html.includes('id="basket-back"')&&
+ cartClient.includes('article.dataset.openEntry=String(entry.id)')&&
+ cartClient.includes('const row=event.target.closest("[data-open-entry]")')&&
+ cartClient.includes('expandEntry(Number(row.dataset.openEntry))')&&
+ cartClient.includes('el("basket-other-items").addEventListener("keydown"')&&
+ cartClient.includes('if(event.key!=="Enter"&&event.key!==" ")return;'));
+check("Collapsed pack price sits beside its name, with remove button at upper right",
+ cartClient.includes('appendNode(head,"strong","basket-flow__previous-price"')&&
+ cartClient.includes('appendNode(article,"button","basket-flow__mini-remove"')&&
+ flowCss.includes('.basket-flow__previous-price{')&&
+ flowCss.includes('position:static;font-size:clamp(20px,4.2vw,25px)')&&
+ flowCss.includes('.basket-flow__mini-remove{')&&
+ flowCss.includes('position:absolute;top:6px;right:7px'));
+check("Date and shared details are below all items; total remains below them",
+ html.indexOf('id="basket-shared-details"')>html.indexOf('id="basket-items-control"')&&
+ html.indexOf('id="basket-shared-details"')<html.indexOf('class="basket-flow__footer"')&&
+ flowCss.includes('grid-template-columns:auto 25px minmax(0,1fr) 25px')&&
+ flowCss.includes('grid-template-columns:repeat(4,minmax(0,1fr))')&&
+ flowCss.includes('.basket-flow__shared{')&&
+ flowCss.includes('max-height:min(50vh,305px)')&&
+ !html.includes('id="basket-back"'));
 check("Editing an earlier pack does not reorder its entry",
  html.includes('id="basket-current-item"')&&
  html.includes('id="basket-other-items"')&&
