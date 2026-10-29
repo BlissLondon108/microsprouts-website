@@ -238,8 +238,7 @@ try{
  // Independent basket entries can have distinct sizes, frequencies and methods,
  // while remaining in a single Stripe Checkout session.
  const mixedBasket={
-   name:"Test Customer",email:"test@example.com",whatsapp:"",
-   date:requestedDate(true),code:"",return_to_basket:true,
+   date:requestedDate(true),return_to_basket:true,
    items:[
      {pack:"500",frequency:"weekly",method:"delivery"},
      {pack:"200",frequency:"once",method:"delivery"},
@@ -252,6 +251,17 @@ try{
    sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_weekly_v2").id&&
    sessionForm.get("line_items[1][price]")===prices.get("ms_broccoli_200g_once_v1").id&&
    sessionForm.get("line_items[2][price]")===prices.get("ms_broccoli_500g_once_v1").id);
+ check("Stripe Checkout requires individual name and collects email automatically",
+   sessionForm.get("name_collection[individual][enabled]")==="true"&&
+   sessionForm.get("name_collection[individual][optional]")==="false"&&
+   !sessionForm.has("customer_email")&&
+   !sessionForm.has("metadata[name]")&&!sessionForm.has("metadata[email]")&&
+   !sessionForm.has("subscription_data[metadata][email]"));
+ res=await submit({...mixedBasket,name:"Untrusted Name",email:"injected@example.com",whatsapp:"+441234567890"});
+ check("Untrusted contact fields sent from the browser are ignored by Stripe metadata",
+   res.status===200&&!sessionForm.has("customer_email")&&
+   !sessionForm.has("metadata[name]")&&!sessionForm.has("metadata[email]")&&
+   !sessionForm.has("metadata[whatsapp]"));
  check("Mixed delivery is charged once for one-time entries, not weekly renewals",
    sessionForm.get("line_items[3][price]")===prices.get("ms_delivery_london_once_v1").id&&
    sessionForm.get("metadata[total_pence]")==="4477"&&
@@ -309,11 +319,13 @@ try{
    sessionForm.get("metadata[renewal_pence]")==="0"&&
    sessionForm.get("metadata[delivery_pence]")==="230");
  session={payment_status:"paid",amount_total:4477,currency:"gbp",client_reference_id:"mixed-123",
-   collected_information:{shipping_details:{name:"Test Customer",
-     address:{line1:"12 Sample Road",city:"Manchester",postal_code:"M1 1AA",country:"GB"}}},
+   collected_information:{individual_name:"Stripe Customer",
+     shipping_details:{name:"Stripe Customer",
+       address:{line1:"12 Sample Road",city:"Manchester",postal_code:"M1 1AA",country:"GB"}}},
+   customer_details:{individual_name:"Stripe Customer",email:"stripe@example.com"},
    metadata:{
      total_pence:"4477",pack:"mixed",quantity:"3",frequency:"mixed",method:"mixed",
-     preferred_date:requestedDate(true),name:"Test Customer",
+     preferred_date:requestedDate(true),
      renewal_pence:"1549",basket_entries:"500:w:d|200:o:d|500:o:p"
    }};
  res=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
@@ -324,7 +336,8 @@ try{
    verifiedBasket.items[1].method==="delivery"&&
    verifiedBasket.items[2].pack==="500"&&verifiedBasket.renewal_pence===1549&&
    verifiedBasket.shipping?.address?.city==="Manchester"&&
-   verifiedBasket.postcode==="M1 1AA");
+   verifiedBasket.postcode==="M1 1AA"&&
+   verifiedBasket.name==="Stripe Customer"&&verifiedBasket.email==="stripe@example.com");
 
  res=await submit({...customer,email:""});
  check("Contact email required",res.status===400);
