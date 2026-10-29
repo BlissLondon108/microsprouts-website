@@ -246,9 +246,23 @@ const createBasketSession=async(input,request,env)=>{
   };
   for(const [key,value] of Object.entries(metadata))put(form,"metadata["+key+"]",value);
   if(hasWeekly){
-    for(const [key,value] of Object.entries(metadata))put(form,"subscription_data[metadata]["+key+"]",value);
-    put(form,"subscription_data[description]","MicroSprouts "+entries.length+" packs, weekly recurring "+
-      entries.filter(item=>item.frequency==="weekly").length+" packs");
+    // Subscription metadata must describe ONLY recurring items, since Stripe
+    // renewals exclude the one-time products from their first invoice.
+    const renewals=entries.filter(item=>item.frequency==="weekly");
+    const renewalFirst=renewals[0];
+    const recurringMetadata={
+      ...metadata,
+      pack:renewals.every(item=>item.pack===renewalFirst.pack)?renewalFirst.pack:"mixed",
+      quantity:String(renewals.length),
+      frequency:"weekly",
+      method:renewals.every(item=>item.method===renewalFirst.method)?renewalFirst.method:"mixed",
+      promo:"",subtotal_pence:String(weekly),delivery_pence:"0",
+      total_pence:String(weekly),basket_entries:renewals.map(item=>
+        item.pack+":w:"+(item.method==="delivery"?"d":"p")).join("|")
+    };
+    for(const [key,value] of Object.entries(recurringMetadata))
+      put(form,"subscription_data[metadata]["+key+"]",value);
+    put(form,"subscription_data[description]","MicroSprouts "+renewals.length+" recurring broccoli packs");
   }else{
     for(const [key,value] of Object.entries(metadata))put(form,"payment_intent_data[metadata]["+key+"]",value);
   }
