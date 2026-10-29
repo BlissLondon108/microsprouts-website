@@ -6,9 +6,9 @@
  */
 export const PRODUCT_DEFINITIONS=Object.freeze([
   {id:"prod_microsprouts_broccoli_200g",name:"MicroSprouts Broccoli Sprouts — Single Pack 200g",amount:999,subscriptionAmount:899,grams:200,kind:"sprouts",
-   description:"200g fresh broccoli sprouts, grown in London. UK shipping or free collection. Requested first date and shipping or collection choice appear at checkout.",type:"good",shippable:true},
+   description:"Fresh broccoli sprouts, grown in London.",type:"good",shippable:true},
   {id:"prod_microsprouts_broccoli_500g",name:"MicroSprouts Broccoli Sprouts — Family Pack 500g",amount:1699,subscriptionAmount:1549,grams:500,kind:"sprouts",
-   description:"500g fresh broccoli sprouts, grown in London. UK shipping or free collection. Requested first date and shipping or collection choice appear at checkout.",type:"good",shippable:true},
+   description:"Fresh broccoli sprouts, grown in London.",type:"good",shippable:true},
   {id:"prod_microsprouts_delivery_london",name:"MicroSprouts UK Shipping",amount:230,grams:0,kind:"delivery",
    description:"UK shipping, preferred dates Tuesday to Friday.",type:"service",shippable:false}
 ]);
