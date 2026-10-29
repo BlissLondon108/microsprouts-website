@@ -46,7 +46,7 @@ const ids=[
  "basket-total","basket-total-type","basket-total-note","basket-add-another",
  "basket-remove-entry","nav-cart-count","basket-name","basket-email","basket-date","basket-error",
  "basket-pack-200-price","basket-pack-500-price","basket-delivery-price",
- "basket-items-control","basket-stage","basket-shipping-notice","basket-current-item",
+ "basket-items-control","basket-stage","basket-shipping-notice","basket-current-item","basket-current-price",
  "basket-calendar-grid","basket-calendar-month","basket-calendar-prev","basket-calendar-next",
  "basket-date-label","basket-selected-pack","basket-selected-order","basket-selected-delivery",
  "basket-other-items","close-cart","checkout-button"
