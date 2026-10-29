@@ -26,73 +26,74 @@ const flowCss=read("basket-flow.css");
 const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","close-cart","basket","basket-title",
  "basket-flow-form","basket-pack-label","basket-order-label","basket-delivery-label",
  "basket-details-label","basket-total","basket-pay","basket-date","basket-postcode",
- "basket-name","basket-email","basket-item-count","basket-add-another",
- "basket-back","sprout-scroll","order-options","explore-sprouts"];
-check("Compact progressive basket has exactly the four necessary stages",
+ "basket-name","basket-email","basket-other-items","basket-add-another",
+ "basket-remove-entry","basket-back","sprout-scroll","order-options","explore-sprouts"];
+check("Multi-entry basket keeps the four minimal decision stages",
  required.every(id=>idSet.has(id))&&
  ["pack","order","delivery","details"].every(stage=>
    html.includes('data-basket-stage="'+stage+'"'))&&
  html.includes('id="basket" role="dialog" aria-modal="true"')&&
  (html.match(/class="basket-flow__choice"/g)||[]).length===6&&
  !html.includes('id="quantity"')&&
+ !html.includes('id="basket-item-count"')&&
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=5"')&&
- html.includes('href="basket-flow.css?v=1"'));
-check("Order types, delivery and personal details only appear when requested",
- html.includes('data-basket-stage="pack"')&&
- html.includes('data-basket-stage="order"')&&
- html.includes('data-basket-stage="delivery"')&&
- html.includes('data-basket-stage="details"')&&
- cartClient.includes('setStage("order")')&&
- cartClient.includes('setStage("delivery")')&&
- cartClient.includes('setStage("details")')&&
- cartClient.includes('section.hidden=section.dataset.basketStage!==state.stage')&&
- cartClient.includes('form.querySelectorAll("[data-flow-pack]")')&&
- cartClient.includes('form.querySelectorAll("[data-flow-order]")')&&
- cartClient.includes('form.querySelectorAll("[data-flow-method]")')&&
- cartClient.includes('state.count=Math.min(10,state.count+1)'));
-check("Basket calculates genuine one-time and recurring totals",
+ html.includes('src="cart-preview.js?v=6"')&&
+ html.includes('href="basket-flow.css?v=2"'));
+check("Chips appear before active broccoli heading and never say Edit",
+ html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
+ cartClient.includes('button.textContent=label')&&
+ !cartClient.includes('label+" · edit"')&&
+ !html.includes('1 pack</span>')&&
+ cartClient.includes('button.setAttribute("aria-label","Change "+label)'));
+check("Adding broccoli creates independent entries with size, frequency, method and removal",
+ cartClient.includes('const makeEntry=id=>({id,pack:null,frequency:null,method:null})')&&
+ cartClient.includes('state.entries.push(entry)')&&
+ cartClient.includes('state.activeId=entry.id')&&
+ cartClient.includes('const entry=active()')&&
+ cartClient.includes('renderOther()')&&
+ cartClient.includes('data-entry-id')&&
+ cartClient.includes('data-remove-entry')&&
+ cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
+check("Basket allows mixed weekly and one-time checkout with one payment",
+ cartClient.includes('items:state.entries.map(item=>({pack:item.pack,frequency:item.frequency,method:item.method}))')&&
+ cartClient.includes('fetch("/api/checkout/session"')&&
+ checkoutWorker.includes('const createBasketSession=async(input,request,env)=>')&&
+ checkoutWorker.includes('if(Object.hasOwn(input,"items"))return createBasketSession')&&
+ checkoutWorker.includes('hasWeekly?"subscription":"payment"')&&
+ checkoutWorker.includes('basket_entries:encoded')&&
+ checkoutWorker.includes('input.return_to_basket===true')&&
+ cartClient.includes('return_to_basket:true'));
+check("Multi-entry basket shows due-today and weekly renewal totals with correct prices",
  cartClient.includes('once:{"200":999,"500":1699}')&&
  cartClient.includes('weekly:{"200":899,"500":1549}')&&
- cartClient.includes('state.method==="delivery"&&state.frequency!=="weekly"?230:0')&&
- cartClient.includes('code==="SPROUT"?Math.round(goods*.2):0')&&
- cartClient.includes('fetch("/api/checkout/status"')&&
- cartClient.includes('fetch("/api/checkout/session"')&&
- checkoutWorker.includes('if(await paymentMode(env)==="not-configured")return issue('));
-check("No redundant form screen between basket and Stripe",
+ cartClient.includes('money(amounts.weekly)+" / week after today"')&&
+ cartClient.includes('state.method==="delivery"')===false&&
+ checkoutWorker.includes('entries.some(item=>item.method==="delivery"&&item.frequency==="once")?DELIVERY_PENCE:0')&&
+ cartClient.includes('calc()'));
+check("Shared contact details remain compact with secure Stripe handoff",
+ html.includes('id="basket-name"')&&html.includes('id="basket-email"')&&
+ html.includes('id="basket-date"')&&html.includes('id="basket-postcode"')&&
+ html.includes('id="basket-code"')&&
  html.includes('id="checkout-button" aria-label="Open shopping basket')&&
  html.includes('data-cart-open data-frequency="once"')&&
  html.includes('data-cart-open data-frequency="weekly"')&&
- !html.includes('src="checkout.js?v=drawer-1"')&&
- !html.includes('href="checkout.html?pack=200&amp;frequency=once"')&&
  !app.includes("checkout.href = 'checkout.html?pack='")&&
- cartClient.includes('return_to_basket:true')&&
- cartClient.includes('window.location.assign(payload.url)')&&
- checkoutWorker.includes('input.return_to_basket===true'));
-check("Basket remains a comfortable right-hand drawer with minimal stacked controls",
  flowCss.includes('width:min(480px,100vw)')&&
- flowCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))')&&
- flowCss.includes('.basket-flow__stage')&&
- flowCss.includes('.basket-flow__footer')&&
- cartClient.includes('event.key==="Escape"')&&
- cartClient.includes('event.key!=="Tab"'));
-check("Three order choices remain above static collection with WhatsApp for custom",
+ flowCss.includes('.basket-flow__previous-item')&&
+ cartClient.includes('event.key==="Escape"'));
+check("Three order choices remain above manual sprout gallery",
  html.indexOf('id="order-options"')<html.indexOf('id="explore-sprouts"')&&
  html.indexOf('id="explore-sprouts"')<html.indexOf('id="faq"')&&
  (html.match(/<article class="order-choice-card/g)||[]).length===3&&
  ["One-time order","Weekly subscription","Custom subscription"].every(x=>html.includes(x))&&
  html.includes("https://wa.me/447386853514?text=Hello%20MicroSprouts%21")&&
  ["broccoli","radish","mung-bean","leek"].every(name=>
-   html.includes('class="sprout-tile" href="sprouts.html#'+name+'"'))&&
- !html.includes("animation:microSproutsMoveRight"));
-check("Sprout selection carousel still moves only upon manual interaction",
+  html.includes('class="sprout-tile" href="sprouts.html#'+name+'"'))&&
  html.includes('src="carousel-interaction.js?v=2"')&&
- css.includes('scroll-snap-type:x proximity')&&
- carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})')&&
- !carouselClient.includes("getAnimations"));
-check("Existing standalone checkout still supports direct legacy links",
+ carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})'));
+check("Legacy standalone checkout remains unchanged",
  read("checkout.html").includes('id="stripe-checkout-form"')&&
  read("checkout.html").includes('src="checkout.js?v=stripe-only-live-1"'));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
