@@ -118,7 +118,7 @@
     items.replaceChildren();
     if(!skus.length){
       items.append(element("li","basket-preview__empty",
-        "Your basket is waiting for something green. Choose a sprout to get started."));
+        "Your basket is empty. Browse the sprout varieties, then select one of the ordering options below."));
       return;
     }
     for(const sku of skus){
