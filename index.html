@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=basket-flow-1">
 
-<link rel="stylesheet" href="basket-flow.css?v=7">
+<link rel="stylesheet" href="basket-flow.css?v=8">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=11" defer></script>
+<script src="cart-preview.js?v=12" defer></script>
 
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
@@ -263,6 +263,10 @@
       </div>
       <form id="basket-flow-form" class="basket-flow__form" novalidate>
         <div class="basket-flow__body">
+          <div class="basket-flow__empty" id="basket-empty">
+            <p>Your basket is empty.</p>
+            <button type="button" id="basket-start" class="basket-flow__start">Add broccoli sprouts <span aria-hidden="true">+</span></button>
+          </div>
           <div class="basket-flow__previous" id="basket-other-items" aria-label="Your broccoli packs in order of addition">
           <section class="basket-flow__current" id="basket-current-item" aria-label="Broccoli pack being configured">
           <button type="button" class="basket-flow__mini-remove basket-flow__current-remove" id="basket-remove-entry" aria-label="Remove this broccoli pack" hidden>×</button>
@@ -277,7 +281,10 @@
               <strong>Broccoli Sprouts</strong>
               <p>Freshly grown in London</p>
             </div>
-            <strong class="basket-flow__current-price" id="basket-current-price" hidden></strong>
+            <div class="basket-flow__current-cost">
+              <strong class="basket-flow__current-price" id="basket-current-price" hidden></strong>
+              <small class="basket-flow__shipping-note" id="basket-current-shipping" hidden></small>
+            </div>
           </div>
           <div class="basket-flow__stage" id="basket-stage" aria-live="polite">
             <section data-basket-stage="pack" aria-labelledby="basket-pack-label">
@@ -337,7 +344,7 @@
             <strong id="basket-total">—</strong>
           </div>
           <p class="basket-flow__error" id="basket-error" role="status" aria-live="polite" hidden></p>
-          <button type="submit" class="basket-flow__pay" id="basket-pay" hidden disabled>Continue to secure payment <span aria-hidden="true">→</span></button>
+          <button type="submit" class="basket-flow__pay" id="basket-pay" hidden disabled>Continue to payment <span aria-hidden="true">→</span></button>
         </div>
       </form>
     </section>
