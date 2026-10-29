@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=basket-flow-1">
 
-<link rel="stylesheet" href="basket-flow.css?v=2">
+<link rel="stylesheet" href="basket-flow.css?v=3">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=6" defer></script>
+<script src="cart-preview.js?v=7" defer></script>
 
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
@@ -301,25 +301,33 @@
               <h3 id="basket-delivery-label">How should we get it to you?</h3>
               <div class="basket-flow__choices">
                 <button type="button" class="basket-flow__choice" data-flow-method="pickup"><strong>Collection</strong><span>Free</span></button>
-                <button type="button" class="basket-flow__choice" data-flow-method="delivery"><strong>Delivery</strong><span id="basket-delivery-price">£2.30</span></button>
+                <button type="button" class="basket-flow__choice" data-flow-method="delivery"><strong>Shipping</strong><span id="basket-delivery-price">London · £2.30</span></button>
               </div>
             </section>
             <section data-basket-stage="details" aria-labelledby="basket-details-label" hidden>
               <h3 id="basket-details-label">Almost there</h3>
               <div class="basket-flow__fields">
-                <label>Preferred date <input id="basket-date" type="date" required></label>
-                <label id="basket-postcode-wrap" hidden>Delivery postcode <input id="basket-postcode" maxlength="10" autocomplete="postal-code" placeholder="e.g. SE1 1AA"></label>
-                <label>Full name <input id="basket-name" maxlength="100" autocomplete="name" required placeholder="Your name"></label>
-                <label>Email <input id="basket-email" type="email" maxlength="254" autocomplete="email" required placeholder="you@example.com"></label>
+                <label class="basket-flow__field--date">Preferred date
+                  <select id="basket-date" required aria-label="Preferred date">
+                    <option value="">Choose a date</option>
+                  </select>
+                </label>
+                <label class="basket-flow__field--address" id="basket-address-wrap" hidden>Street address
+                  <input id="basket-address" maxlength="160" autocomplete="street-address" placeholder="Flat / house number and street">
+                </label>
+                <label class="basket-flow__field--postcode" id="basket-postcode-wrap" hidden>Postcode
+                  <input id="basket-postcode" maxlength="10" autocomplete="postal-code" placeholder="e.g. SE1 1AA">
+                </label>
+                <label class="basket-flow__field--city" id="basket-city-wrap" hidden>City
+                  <input id="basket-city" maxlength="80" autocomplete="address-level2" placeholder="London">
+                </label>
+                <label class="basket-flow__field--name">Full name
+                  <input id="basket-name" maxlength="100" autocomplete="name" required placeholder="Your name">
+                </label>
+                <label class="basket-flow__field--email">Email
+                  <input id="basket-email" type="email" maxlength="254" autocomplete="email" required placeholder="you@example.com">
+                </label>
               </div>
-              <details class="basket-flow__optional">
-                <summary>Promo code or WhatsApp number (optional)</summary>
-                <div class="basket-flow__fields">
-                  <label>Promo code <input id="basket-code" maxlength="20" autocomplete="off" placeholder="SPROUT"></label>
-                  <label>WhatsApp number <input id="basket-whatsapp" type="tel" maxlength="28" autocomplete="tel" placeholder="+44 7…"></label>
-                </div>
-              </details>
-              <p class="basket-flow__hint">Date and delivery time are subject to confirmation. Allow at least seven days. You can cancel weekly renewals through Stripe.</p>
             </section>
           </div>
           <div class="basket-flow__items" id="basket-items-control" hidden>
