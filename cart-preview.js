@@ -106,6 +106,7 @@
    form.querySelectorAll("[data-basket-stage]").forEach(section=>{
      section.hidden=section.dataset.basketStage!==state.stage;
    });
+   el("basket-stage").hidden=state.stage==="details";
    const choices={
      pack:entry.pack?entry.pack+"g":null,
      order:entry.frequency==="weekly"?"Weekly":entry.frequency==="once"?"One-time":null,
