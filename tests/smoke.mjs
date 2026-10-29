@@ -25,7 +25,7 @@ check("All in-page links resolve", [...html.matchAll(/href="#([^"]+)"/g)].every(
 const flowCss=read("basket-flow.css");
 const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","close-cart","basket","basket-title",
  "basket-flow-form","basket-pack-label","basket-order-label","basket-delivery-label",
- "basket-details-label","basket-total","basket-pay","basket-date","basket-calendar-grid",
+ "basket-current-price","basket-total","basket-pay","basket-date","basket-calendar-grid",
  "basket-calendar-month","basket-calendar-prev","basket-calendar-next","basket-date-label",
  "basket-name","basket-email","basket-other-items","basket-add-another","basket-shared-details",
  "basket-remove-entry","sprout-scroll","order-options","explore-sprouts"];
@@ -40,8 +40,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=9"')&&
- html.includes('href="basket-flow.css?v=5"'));
+ html.includes('src="cart-preview.js?v=10"')&&
+ html.includes('href="basket-flow.css?v=6"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -92,11 +92,12 @@ check("Universal customer details appear once, outside per-product cards",
 check("One-row calendar offers only Tuesday–Friday across browsable weeks",
  html.includes('class="basket-flow__calendar"')&&
  html.includes('id="basket-calendar-grid"')&&
+ html.includes('id="basket-calendar-month" class="basket-flow__month-name"')&&
  html.includes('id="basket-calendar-prev"')&&
  html.includes('id="basket-calendar-next"')&&
  cartClient.includes('const allowedDay=day=>[2,3,4,5].includes(day.getUTCDay())')&&
- cartClient.includes('for(const offset of [1,2,3,4])')&&
- cartClient.includes('if(value<minimumDate||value>maxDate())continue;')&&
+ cartClient.includes('for(let i=0;i<=90;i++)')&&
+ cartClient.includes('const shown=dates.slice(dateOffset,dateOffset+4)')&&
  cartClient.includes('renderCalendar()')&&
  checkoutWorker.includes('[2,3,4,5].includes(d.getUTCDay())'));
 check("Stripe collects a single UK shipping address for all delivery entries",
@@ -122,10 +123,26 @@ check("Collapsed pack price sits beside its name, with remove button at upper ri
  flowCss.includes('position:static;font-size:clamp(20px,4.2vw,25px)')&&
  flowCss.includes('.basket-flow__mini-remove{')&&
  flowCss.includes('position:absolute;top:6px;right:7px'));
+check("Expanded pack also shows its live recalculated price beside product title",
+ html.includes('id="basket-current-price"')&&
+ html.includes('class="basket-flow__product-name"')&&
+ cartClient.includes('currentPrice.hidden=!entry.pack')&&
+ cartClient.includes('currentPrice.textContent=money(prices[entry.frequency||"once"][entry.pack])')&&
+ flowCss.includes('.basket-flow__current-price{')&&
+ flowCss.includes('font-weight:800!important'));
+check("Small month header replaces Your details, with four consecutive available days",
+ !html.includes('id="basket-details-label"')&&
+ !html.includes('>Your details</h3>')&&
+ !html.includes('basket-flow__calendar-caption')&&
+ html.includes('id="basket-calendar-month" class="basket-flow__month-name"')&&
+ cartClient.includes('function availableDates()')&&
+ cartClient.includes('if(allowedDay(day))dates.push(isoDate(day))')&&
+ cartClient.includes('const shown=dates.slice(dateOffset,dateOffset+4)')&&
+ flowCss.includes('.basket-flow__month-heading{'));
 check("Date and shared details are below all items; total remains below them",
  html.indexOf('id="basket-shared-details"')>html.indexOf('id="basket-items-control"')&&
  html.indexOf('id="basket-shared-details"')<html.indexOf('class="basket-flow__footer"')&&
- flowCss.includes('grid-template-columns:auto 25px minmax(0,1fr) 25px')&&
+ flowCss.includes('grid-template-columns:25px minmax(0,1fr) 25px')&&
  flowCss.includes('grid-template-columns:repeat(4,minmax(0,1fr))')&&
  flowCss.includes('.basket-flow__shared{')&&
  flowCss.includes('max-height:min(50vh,305px)')&&
