@@ -415,3 +415,46 @@
 .basket-flow__current .basket-flow__selections{padding-right:27px}
 .basket-flow__current .basket-flow__selections button:focus-visible,
 .basket-flow__current-remove:focus-visible{outline:2px solid #2b7442;outline-offset:2px}
+
+
+/* Empty means empty: do not show a preselected broccoli card until requested. */
+.basket-flow__empty{
+ min-height:200px;display:flex;flex-direction:column;
+ justify-content:center;align-items:center;gap:16px;padding:22px 10px;
+ text-align:center
+}
+.basket-flow__empty p{
+ margin:0;color:#627568;font-family:Georgia,serif;
+ font-size:21px;letter-spacing:-.025em
+}
+.basket-flow__start{
+ border:1px solid #adc7a8;border-radius:12px;background:#eff6e8;
+ color:#245736;font-size:13px;font-weight:750;
+ display:flex;align-items:center;justify-content:center;gap:12px;
+ padding:13px 18px;min-height:46px;cursor:pointer
+}
+.basket-flow__start:hover{background:#deefda}
+.basket-flow__start span{font-size:21px;line-height:1}
+.basket-flow__current-cost,.basket-flow__previous-cost{
+ display:flex;flex:0 0 auto;align-items:flex-end;
+ flex-direction:column;justify-content:center;gap:3px;
+ min-width:0;margin-left:auto
+}
+.basket-flow__current-cost .basket-flow__current-price{
+ margin:0!important
+}
+.basket-flow__previous-cost .basket-flow__previous-price{
+ font-weight:800;letter-spacing:-.035em
+}
+.basket-flow__shipping-note{
+ display:block;min-width:0;max-width:160px;
+ text-align:right;font-size:10px;font-weight:650;
+ color:#4c8154;line-height:1.2;white-space:nowrap
+}
+.basket-flow__previous-head{padding-right:18px}
+.basket-flow__current .basket-flow__product{gap:10px}
+@media(max-width:520px){
+ .basket-flow__current-cost .basket-flow__current-price{font-size:20px!important}
+ .basket-flow__previous-cost .basket-flow__previous-price{font-size:21px}
+ .basket-flow__shipping-note{font-size:9px;max-width:128px}
+}
