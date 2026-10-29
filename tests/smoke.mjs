@@ -144,7 +144,7 @@ check("Expanded broccoli pack also has a top-right remove button",
  flowCss.includes('.basket-flow__current-remove{')&&
  cartClient.includes('el("basket-remove-entry").addEventListener("click",()=>removeEntry(state.activeId))'));
 check("Collapsed pack price sits beside its name, with remove button at upper right",
- cartClient.includes('appendNode(head,"strong","basket-flow__previous-price"')&&
+ cartClient.includes('appendNode(cost,"strong","basket-flow__previous-price"')&&
  cartClient.includes('appendNode(article,"button","basket-flow__mini-remove"')&&
  flowCss.includes('.basket-flow__previous-price{')&&
  flowCss.includes('position:static;font-size:clamp(20px,4.2vw,25px)')&&
