@@ -130,8 +130,8 @@ check("Opening nav basket doesn't add broccoli or start checkout",
  el("nav-cart-count").textContent==="0");
 el("close-cart").listeners.click();
 el("basket-start").listeners.click();
-check("Clicking Add broccoli sprouts explicitly creates a new draft",
- !el("basket-empty").hidden===false&&
+check("Clicking Add broccoli sprouts explicitly creates a removable draft",
+ !el("basket-empty").hidden&&!el("basket-remove-entry").hidden&&
  el("basket-other-items").children[0]===el("basket-current-item")&&
  !stages[0].hidden);
 el("basket-remove-entry").listeners.click();
@@ -223,6 +223,20 @@ check("Active item exposes the top-right removal control",
 el("basket-remove-entry").listeners.click();
 check("Removing active item preserves first card and its settings",
  el("nav-cart-count").textContent==="1"&&el("basket-total").textContent==="£15.49");
+el("basket-selected-order").listeners.click();
+orders[0].listeners.click();methods[1].listeners.click();
+check("One-time 500g shipping shows fee separately under £16.99",
+ el("basket-current-price").textContent==="£16.99"&&
+ el("basket-current-shipping").textContent==="+ £2.30 shipping"&&
+ el("basket-total").textContent==="£19.29");
+el("basket-add-another").listeners.click();
+packs[0].listeners.click();orders[0].listeners.click();methods[1].listeners.click();
+check("Shipping is charged only once across multiple one-time packs",
+ el("basket-total").textContent==="£29.28"&&
+ el("basket-current-price").textContent==="£9.99"&&
+ el("basket-current-shipping").textContent==="Shipping · Included"&&
+ el("basket-other-items").children[0].children[1].children[1].children[1].textContent==="+ £2.30 shipping");
+el("basket-remove-entry").listeners.click();
 el("basket-remove-entry").listeners.click();
 check("Removing all packs leaves a truly empty basket",
  el("nav-cart-count").textContent==="0"&&
