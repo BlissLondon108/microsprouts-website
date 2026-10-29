@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import {webcrypto} from "node:crypto";
 import worker from "../worker.js";
-import {PRODUCT_DEFINITIONS,BILLING_FREQUENCIES,priceLookupKey,PROMO_COUPON_ID} from "../stripe-catalog.js";
+import {PRODUCT_DEFINITIONS,BILLING_FREQUENCIES,priceLookupKey,PROMO_COUPON_ID,
+  LIVE_CHECKOUT_PRICE_IDS} from "../stripe-catalog.js";
 globalThis.crypto||=webcrypto;
 const base="https://microsprouts.bhaktivedanta-london.workers.dev";
 const envOff={ASSETS:{fetch:async()=>new Response("asset fetched")}};
@@ -373,6 +374,22 @@ try{
    res.status===503&&failedCatalogue.setup_stage==="price_ms_broccoli_200g_once_v1"&&failedCatalogue.stripe_http_status===403&&failedCatalogue.stripe_error_code==="permission_denied");
  check("Stripe failure never exposes API secrets or raw error messages",
    !JSON.stringify(failedCatalogue).includes("sk_test_")&&!JSON.stringify(failedCatalogue).includes("Mock internal error"));
+ // Live checkout reuses seven independently verified Price IDs and never
+ // needs catalogue write or read permissions merely to create a Session.
+ res=await submit(customer,liveBase);
+ check("Live checkout uses preconfigured 200g Price ID when catalogue lookups are denied",
+   res.status===200&&sessionForm.get("line_items[0][price]")===
+   LIVE_CHECKOUT_PRICE_IDS.ms_broccoli_200g_once_v1&&
+   sessionForm.get("mode")==="payment");
+ res=await submit(mixedBasket,{...liveBase,STRIPE_SECRET_KEY:"rk_live_restricted_mock"});
+ check("Restricted-key live checkout bypasses catalogue lookups for mixed subscriptions",
+   res.status===200&&sessionForm.get("mode")==="subscription"&&
+   sessionForm.get("line_items[0][price]")===
+   LIVE_CHECKOUT_PRICE_IDS.ms_broccoli_500g_weekly_v2&&
+   sessionForm.get("line_items[1][price]")===
+   LIVE_CHECKOUT_PRICE_IDS.ms_broccoli_200g_once_v1&&
+   sessionForm.get("line_items[3][price]")===
+   LIVE_CHECKOUT_PRICE_IDS.ms_delivery_london_once_v1);
  deliberatelyFailPriceLookups=false;
  deliberatelyFailPortal=true;
  res=await submit(customer);
