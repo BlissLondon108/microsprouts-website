@@ -113,7 +113,7 @@ check("Three order choices remain above manual sprout gallery",
  carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})'));
 check("Legacy standalone checkout remains unchanged",
  read("checkout.html").includes('id="stripe-checkout-form"')&&
- read("checkout.html").includes('src="checkout.js?v=stripe-only-live-1"'));
+ read("checkout.html").includes('src="checkout.js?v=stripe-only-live-2"'));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
