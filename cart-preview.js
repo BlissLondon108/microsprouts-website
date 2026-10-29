@@ -126,6 +126,7 @@
    el("basket-other-items").hidden=isEmpty;
    el("basket-shared-details").hidden=isEmpty;
    if(isEmpty){
+     el("basket-other-items").replaceChildren();
      el("basket-items-control").hidden=true;
      el("basket-stage").hidden=true;
      el("basket-pay").hidden=true;
