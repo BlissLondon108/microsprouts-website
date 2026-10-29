@@ -39,7 +39,9 @@
     const checkout = $('checkout-button');
     if (checkout) {
       checkout.dataset.pack = pack;
-      checkout.href = 'checkout.html?pack=' + encodeURIComponent(pack);
+      // Checkout now opens the in-page basket. Store the selected pack on
+      // the trigger so the drawer receives the hero's current pack choice.
+      checkout.dataset.pack = pack;
     }
     thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'));
     setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on an ornate cream-and-gold porcelain plate, ' + pack + ' gram ' + packLabels[pack].name + ' option', true);
