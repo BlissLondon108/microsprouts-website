@@ -17,14 +17,19 @@ class Fake {
  get textContent(){return this._text+this.children.map(x=>x.textContent).join("")}
  addEventListener(k,fn){this.listeners[k]=fn}
  setAttribute(k,v){this.attributes[k]=String(v)}
- append(...nodes){this.children.push(...nodes)}
- replaceChildren(...nodes){this.children=[...nodes];this._text=""}
+ append(...nodes){for(const node of nodes)node.parentElement=this;this.children.push(...nodes)}
+ replaceChildren(...nodes){this.children=[...nodes];for(const node of nodes)node.parentElement=this;this._text=""}
  focus(){document.activeElement=this}
  getClientRects(){return [1]}
  closest(sel){
-  if(sel==="[data-entry-id]"&&this.dataset.entryId)return this;
-  if(sel==="[data-remove-entry]"&&this.dataset.removeEntry)return this;
-  if(sel==="button[data-calendar-date]"&&this.dataset.calendarDate)return this;
+  let node=this;
+  while(node){
+   if(sel==="[data-entry-id]"&&node.dataset.entryId)return node;
+   if(sel==="[data-remove-entry]"&&node.dataset.removeEntry)return node;
+   if(sel==="[data-open-entry]"&&node.dataset.openEntry)return node;
+   if(sel==="button[data-calendar-date]"&&node.dataset.calendarDate)return node;
+   node=node.parentElement;
+  }
   return null;
  }
  querySelectorAll(){return this.children}
@@ -37,7 +42,7 @@ class Fake {
  }
 }
 const ids=[
- "cart-overlay","open-cart","basket-flow-form","basket","basket-back","basket-pay",
+ "cart-overlay","open-cart","basket-flow-form","basket","basket-pay",
  "basket-total","basket-total-type","basket-total-note","basket-add-another",
  "basket-remove-entry","nav-cart-count","basket-name","basket-email","basket-date","basket-error",
  "basket-pack-200-price","basket-pack-500-price","basket-delivery-price",
@@ -121,29 +126,41 @@ check("First item is 500g weekly UK shipping",
  !el("basket-shipping-notice").hidden);
 const grid=el("basket-calendar-grid");
 const available=grid.children.filter(button=>button.dataset.calendarDate&&!button.disabled);
-check("Calendar is shown immediately at the shared details stage",
- !stages[3].hidden&&grid.children.length>=35&&available.length>0);
-check("Calendar enables only Tuesday–Friday after minimum date",
+check("Small single-line date strip appears at the shared details stage",
+ !stages[3].hidden&&grid.children.length===4&&available.length===4);
+check("Date strip contains only Tuesday–Friday dates",
  available.every(button=>[2,3,4,5].includes(new Date(button.dataset.calendarDate+"T12:00:00Z").getUTCDay()))&&
- grid.children.some(x=>x.dataset.calendarDate==="2026-11-14"&&x.disabled)&&
- grid.children.some(x=>x.dataset.calendarDate==="2026-11-13"&&!x.disabled));
+ !grid.children.some(x=>x.dataset.calendarDate==="2026-11-14")&&
+ grid.children.some(x=>x.dataset.calendarDate==="2026-11-13"));
+el("basket-calendar-next").listeners.click();
+check("Next arrow presents following available week",
+ grid.children.length===4&&grid.children[0].dataset.calendarDate==="2026-11-17");
+el("basket-calendar-prev").listeners.click();
+check("Previous arrow returns to initial eligible week",
+ grid.children[0].dataset.calendarDate==="2026-11-10"&&el("basket-calendar-prev").disabled);
 el("basket-add-another").listeners.click();
 const list=el("basket-other-items");
 check("Adding a second item leaves first product at top and editor at bottom",
  list.children.length===2&&list.children[0].textContent.includes("500g")&&
  list.children[1]===el("basket-current-item"));
+check("Collapsed pack shows large price beside name and top-right remove control",
+ list.children[0].children[1].children[0].textContent==="Broccoli Sprouts"&&
+ list.children[0].children[1].children[1].textContent==="£15.49"&&
+ list.children[0].children[2].dataset.removeEntry==="1");
 packs[0].listeners.click();orders[0].listeners.click();methods[0].listeners.click();
 check("Second item gets its own 200g one-time collection",
  el("basket-total").textContent==="£25.48"&&
  el("basket-selected-pack").textContent==="200g"&&
  el("nav-cart-count").textContent==="2");
-const firstEdit=list.children[0].children[0].children[0];
-el("basket-other-items").listeners.click({target:firstEdit});
-check("Editing first item keeps its editor at top, with second still below",
+const firstRow=list.children[0];
+const firstHeading=firstRow.children[1];
+el("basket-other-items").listeners.click({target:firstHeading});
+check("Clicking anywhere in collapsed card opens that broccoli entry",
+ !stages[2].hidden&&el("basket-selected-pack").textContent==="500g");
+check("Expanding the first entry preserves its position above the second",
  list.children[0]===el("basket-current-item")&&
- list.children[1].textContent.includes("200g")&&
- el("basket-selected-pack").textContent==="500g");
-packs[1].listeners.click();orders[1].listeners.click();methods[1].listeners.click();
+ list.children[1].textContent.includes("200g"));
+methods[1].listeners.click();
 const secondEdit=list.children[1].children[0].children[2];
 el("basket-other-items").listeners.click({target:secondEdit});
 check("Editing second item puts the editor back in second position, never on top",
