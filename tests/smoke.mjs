@@ -25,8 +25,9 @@ check("All in-page links resolve", [...html.matchAll(/href="#([^"]+)"/g)].every(
 const flowCss=read("basket-flow.css");
 const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","close-cart","basket","basket-title",
  "basket-flow-form","basket-pack-label","basket-order-label","basket-delivery-label",
- "basket-details-label","basket-total","basket-pay","basket-date","basket-postcode",
- "basket-name","basket-email","basket-other-items","basket-add-another",
+ "basket-details-label","basket-total","basket-pay","basket-date","basket-calendar-grid",
+ "basket-calendar-month","basket-calendar-prev","basket-calendar-next","basket-date-label",
+ "basket-name","basket-email","basket-other-items","basket-add-another","basket-shared-details",
  "basket-remove-entry","basket-back","sprout-scroll","order-options","explore-sprouts"];
 check("Multi-entry basket keeps the four minimal decision stages",
  required.every(id=>idSet.has(id))&&
@@ -39,8 +40,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=7"')&&
- html.includes('href="basket-flow.css?v=3"'));
+ html.includes('src="cart-preview.js?v=8"')&&
+ html.includes('href="basket-flow.css?v=4"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -72,29 +73,46 @@ check("Multi-entry basket shows due-today and weekly renewal totals with correct
  cartClient.includes('state.method==="delivery"')===false&&
  checkoutWorker.includes('entries.some(item=>item.method==="delivery"&&item.frequency==="once")?DELIVERY_PENCE:0')&&
  cartClient.includes('calc()'));
-check("London shipping and compact address/contact fields are present",
+check("Universal customer details appear once, outside per-product cards",
  html.includes('id="basket-name"')&&html.includes('id="basket-email"')&&
- html.includes('id="basket-date"')&&html.includes('id="basket-postcode"')&&
- html.includes('id="basket-address"')&&html.includes('id="basket-city"')&&
+ html.includes('id="basket-date" type="hidden"')&&
+ html.includes('id="basket-shared-details"')&&
+ html.indexOf('id="basket-shared-details"')>html.indexOf('id="basket-items-control"')&&
+ !html.includes('id="basket-postcode"')&&
+ !html.includes('id="basket-address"')&&
+ !html.includes('id="basket-city"')&&
  !html.includes('id="basket-code"')&&
  !html.includes('id="basket-whatsapp"')&&
- !html.includes('basket-flow__optional')&&
  html.includes('id="checkout-button" aria-label="Open shopping basket')&&
  html.includes('data-cart-open data-frequency="once"')&&
  html.includes('data-cart-open data-frequency="weekly"')&&
  !app.includes("checkout.href = 'checkout.html?pack='")&&
  flowCss.includes('width:min(480px,100vw)')&&
- flowCss.includes('.basket-flow__previous-item')&&
  cartClient.includes('event.key==="Escape"'));
-check("Shipping weekday selection and server safeguards agree",
- html.includes('<select id="basket-date"')&&
- html.includes('data-flow-method="delivery"><strong>Shipping</strong>')&&
- cartClient.includes('if(shipping&&![2,3,4,5].includes(weekday))continue;')&&
- checkoutWorker.includes('(!delivery||[2,3,4,5].includes(d.getUTCDay()))')&&
- checkoutWorker.includes('const validShippingAddress=')&&
- checkoutWorker.includes('shipping_address:hasDelivery?address:""')&&
+check("The calendar opens inline and makes only Tuesday–Friday selectable",
+ html.includes('class="basket-flow__calendar"')&&
+ html.includes('id="basket-calendar-grid"')&&
+ html.includes('id="basket-calendar-prev"')&&
+ html.includes('id="basket-calendar-next"')&&
+ cartClient.includes('const allowedDay=day=>[2,3,4,5].includes(day.getUTCDay())')&&
+ cartClient.includes('button.disabled=!available')&&
+ cartClient.includes('renderCalendar()')&&
+ checkoutWorker.includes('[2,3,4,5].includes(d.getUTCDay())'));
+check("Stripe collects a single UK shipping address for all delivery entries",
+ html.includes('id="basket-shipping-notice"')&&
+ html.includes('Your UK shipping address and postcode are collected securely at Stripe checkout.')&&
+ checkoutWorker.includes('if(hasDelivery)put(form,"shipping_address_collection[allowed_countries][0]","GB")')&&
+ checkoutWorker.includes('session.collected_information?.shipping_details')&&
+ read("checkout.js").includes('Enter a full UK shipping address and city.')&&
  read("checkout.html").includes('id="shipping-address-fields"')&&
  read("checkout.js").includes('el("shipping-address-fields").hidden=method()!=="delivery"'));
+check("Editing an earlier pack does not reorder its entry",
+ html.includes('id="basket-current-item"')&&
+ html.includes('id="basket-other-items"')&&
+ cartClient.includes('for(const entry of state.entries)')&&
+ cartClient.includes('box.append(current)')&&
+ cartClient.includes('state.entries.push(entry)')&&
+ !cartClient.includes('if(entry.id===state.activeId)continue;'));
 check("Sprout packs are visually separated by broccoli-green backgrounds",
  html.includes('id="basket-current-item"')&&
  flowCss.includes('.basket-flow__previous-item{')&&
@@ -113,7 +131,7 @@ check("Three order choices remain above manual sprout gallery",
  carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})'));
 check("Legacy standalone checkout remains unchanged",
  read("checkout.html").includes('id="stripe-checkout-form"')&&
- read("checkout.html").includes('src="checkout.js?v=stripe-only-live-2"'));
+ read("checkout.html").includes('src="checkout.js?v=stripe-only-live-3"'));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
@@ -143,7 +161,7 @@ check("Main photo and gallery load without any opacity fade or banner rewrite",
   !app.includes("requestAnimationFrame"));
 check("Checkout and basket JavaScript parse", (() => { try { new vm.Script(app); new vm.Script(cartClient); new vm.Script(carouselClient); new vm.Script(paymentClient); return true; } catch { return false; } })());
 check("Both product prices and delivery cost retained", [999,1699,230].every(n => paymentClient.includes(String(n))));
-check("Seven day lead and Tuesday–Friday London shipping retained",
+check("Seven day lead and Tue–Fri UK dates retained",
   checkoutWorker.includes("d.setUTCDate(d.getUTCDate()+7)")&&
   checkoutWorker.includes("[2,3,4,5]"));
 check("Retains customer support WhatsApp but no WhatsApp ordering form",
