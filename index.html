@@ -11,12 +11,12 @@
 <title>MicroSprouts | Freshly grown in London</title>
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
-<link rel="stylesheet" href="comp.css?v=basket-checkout-1">
-<link rel="stylesheet" href="checkout.css?v=drawer-1">
-<link rel="stylesheet" href="basket-checkout.css?v=1">
+<link rel="stylesheet" href="comp.css?v=basket-flow-1">
+
+<link rel="stylesheet" href="basket-flow.css?v=1">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=4" defer></script>
-<script src="checkout.js?v=drawer-1" defer></script>
+<script src="cart-preview.js?v=5" defer></script>
+
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
 <body>
@@ -253,76 +253,90 @@
 
   <div id="cart-overlay" class="cart-overlay" hidden>
     <div class="cart-overlay__backdrop" data-cart-close aria-hidden="true"></div>
-    <section class="cart-overlay__panel" id="basket" role="dialog" aria-modal="true" aria-labelledby="basket-title" tabindex="-1">
+    <section class="cart-overlay__panel basket-flow" id="basket" role="dialog" aria-modal="true" aria-labelledby="basket-title" tabindex="-1">
       <div class="cart-overlay__top">
         <div>
-          <span class="cart-overlay__brand">MICROSPROUTS / FRESHLY GROWN</span>
-          <h2 id="basket-title" class="serif basket-drawer-title">Your shopping basket</h2>
+          <span class="cart-overlay__brand">MICROSPROUTS</span>
+          <h2 id="basket-title" class="serif basket-drawer-title">Your basket</h2>
         </div>
         <button type="button" class="cart-overlay__close" id="close-cart" data-cart-close aria-label="Close shopping basket">Close <span aria-hidden="true">×</span></button>
       </div>
-      <div class="cart-overlay__content basket-checkout-content">
-        <p class="basket-checkout-intro">Choose your sprouts, when you'd like them, and your delivery details — all here in one place.</p>
-        <div class="checkout-alert" id="checkout-state" role="status">Checking secure payment availability…</div>
-<div class="checkout-columns">
-<form id="stripe-checkout-form" class="order-card" novalidate>
-<h2 class="serif">Your sprouts</h2>
-<div class="checkout-pack-gallery" role="group" aria-label="Choose pack using photographs">
-<button type="button" class="checkout-pack-choice" data-pack-choice="200" aria-pressed="true">
-<img src="assets/single-ornate-wide-v1.svg" width="2400" height="768" loading="lazy" alt="Generous mound of fresh broccoli sprouts on a ornate cream-and-gold porcelain plate">
-<span class="checkout-pack-text"><strong>Single Pack <small>200g</small></strong><span>£9.99 one-time <small>· from £8.99 subscription</small></span></span>
-</button>
-<button type="button" class="checkout-pack-choice" data-pack-choice="500" aria-pressed="false">
-<img src="assets/family-ornate-wide-v1.svg" width="2400" height="768" loading="lazy" alt="Larger mound of fresh broccoli sprouts on a matching larger ornate porcelain platter">
-<span class="checkout-pack-text"><strong>Family Pack <small>500g</small></strong><span>£16.99 one-time <small>· from £15.49 subscription</small></span></span>
-</button>
-</div>
-<div class="order-form-grid">
-<div class="field"><label for="pack">Pack size</label><select id="pack" name="pack" required><option value="200">Single Pack · 200g · £9.99</option><option value="500">Family Pack · 500g · £16.99</option></select></div>
-<div class="field"><label for="quantity">Quantity</label><input type="number" min="1" max="10" step="1" id="quantity" name="quantity" value="1" required></div>
-</div>
-<div class="field"><label for="frequency">Purchase frequency</label><select id="frequency" name="frequency" required>
-<option value="once">One-time purchase</option>
-<option value="weekly">Weekly subscription — automatically billed each week</option>
-<option value="fortnightly">Fortnightly subscription — automatically billed every two weeks</option>
-</select></div>
-<p class="checkout-hint" id="frequency-note">One-time purchase. You pay once.</p>
-<p class="subscription-perk" id="subscription-perk" hidden>Subscribe and save on every pack — plus <strong>free personal London delivery</strong> for both weekly and fortnightly orders.</p>
-<div class="field"><span class="field-label">Collection or delivery</span>
-<div class="method-options">
-<label class="method-option"><input type="radio" name="method" value="pickup" checked><strong>Free collection</strong><small>By appointment</small></label>
-<label class="method-option"><input type="radio" name="method" value="delivery"><strong>London delivery</strong><small id="delivery-method-price">£2.30 one-time · FREE on subscription</small></label>
-</div></div>
-<div class="order-form-grid">
-<div class="field"><label for="date">Preferred first date</label><input id="date" type="date" required><p class="checkout-hint">Subject to confirmation. Allow at least seven days.</p></div>
-<div class="field" id="postcode-field" hidden><label for="postcode">Delivery postcode</label><input id="postcode" autocomplete="postal-code" maxlength="10" placeholder="e.g. SE1 1AA"></div>
-</div>
-<div class="field"><label for="code">Promo code (optional)</label><input id="code" autocomplete="off" maxlength="20" placeholder="SPROUT"><p class="checkout-hint">SPROUT gives 20% off sprouts on eligible one-time orders.</p></div>
-<h2 class="serif checkout-subheading">Your details</h2>
-<p class="checkout-hint">You can pay as a guest. A MicroSprouts customer account is not required.</p>
-<div class="field"><label for="name">Full name <span aria-label="required">*</span></label><input id="name" autocomplete="name" maxlength="100" required></div>
-<div class="field"><label for="email">Email address <span aria-label="required">*</span></label><input id="email" type="email" autocomplete="email" maxlength="254" required><p class="checkout-hint">Required so we can contact you about your order.</p></div>
-<div class="field"><label for="whatsapp">WhatsApp number (optional)</label><input id="whatsapp" type="tel" autocomplete="tel" maxlength="28" placeholder="+44 7…"></div>
-<p class="checkout-hint">We will contact you to agree the final collection or delivery window. Your preferred date is not a guaranteed booking.</p>
-<p class="checkout-hint" id="subscription-disclosure" hidden>Subscriptions are charged automatically at the displayed discounted price every week or every two weeks. Personal London delivery is included free with a subscription. You can manage your payment method or cancel future renewal through Stripe's secure customer portal. The first requested fulfilment date is subject to confirmation.</p>
-<button id="pay-button" class="submit-btn" type="submit" disabled>Preparing secure checkout…</button>
-<p class="form-hint" id="checkout-message" aria-live="polite">Payment is currently unavailable while Stripe is being configured.</p>
-<p class="checkout-hint">Already subscribed? <a href="manage-subscription.html">Manage or cancel your subscription through Stripe</a>.</p>
-</form>
-<aside class="checkout-summary" aria-label="Order summary">
-<h2 class="serif">Order summary</h2>
-<div class="checkout-product"><img id="summary-photo" src="assets/single-ornate-v3.webp" alt="Single Pack broccoli sprouts on an ornate porcelain plate"><div><strong id="summary-product-title">Single Pack · 200g</strong><p>Fresh broccoli sprouts, grown in London</p></div></div>
-<div class="price-row"><span>Sprouts at one-time price</span><strong id="subtotal">£9.99</strong></div>
-<div class="price-row price-row--savings" id="subscription-savings-row" hidden><span id="subscription-savings-label">Subscription saving</span><strong id="subscription-savings">−£1.00</strong></div>
-<div class="price-row"><span>Delivery / collection</span><strong id="deliveryfee">FREE</strong></div>
-<div class="price-row" id="discount-row" hidden><span>SPROUT discount</span><strong id="discount">−£0.00</strong></div>
-<div class="price-row total"><span id="total-label">Total today</span><strong id="total">£9.99</strong></div>
-<p class="checkout-hint" id="repeat-summary">A one-time order.</p>
-<p class="checkout-hint" id="subscription-delivery-hint" hidden>Free London delivery is included for every recurring order.</p>
-<p class="checkout-hint">Secure payment is processed by Stripe. You will only be charged if you complete the Stripe payment page.</p>
-</aside>
-</div>
-      </div>
+      <form id="basket-flow-form" class="basket-flow__form" novalidate>
+        <div class="basket-flow__body">
+          <div class="basket-flow__product">
+            <img src="assets/approved/week.webp" width="110" height="110" alt="Fresh broccoli sprouts">
+            <div>
+              <strong>Broccoli Sprouts</strong>
+              <p>Freshly grown in London</p>
+            </div>
+          </div>
+          <div class="basket-flow__selections" id="basket-selections" aria-label="Your selections">
+            <button type="button" data-edit-step="pack" id="basket-selected-pack" hidden></button>
+            <button type="button" data-edit-step="order" id="basket-selected-order" hidden></button>
+            <button type="button" data-edit-step="delivery" id="basket-selected-delivery" hidden></button>
+          </div>
+          <div class="basket-flow__stage" id="basket-stage" aria-live="polite">
+            <section data-basket-stage="pack" aria-labelledby="basket-pack-label">
+              <h3 id="basket-pack-label">Choose your pack</h3>
+              <div class="basket-flow__choices">
+                <button type="button" class="basket-flow__choice" data-flow-pack="200">
+                  <strong>200g</strong><span>Single Pack</span>
+                  <small id="basket-pack-200-price">£9.99</small>
+                </button>
+                <button type="button" class="basket-flow__choice" data-flow-pack="500">
+                  <strong>500g</strong><span>Family Pack</span>
+                  <small id="basket-pack-500-price">£16.99</small>
+                </button>
+              </div>
+            </section>
+            <section data-basket-stage="order" aria-labelledby="basket-order-label" hidden>
+              <h3 id="basket-order-label">How often?</h3>
+              <div class="basket-flow__choices">
+                <button type="button" class="basket-flow__choice" data-flow-order="once"><strong>One-time</strong><span>Order once</span></button>
+                <button type="button" class="basket-flow__choice" data-flow-order="weekly"><strong>Weekly</strong><span>Subscribe &amp; save</span></button>
+              </div>
+            </section>
+            <section data-basket-stage="delivery" aria-labelledby="basket-delivery-label" hidden>
+              <h3 id="basket-delivery-label">How should we get it to you?</h3>
+              <div class="basket-flow__choices">
+                <button type="button" class="basket-flow__choice" data-flow-method="pickup"><strong>Collection</strong><span>Free</span></button>
+                <button type="button" class="basket-flow__choice" data-flow-method="delivery"><strong>Delivery</strong><span id="basket-delivery-price">£2.30</span></button>
+              </div>
+            </section>
+            <section data-basket-stage="details" aria-labelledby="basket-details-label" hidden>
+              <h3 id="basket-details-label">Almost there</h3>
+              <div class="basket-flow__fields">
+                <label>Preferred date <input id="basket-date" type="date" required></label>
+                <label id="basket-postcode-wrap" hidden>Delivery postcode <input id="basket-postcode" maxlength="10" autocomplete="postal-code" placeholder="e.g. SE1 1AA"></label>
+                <label>Full name <input id="basket-name" maxlength="100" autocomplete="name" required placeholder="Your name"></label>
+                <label>Email <input id="basket-email" type="email" maxlength="254" autocomplete="email" required placeholder="you@example.com"></label>
+              </div>
+              <details class="basket-flow__optional">
+                <summary>Promo code or WhatsApp number (optional)</summary>
+                <div class="basket-flow__fields">
+                  <label>Promo code <input id="basket-code" maxlength="20" autocomplete="off" placeholder="SPROUT"></label>
+                  <label>WhatsApp number <input id="basket-whatsapp" type="tel" maxlength="28" autocomplete="tel" placeholder="+44 7…"></label>
+                </div>
+              </details>
+              <p class="basket-flow__hint">Date and delivery time are subject to confirmation. Allow at least seven days. You can cancel weekly renewals through Stripe.</p>
+            </section>
+          </div>
+          <div class="basket-flow__items" id="basket-items-control" hidden>
+            <span id="basket-item-count">1 pack</span>
+            <button type="button" id="basket-add-another">Add another broccoli pack</button>
+            <button type="button" id="basket-remove-one" hidden>Remove one</button>
+          </div>
+        </div>
+        <div class="basket-flow__footer">
+          <div class="basket-flow__total">
+            <div><span id="basket-total-type">Your sprouts</span><small id="basket-total-note">Choose a pack to begin</small></div>
+            <strong id="basket-total">—</strong>
+          </div>
+          <p class="basket-flow__error" id="basket-error" role="status" aria-live="polite" hidden></p>
+          <button type="submit" class="basket-flow__pay" id="basket-pay" hidden disabled>Continue to secure payment <span aria-hidden="true">→</span></button>
+          <button type="button" class="basket-flow__back" id="basket-back" hidden>Back</button>
+        </div>
+      </form>
     </section>
   </div>
 
