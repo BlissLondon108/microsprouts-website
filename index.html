@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=basket-flow-1">
 
-<link rel="stylesheet" href="basket-flow.css?v=3">
+<link rel="stylesheet" href="basket-flow.css?v=4">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=7" defer></script>
+<script src="cart-preview.js?v=8" defer></script>
 
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
@@ -263,7 +263,7 @@
       </div>
       <form id="basket-flow-form" class="basket-flow__form" novalidate>
         <div class="basket-flow__body">
-          <div class="basket-flow__previous" id="basket-other-items" aria-label="Other broccoli packs in your basket"></div>
+          <div class="basket-flow__previous" id="basket-other-items" aria-label="Your broccoli packs in order of addition">
           <section class="basket-flow__current" id="basket-current-item" aria-label="Broccoli pack being configured">
           <div class="basket-flow__selections" id="basket-selections" aria-label="Current pack selections">
             <button type="button" data-edit-step="pack" id="basket-selected-pack" hidden></button>
@@ -302,26 +302,34 @@
               <h3 id="basket-delivery-label">How should we get it to you?</h3>
               <div class="basket-flow__choices">
                 <button type="button" class="basket-flow__choice" data-flow-method="pickup"><strong>Collection</strong><span>Free</span></button>
-                <button type="button" class="basket-flow__choice" data-flow-method="delivery"><strong>Shipping</strong><span id="basket-delivery-price">London · £2.30</span></button>
+                <button type="button" class="basket-flow__choice" data-flow-method="delivery"><strong>Shipping</strong><span id="basket-delivery-price">UK · £2.30</span></button>
               </div>
             </section>
+
+          </div>
+          </section>
+          </div>
+          <div class="basket-flow__items" id="basket-items-control" hidden>
+            <button type="button" id="basket-add-another">+ Add another broccoli pack</button>
+            <button type="button" id="basket-remove-entry" hidden>Remove this pack</button>
+          </di
+          <div class="basket-flow__shared" id="basket-shared-details">
             <section data-basket-stage="details" aria-labelledby="basket-details-label" hidden>
-              <h3 id="basket-details-label">Almost there</h3>
+              <h3 id="basket-details-label">Your details</h3>
+              <div class="basket-flow__calendar" aria-label="Preferred date calendar">
+                <div class="basket-flow__calendar-top">
+                  <span>Preferred date</span>
+                  <div class="basket-flow__calendar-nav">
+                    <button type="button" id="basket-calendar-prev" aria-label="Previous month">‹</button>
+                    <strong id="basket-calendar-month"></strong>
+                    <button type="button" id="basket-calendar-next" aria-label="Next month">›</button>
+                  </div>
+                </div>
+                <div class="basket-flow__calendar-grid" id="basket-calendar-grid" role="group" aria-label="Available dates Tuesday to Friday"></div>
+                <input id="basket-date" type="hidden" required>
+                <p class="basket-flow__calendar-picked" id="basket-date-label" aria-live="polite">Select a Tuesday–Friday date</p>
+              </div>
               <div class="basket-flow__fields">
-                <label class="basket-flow__field--date">Preferred date
-                  <select id="basket-date" required aria-label="Preferred date">
-                    <option value="">Choose a date</option>
-                  </select>
-                </label>
-                <label class="basket-flow__field--address" id="basket-address-wrap" hidden>Street address
-                  <input id="basket-address" maxlength="160" autocomplete="street-address" placeholder="Flat / house number and street">
-                </label>
-                <label class="basket-flow__field--postcode" id="basket-postcode-wrap" hidden>Postcode
-                  <input id="basket-postcode" maxlength="10" autocomplete="postal-code" placeholder="e.g. SE1 1AA">
-                </label>
-                <label class="basket-flow__field--city" id="basket-city-wrap" hidden>City
-                  <input id="basket-city" maxlength="80" autocomplete="address-level2" placeholder="London" value="London">
-                </label>
                 <label class="basket-flow__field--name">Full name
                   <input id="basket-name" maxlength="100" autocomplete="name" required placeholder="Your name">
                 </label>
@@ -329,13 +337,9 @@
                   <input id="basket-email" type="email" maxlength="254" autocomplete="email" required placeholder="you@example.com">
                 </label>
               </div>
+              <p class="basket-flow__shipping-notice" id="basket-shipping-notice" hidden>Your UK shipping address and postcode are collected securely at Stripe checkout.</p>
             </section>
-          </div>
-          </section>
-          <div class="basket-flow__items" id="basket-items-control" hidden>
-            <button type="button" id="basket-add-another">+ Add another broccoli pack</button>
-            <button type="button" id="basket-remove-entry" hidden>Remove this pack</button>
-          </div>
+          </div>v>
         </div>
         <div class="basket-flow__footer">
           <div class="basket-flow__total">
