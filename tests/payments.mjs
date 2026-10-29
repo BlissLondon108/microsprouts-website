@@ -229,6 +229,75 @@ try{
    res.status===200&&sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_200g_fortnightly_v2").id&&
    sessionForm.get("metadata[total_pence]")==="899"&&!sessionForm.has("line_items[1][price]"));
 
+ // Independent basket entries can have distinct sizes, frequencies and methods,
+ // while remaining in a single Stripe Checkout session.
+ const mixedBasket={
+   name:"Test Customer",email:"test@example.com",whatsapp:"",
+   date:requestedDate(true),postcode:"SE1 1AA",code:"",return_to_basket:true,
+   items:[
+     {pack:"500",frequency:"weekly",method:"delivery"},
+     {pack:"200",frequency:"once",method:"delivery"},
+     {pack:"500",frequency:"once",method:"pickup"}
+   ]
+ };
+ res=await submit(mixedBasket);
+ check("Mixed one-time and weekly broccoli entries use one subscription-mode session",
+   res.status===200&&sessionForm.get("mode")==="subscription"&&
+   sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_weekly_v2").id&&
+   sessionForm.get("line_items[1][price]")===prices.get("ms_broccoli_200g_once_v1").id&&
+   sessionForm.get("line_items[2][price]")===prices.get("ms_broccoli_500g_once_v1").id);
+ check("Mixed delivery is charged once for one-time entries, not weekly renewals",
+   sessionForm.get("line_items[3][price]")===prices.get("ms_delivery_london_once_v1").id&&
+   sessionForm.get("metadata[total_pence]")==="4477"&&
+   sessionForm.get("metadata[delivery_pence]")==="230"&&
+   sessionForm.get("metadata[renewal_pence]")==="1549"&&
+   sessionForm.get("metadata[basket_entries]")==="500:w:d|200:o:d|500:o:p"&&
+   sessionForm.get("subscription_data[metadata][basket_entries]")==="500:w:d|200:o:d|500:o:p");
+ const beforeInvalid=stats.checkouts;
+ res=await submit({...mixedBasket,items:[{pack:"300",frequency:"weekly",method:"pickup"}]});
+ check("Unlisted pack size in independent basket cannot create a Stripe session",
+   res.status===400&&stats.checkouts===beforeInvalid);
+ res=await submit({...mixedBasket,items:[
+   {pack:"500",frequency:"weekly",method:"delivery"},
+   {pack:"200",frequency:"once",method:"delivery"}],code:"SPROUT"});
+ check("Promo cannot accidentally discount a mixed basket's weekly renewal",
+   res.status===400&&stats.checkouts===beforeInvalid);
+ res=await submit({...mixedBasket,items:[]});
+ check("Empty multi-entry order cannot create a Stripe session",res.status===400&&stats.checkouts===beforeInvalid);
+ res=await submit({...mixedBasket,items:Array.from({length:11},()=>({pack:"200",frequency:"once",method:"pickup"}))});
+ check("More than ten independently configured packs are refused",res.status===400&&stats.checkouts===beforeInvalid);
+ const allOnceBasket={
+   ...mixedBasket,items:[
+     {pack:"200",frequency:"once",method:"pickup"},
+     {pack:"200",frequency:"once",method:"delivery"},
+     {pack:"500",frequency:"once",method:"pickup"}
+   ],code:"SPROUT"
+ };
+ res=await submit(allOnceBasket);
+ check("Independent one-time entries are grouped into Stripe line quantities safely",
+   res.status===200&&sessionForm.get("mode")==="payment"&&
+   sessionForm.get("line_items[0][quantity]")==="2"&&
+   sessionForm.get("line_items[1][quantity]")==="1"&&
+   sessionForm.get("line_items[2][quantity]")==="1"&&
+   sessionForm.get("discounts[0][coupon]")===PROMO_COUPON_ID);
+ check("All one-time basket coupon applies only to goods and delivery stays £2.30",
+   sessionForm.get("metadata[total_pence]")==="3188"&&
+   sessionForm.get("metadata[renewal_pence]")==="0"&&
+   sessionForm.get("metadata[delivery_pence]")==="230");
+ session={payment_status:"paid",amount_total:4477,currency:"gbp",client_reference_id:"mixed-123",
+   metadata:{
+     total_pence:"4477",pack:"mixed",quantity:"3",frequency:"mixed",method:"mixed",
+     preferred_date:requestedDate(true),name:"Test Customer",postcode:"SE1 1AA",
+     renewal_pence:"1549",basket_entries:"500:w:d|200:o:d|500:o:p"
+   }};
+ res=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
+ const verifiedBasket=await res.json();
+ check("Verified paid mixed basket returns every individual packing and billing choice",
+   verifiedBasket.paid===true&&verifiedBasket.items?.length===3&&
+   verifiedBasket.items[0].frequency==="weekly"&&
+   verifiedBasket.items[1].method==="delivery"&&
+   verifiedBasket.items[2].pack==="500"&&verifiedBasket.renewal_pence===1549);
+
  res=await submit({...customer,email:""});
  check("Contact email required",res.status===400);
  res=await submit({...customer,date:"2020-01-01"});
