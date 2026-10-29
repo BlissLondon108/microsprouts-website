@@ -264,6 +264,7 @@
       <form id="basket-flow-form" class="basket-flow__form" novalidate>
         <div class="basket-flow__body">
           <div class="basket-flow__previous" id="basket-other-items" aria-label="Other broccoli packs in your basket"></div>
+          <section class="basket-flow__current" id="basket-current-item" aria-label="Broccoli pack being configured">
           <div class="basket-flow__selections" id="basket-selections" aria-label="Current pack selections">
             <button type="button" data-edit-step="pack" id="basket-selected-pack" hidden></button>
             <button type="button" data-edit-step="order" id="basket-selected-order" hidden></button>
@@ -319,7 +320,7 @@
                   <input id="basket-postcode" maxlength="10" autocomplete="postal-code" placeholder="e.g. SE1 1AA">
                 </label>
                 <label class="basket-flow__field--city" id="basket-city-wrap" hidden>City
-                  <input id="basket-city" maxlength="80" autocomplete="address-level2" placeholder="London">
+                  <input id="basket-city" maxlength="80" autocomplete="address-level2" placeholder="London" value="London">
                 </label>
                 <label class="basket-flow__field--name">Full name
                   <input id="basket-name" maxlength="100" autocomplete="name" required placeholder="Your name">
@@ -330,6 +331,7 @@
               </div>
             </section>
           </div>
+          </section>
           <div class="basket-flow__items" id="basket-items-control" hidden>
             <button type="button" id="basket-add-another">+ Add another broccoli pack</button>
             <button type="button" id="basket-remove-entry" hidden>Remove this pack</button>
