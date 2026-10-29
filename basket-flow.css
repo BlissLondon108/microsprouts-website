@@ -189,3 +189,75 @@
  .basket-flow__current{padding:13px 11px}
  .basket-flow__fields{gap:9px 8px}
 }
+
+
+/* The editor is placed in its permanent basket slot, not promoted to the top. */
+.basket-flow__previous{display:grid;gap:14px;margin-bottom:0}
+.basket-flow__previous-item,.basket-flow__current{
+ min-width:0;margin:0;
+ background:linear-gradient(135deg,rgba(213,235,199,.69),rgba(244,250,240,.7));
+ border:1px solid rgba(148,184,138,.62);
+ border-left:5px solid #7aab71;
+ border-bottom:4px solid rgba(104,155,100,.68);
+ border-radius:15px;
+ box-shadow:0 5px 0 rgba(74,125,68,.06);
+}
+.basket-flow__previous-item{padding:13px}
+.basket-flow__previous-item+.basket-flow__previous-item{margin-top:0}
+.basket-flow__current{padding:15px}
+.basket-flow__previous:empty{display:grid}
+.basket-flow__previous-chips{padding-right:35px}
+.basket-flow__items{border-top:none;justify-content:space-between;margin-top:8px;padding-top:5px}
+.basket-flow__stage[hidden],.basket-flow__shared [hidden]{display:none!important}
+.basket-flow__shared{margin-top:16px}
+.basket-flow__shared:has(>section[hidden]){display:none}
+.basket-flow__shared>section{border-top:1px solid #e1ebdd;padding:15px 2px 0}
+.basket-flow__shared h3{font-size:15px;color:#19462a;margin:0 0 13px}
+.basket-flow__fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.basket-flow__fields .basket-flow__field--name,
+.basket-flow__fields .basket-flow__field--email{grid-column:span 1}
+.basket-flow__shipping-notice{
+ margin-top:13px;color:#55785e;font-size:11px;line-height:1.5
+}
+/* Always-visible date calendar with only Tue–Fri enabled. */
+.basket-flow__calendar{
+ border:1px solid #dce8d7;background:#f5faf0;border-radius:13px;
+ padding:13px 11px 10px;margin:0 0 16px
+}
+.basket-flow__calendar-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 13px}
+.basket-flow__calendar-top>span{font-size:11px;color:#355b3e;font-weight:750}
+.basket-flow__calendar-nav{display:flex;align-items:center;gap:8px}
+.basket-flow__calendar-nav strong{font-size:12px;min-width:105px;text-align:center;color:#183b25}
+.basket-flow__calendar-nav button{
+ width:28px;height:28px;padding:0;display:grid;place-items:center;
+ border:1px solid #d3e2cd;border-radius:50%;background:#fff;color:#1c5831;font-size:21px
+}
+.basket-flow__calendar-nav button:disabled{opacity:.3;cursor:default}
+.basket-flow__calendar-grid{
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px
+}
+.basket-flow__calendar-weekday{
+ font-size:9px;color:#7a907c;font-weight:700;text-align:center;padding:3px 0 6px
+}
+.basket-flow__calendar-day{
+ aspect-ratio:1;min-width:0;border:1px solid transparent;border-radius:9px;
+ background:#fff;color:#1d4b2d;font-size:12px;font-weight:650;padding:0;
+ display:grid;place-items:center
+}
+.basket-flow__calendar-day:hover:not(:disabled){background:#d8efd2;border-color:#86b282}
+.basket-flow__calendar-day:disabled{
+ color:#aab8a8;background:transparent;opacity:.5;cursor:not-allowed
+}
+.basket-flow__calendar-day.is-selected,
+.basket-flow__calendar-day[aria-pressed="true"]{
+ background:#153f27;color:#fff;border-color:#153f27
+}
+.basket-flow__calendar-day:focus-visible{outline:2px solid #256f3b;outline-offset:2px}
+.basket-flow__calendar-picked{color:#51745b;font-size:11px;margin:11px 1px 0}
+@media(max-width:520px){
+ .basket-flow__current{padding:12px 10px}
+ .basket-flow__calendar{padding:12px 8px 9px}
+ .basket-flow__calendar-grid{gap:3px}
+ .basket-flow__calendar-nav strong{min-width:97px}
+ .basket-flow__calendar-day{font-size:11px}
+}
