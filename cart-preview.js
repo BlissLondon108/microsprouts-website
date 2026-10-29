@@ -59,6 +59,13 @@
  qty.addEventListener("change",updateBadge);
  qty.addEventListener("input",updateBadge);
  updateBadge();
+ // A customer who backs out of Stripe returns directly to this drawer.
+ if (typeof location !== "undefined") {
+   const query = new URLSearchParams(location.search);
+   if (query.get("checkout_cancelled")==="1") {
+     openCart({pack:query.get("pack"),frequency:query.get("frequency")});
+   }
+ }
  document.addEventListener("keydown",event=>{
    if (overlay.hidden) return;
    if (event.key==="Escape") {
