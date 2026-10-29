@@ -11,10 +11,10 @@
 <title>MicroSprouts | Freshly grown in London</title>
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
-<link rel="stylesheet" href="comp.css?v=basket-drawer-3">
+<link rel="stylesheet" href="comp.css?v=order-choices-1">
 <script src="comp.js?v=basket-preview-1" defer></script>
 <script src="cart-preview.js?v=3" defer></script>
-<script src="carousel-interaction.js?v=1" defer></script>
+<script src="carousel-interaction.js?v=2" defer></script>
 </head>
 <body>
 <main id="top">
@@ -133,114 +133,101 @@
   <section class="sprout-showcase" id="explore-sprouts" aria-labelledby="sprout-showcase-title">
     <div class="sprout-showcase__intro">
       <p class="sprout-showcase__eyebrow">THE MICROSPROUTS COLLECTION</p>
-      <h2 class="serif" id="sprout-showcase-title">Little sprouts, <em>big possibilities.</em></h2>
-      <p>Discover distinctive flavours and natural goodness in every sprout. Swipe left or right to explore, then tap a circle to choose.</p>
+      <h2 class="serif" id="sprout-showcase-title">Discover your kind of <em>sprout.</em></h2>
+      <p>Discover unique flavours and natural goodness in every variety. Select a sprout to learn more.</p>
     </div>
-    <div class="sprout-marquee" aria-label="Sprout varieties. Swipe left or right, drag with a mouse, or use left and right arrow keys when a variety is focused. Tap to choose.">
-      <div class="sprout-marquee__track">
-        <div class="sprout-marquee__group">
-            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts">
-              <span class="sprout-orb sprout-orb--broccoli"><span class="sprout-orb__letter" aria-hidden="true">B</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/8538298/pexels-photo-8538298.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Fresh & delicate</span>
-              <span class="sprout-tile__price">From £9.99</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts">
-              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/6761088/pexels-photo-6761088.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Radish</strong>
-              <span class="sprout-tile__subtitle">Bright & peppery</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts">
-              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/7420818/pexels-photo-7420818.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Mung bean</strong>
-              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts">
-              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/4965038/pexels-photo-4965038.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Leek</strong>
-              <span class="sprout-tile__subtitle">Gentle & savoury</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--broccoli"><span class="sprout-orb__letter" aria-hidden="true">B</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/8538298/pexels-photo-8538298.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Fresh & delicate</span>
-              <span class="sprout-tile__price">From £9.99</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/6761088/pexels-photo-6761088.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Radish</strong>
-              <span class="sprout-tile__subtitle">Bright & peppery</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/7420818/pexels-photo-7420818.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Mung bean</strong>
-              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/4965038/pexels-photo-4965038.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Leek</strong>
-              <span class="sprout-tile__subtitle">Gentle & savoury</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-        </div>
-        <div class="sprout-marquee__group" aria-hidden="true">
-            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--broccoli"><span class="sprout-orb__letter" aria-hidden="true">B</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/8538298/pexels-photo-8538298.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Fresh & delicate</span>
-              <span class="sprout-tile__price">From £9.99</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/6761088/pexels-photo-6761088.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Radish</strong>
-              <span class="sprout-tile__subtitle">Bright & peppery</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/7420818/pexels-photo-7420818.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Mung bean</strong>
-              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/4965038/pexels-photo-4965038.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Leek</strong>
-              <span class="sprout-tile__subtitle">Gentle & savoury</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="broccoli" aria-label="Choose Broccoli sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--broccoli"><span class="sprout-orb__letter" aria-hidden="true">B</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/8538298/pexels-photo-8538298.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Broccoli</strong>
-              <span class="sprout-tile__subtitle">Fresh & delicate</span>
-              <span class="sprout-tile__price">From £9.99</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="radish" aria-label="Choose Radish sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--radish"><span class="sprout-orb__letter" aria-hidden="true">R</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/6761088/pexels-photo-6761088.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Radish</strong>
-              <span class="sprout-tile__subtitle">Bright & peppery</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="mung" aria-label="Choose Mung bean sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--mung"><span class="sprout-orb__letter" aria-hidden="true">M</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/7420818/pexels-photo-7420818.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Mung bean</strong>
-              <span class="sprout-tile__subtitle">Fresh & crunchy</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
-            <button type="button" class="sprout-tile" data-sprout-choice="leek" aria-label="Choose Leek sprouts" tabindex="-1" aria-hidden="true">
-              <span class="sprout-orb sprout-orb--leek"><span class="sprout-orb__letter" aria-hidden="true">L</span><img class="sprout-orb__photo" src="https://images.pexels.com/photos/4965038/pexels-photo-4965038.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async"><span class="sprout-orb__add" aria-hidden="true">+</span></span>
-              <strong class="sprout-tile__title">Leek</strong>
-              <span class="sprout-tile__subtitle">Gentle & savoury</span>
-              <span class="sprout-tile__price">Ask for availability</span>
-            </button>
+    <div class="sprout-carousel">
+      <button type="button" class="sprout-carousel__arrow" data-sprout-scroll="-1" aria-label="Scroll sprout varieties left">‹</button>
+      <div class="sprout-marquee" id="sprout-scroll" tabindex="0" aria-label="Sprout varieties; swipe or scroll sideways to explore">
+        <div class="sprout-marquee__track">
+        <a class="sprout-tile" href="sprouts.html#broccoli" aria-label="Discover Broccoli sprouts">
+          <span class="sprout-orb sprout-orb--broccoli">
+            <span class="sprout-orb__letter" aria-hidden="true">B</span>
+            <img class="sprout-orb__photo" src="https://images.pexels.com/photos/8538298/pexels-photo-8538298.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async">
+            <span class="sprout-orb__add" aria-hidden="true">↗</span>
+          </span>
+          <strong class="sprout-tile__title">Broccoli</strong>
+          <span class="sprout-tile__subtitle">Fresh & delicate</span>
+          <span class="sprout-tile__price">Naturally rich in glucoraphanin</span>
+        </a>
+        <a class="sprout-tile" href="sprouts.html#radish" aria-label="Discover Radish sprouts">
+          <span class="sprout-orb sprout-orb--radish">
+            <span class="sprout-orb__letter" aria-hidden="true">R</span>
+            <img class="sprout-orb__photo" src="https://images.pexels.com/photos/6761088/pexels-photo-6761088.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async">
+            <span class="sprout-orb__add" aria-hidden="true">↗</span>
+          </span>
+          <strong class="sprout-tile__title">Radish</strong>
+          <span class="sprout-tile__subtitle">Bright & peppery</span>
+          <span class="sprout-tile__price">A colourful crunch</span>
+        </a>
+        <a class="sprout-tile" href="sprouts.html#mung-bean" aria-label="Discover Mung bean sprouts">
+          <span class="sprout-orb sprout-orb--mung">
+            <span class="sprout-orb__letter" aria-hidden="true">M</span>
+            <img class="sprout-orb__photo" src="https://images.pexels.com/photos/7420818/pexels-photo-7420818.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async">
+            <span class="sprout-orb__add" aria-hidden="true">↗</span>
+          </span>
+          <strong class="sprout-tile__title">Mung bean</strong>
+          <span class="sprout-tile__subtitle">Fresh & crunchy</span>
+          <span class="sprout-tile__price">Gentle nutty flavour</span>
+        </a>
+        <a class="sprout-tile" href="sprouts.html#leek" aria-label="Discover Leek sprouts">
+          <span class="sprout-orb sprout-orb--leek">
+            <span class="sprout-orb__letter" aria-hidden="true">L</span>
+            <img class="sprout-orb__photo" src="https://images.pexels.com/photos/4965038/pexels-photo-4965038.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=360&amp;h=360&amp;fit=crop" width="240" height="240" alt="" loading="lazy" decoding="async">
+            <span class="sprout-orb__add" aria-hidden="true">↗</span>
+          </span>
+          <strong class="sprout-tile__title">Leek</strong>
+          <span class="sprout-tile__subtitle">Gentle & savoury</span>
+          <span class="sprout-tile__price">A subtle onion-like finish</span>
+        </a>
         </div>
       </div>
+      <button type="button" class="sprout-carousel__arrow" data-sprout-scroll="1" aria-label="Scroll sprout varieties right">›</button>
     </div>
+  </section>
 
+  <section class="order-choice-section" id="order-options" aria-labelledby="order-options-title">
+    <div class="order-choice-section__intro">
+      <p class="sprout-showcase__eyebrow">A LITTLE HARVEST, MADE FOR YOU</p>
+      <h2 class="serif" id="order-options-title">Fresh sprouts, <em>your way.</em></h2>
+      <p>Choose how you’d like to order.</p>
+    </div>
+    <div class="order-choice-grid">
+      <article class="order-choice-card">
+        <div class="order-choice-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18h28l-4 21H14L10 18ZM16 18l8-12 8 12M8 18h32M20 27v6M28 27v6"/></svg>
+        </div>
+        <h3 class="serif">One-time order</h3>
+        <p>Fresh broccoli sprouts whenever you need them. No commitment.</p>
+        <a class="order-choice-card__action" href="checkout.html?pack=200&amp;frequency=once">Secure checkout <span aria-hidden="true">→</span></a>
+        <div class="order-choice-card__visual">
+          <img src="assets/approved/week.webp" width="512" height="340" loading="lazy" decoding="async" alt="Freshly grown broccoli sprouts">
+        </div>
+      </article>
+      <article class="order-choice-card">
+        <div class="order-choice-card__icon order-choice-card__icon--warm" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="11" width="30" height="29" rx="3"/><path d="M17 7v9M31 7v9M9 20h30M18 28h12M18 34h8"/></svg>
+        </div>
+        <h3 class="serif">Weekly subscription</h3>
+        <p>Your favourite broccoli sprouts every week, at a discounted price.</p>
+        <a class="order-choice-card__action" href="checkout.html?pack=200&amp;frequency=weekly">Subscribe weekly <span aria-hidden="true">→</span></a>
+        <div class="order-choice-card__visual">
+          <img src="assets/approved/family.webp" width="512" height="340" loading="lazy" decoding="async" alt="A freshly grown family-size harvest of broccoli sprouts">
+        </div>
+      </article>
+      <article class="order-choice-card order-choice-card--custom">
+        <div class="order-choice-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 7a17 17 0 0 0-14.7 25.5L7 41l9-2.3A17 17 0 1 0 24 7Z"/><path d="M18 18c1.5 6 6 10.5 12 12l3-3-5-3-2 2c-2-1-4-3-5-5l2-2-3-5-2 4Z"/></svg>
+        </div>
+        <h3 class="serif">Custom subscription</h3>
+        <p>Different varieties, delivery days or quantities? Let’s arrange it together.</p>
+        <a class="order-choice-card__action order-choice-card__action--whatsapp" href="https://wa.me/447386853514?text=Hello%20MicroSprouts%21%20I%27d%20like%20to%20discuss%20a%20custom%20sprouts%20subscription." target="_blank" rel="noopener noreferrer">Chat on WhatsApp <span aria-hidden="true">→</span></a>
+        <div class="order-choice-card__visual order-choice-card__visual--custom" aria-hidden="true">
+          <span class="order-choice-card__custom-emblem">Made for<br><em>your routine.</em></span>
+        </div>
+      </article>
+    </div>
+    <p class="order-choice-section__note">Broccoli packs are available online. For other sprout varieties or a different schedule, chat with us to arrange a personal order.</p>
   </section>
 
   <section class="faq" id="faq" aria-labelledby="faq-title">
