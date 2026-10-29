@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=basket-flow-1">
 
-<link rel="stylesheet" href="basket-flow.css?v=1">
+<link rel="stylesheet" href="basket-flow.css?v=2">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=5" defer></script>
+<script src="cart-preview.js?v=6" defer></script>
 
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
@@ -263,17 +263,18 @@
       </div>
       <form id="basket-flow-form" class="basket-flow__form" novalidate>
         <div class="basket-flow__body">
+          <div class="basket-flow__previous" id="basket-other-items" aria-label="Other broccoli packs in your basket"></div>
+          <div class="basket-flow__selections" id="basket-selections" aria-label="Current pack selections">
+            <button type="button" data-edit-step="pack" id="basket-selected-pack" hidden></button>
+            <button type="button" data-edit-step="order" id="basket-selected-order" hidden></button>
+            <button type="button" data-edit-step="delivery" id="basket-selected-delivery" hidden></button>
+          </div>
           <div class="basket-flow__product">
             <img src="assets/approved/week.webp" width="110" height="110" alt="Fresh broccoli sprouts">
             <div>
               <strong>Broccoli Sprouts</strong>
               <p>Freshly grown in London</p>
             </div>
-          </div>
-          <div class="basket-flow__selections" id="basket-selections" aria-label="Your selections">
-            <button type="button" data-edit-step="pack" id="basket-selected-pack" hidden></button>
-            <button type="button" data-edit-step="order" id="basket-selected-order" hidden></button>
-            <button type="button" data-edit-step="delivery" id="basket-selected-delivery" hidden></button>
           </div>
           <div class="basket-flow__stage" id="basket-stage" aria-live="polite">
             <section data-basket-stage="pack" aria-labelledby="basket-pack-label">
@@ -322,9 +323,8 @@
             </section>
           </div>
           <div class="basket-flow__items" id="basket-items-control" hidden>
-            <span id="basket-item-count">1 pack</span>
-            <button type="button" id="basket-add-another">Add another broccoli pack</button>
-            <button type="button" id="basket-remove-one" hidden>Remove one</button>
+            <button type="button" id="basket-add-another">+ Add another broccoli pack</button>
+            <button type="button" id="basket-remove-entry" hidden>Remove this pack</button>
           </div>
         </div>
         <div class="basket-flow__footer">
