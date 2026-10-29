@@ -11,13 +11,15 @@
  const stages=["pack","order","delivery","details"];
  const prices={once:{"200":999,"500":1699},weekly:{"200":899,"500":1549}};
  const makeEntry=id=>({id,pack:null,frequency:null,method:null});
- const state={entries:[makeEntry(1)],activeId:1,stage:"pack",nextId:2};
- const storeKey="microsprouts-basket-entries-v2";
+ // Truly empty by default. The old v2 key contained an implicit broccoli
+ // draft; do not restore it as an item on existing visitors' next load.
+ const state={entries:[],activeId:null,stage:"pack",nextId:1};
+ const storeKey="microsprouts-basket-entries-v3";
  let enabled=false,working=false,returnFocus=null;
  let minimumDate="",dateOffset=0;
  const money=p=>"£"+(p/100).toFixed(2);
  const setText=(id,value)=>{el(id).textContent=value};
- const active=()=>state.entries.find(entry=>entry.id===state.activeId)||state.entries[0];
+ const active=()=>state.entries.find(entry=>entry.id===state.activeId)||state.entries[0]||null;
  const complete=entry=>!!entry&&["200","500"].includes(entry.pack)&&
    ["once","weekly"].includes(entry.frequency)&&["pickup","delivery"].includes(entry.method);
  function save(){
@@ -53,6 +55,13 @@
  const focusable=()=>[...panel.querySelectorAll(
    'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),summary'
  )].filter(node=>!node.closest("[hidden]")&&node.getClientRects().length);
+ const shippingLine=entry=>{
+   if(!entry||!entry.method)return "";
+   if(entry.method==="pickup")return "Collection · Free";
+   if(entry.frequency==="weekly")return "Shipping · Free";
+   const charged=state.entries.find(item=>item.method==="delivery"&&item.frequency==="once");
+   return charged?.id===entry.id?"+ £2.30 shipping":"Shipping · Included";
+ };
  const calc=()=>{
    const valid=state.entries.filter(entry=>["200","500"].includes(entry.pack));
    const goods=valid.reduce((sum,entry)=>sum+prices[entry.frequency||"once"][entry.pack],0);
@@ -97,8 +106,13 @@
      }
      const head=appendNode(article,"div","basket-flow__previous-head");
      appendNode(head,"span","basket-flow__previous-name","Broccoli Sprouts");
-     if(entry.pack)appendNode(head,"strong","basket-flow__previous-price",
-       money(prices[entry.frequency||"once"][entry.pack]));
+     if(entry.pack){
+       const cost=appendNode(head,"div","basket-flow__previous-cost");
+       appendNode(cost,"strong","basket-flow__previous-price",
+         money(prices[entry.frequency||"once"][entry.pack]));
+       const line=shippingLine(entry);
+       if(line)appendNode(cost,"small","basket-flow__shipping-note",line);
+     }
      const remove=appendNode(article,"button","basket-flow__mini-remove","×");
      remove.type="button";
      remove.dataset.removeEntry=String(entry.id);
@@ -107,6 +121,22 @@
  }
  function render(){
    const entry=active();
+   const isEmpty=!entry;
+   el("basket-empty").hidden=!isEmpty;
+   el("basket-other-items").hidden=isEmpty;
+   el("basket-shared-details").hidden=isEmpty;
+   if(isEmpty){
+     el("basket-items-control").hidden=true;
+     el("basket-stage").hidden=true;
+     el("basket-pay").hidden=true;
+     el("basket-pay").disabled=true;
+     el("nav-cart-count").textContent="0";
+     trigger.setAttribute("aria-label","Open shopping basket, 0 packs");
+     setText("basket-total-type","Due today");
+     setText("basket-total","—");
+     setText("basket-total-note","No items yet");
+     return;
+   }
    form.querySelectorAll("[data-basket-stage]").forEach(section=>{
      section.hidden=section.dataset.basketStage!==state.stage;
    });
@@ -133,6 +163,10 @@
    const currentPrice=el("basket-current-price");
    currentPrice.hidden=!entry.pack;
    if(entry.pack)currentPrice.textContent=money(prices[entry.frequency||"once"][entry.pack]);
+   const currentShipping=el("basket-current-shipping");
+   const line=shippingLine(entry);
+   currentShipping.hidden=!line;
+   currentShipping.textContent=line;
    setText("basket-delivery-price",entry.frequency==="weekly"?"UK · Free":"UK · £2.30");
    const amounts=calc();
    setText("basket-total",count?money(amounts.due):"—");
@@ -145,7 +179,7 @@
    const details=state.stage==="details";
    pay.hidden=!details;
    pay.disabled=!details||!enabled||working||!state.entries.every(complete);
-   pay.textContent=working?"Connecting securely…":"Continue to secure payment →";
+   pay.textContent=working?"Connecting…":"Continue to payment →";
 
  }
  function setStage(stage,focus=true){
@@ -156,16 +190,25 @@
      (section?.querySelector("button,input")||el("close-cart")).focus();
    }
  }
- function openCart(options={}){
-   returnFocus=document.activeElement;
-   const entry=active();
+ function addEntry(options={}){
+   if(state.entries.length>=10)return null;
+   const entry=makeEntry(state.nextId++);
    if(["200","500"].includes(options.pack))entry.pack=options.pack;
    if(["once","weekly"].includes(options.frequency))entry.frequency=options.frequency;
-   if(options.reset)state.stage="pack";
-   else if(!entry.pack)state.stage="pack";
+   state.entries.push(entry);state.activeId=entry.id;state.stage="pack";
+   save();
+   return entry;
+ }
+ function openCart(options={}){
+   returnFocus=document.activeElement;
+   // The nav cart simply opens the basket. Explicit shopping CTAs create
+   // one separate entry, but opening an empty basket never creates broccoli.
+   if(options.add)addEntry(options);
+   if(active()&&!complete(active())&&state.stage==="details")
+     state.stage=active().frequency?"delivery":active().pack?"order":"pack";
    overlay.hidden=false;document.body.classList.add("overlay-open");
    trigger.setAttribute("aria-expanded","true");
-   save();render();el("close-cart").focus();
+   render();el("close-cart").focus();
  }
  function closeCart(){
    if(overlay.hidden)return;
@@ -176,8 +219,9 @@
  trigger.addEventListener("click",()=>openCart());
  document.querySelectorAll("[data-cart-open]").forEach(button=>button.addEventListener("click",event=>{
    event.preventDefault();
-   openCart({pack:button.dataset.pack||el("checkout-button")?.dataset.pack,
-     frequency:button.dataset.frequency,reset:true});
+   openCart({add:true,
+     pack:button.dataset.pack||(button.id==="checkout-button"?el("checkout-button")?.dataset.pack:null),
+     frequency:button.dataset.frequency});
  }));
  document.querySelectorAll("[data-cart-close]").forEach(button=>button.addEventListener("click",closeCart));
  form.querySelectorAll("[data-flow-pack]").forEach(button=>button.addEventListener("click",()=>{
@@ -220,18 +264,21 @@
    event.preventDefault();
    expandEntry(Number(event.target.dataset.openEntry));
  });
+ el("basket-start").addEventListener("click",()=>{
+   if(addEntry())setStage("pack");
+ });
  el("basket-add-another").addEventListener("click",()=>{
    if(state.entries.length>=10||!complete(active()))return;
-   const entry=makeEntry(state.nextId++);
-   state.entries.push(entry);state.activeId=entry.id;save();setStage("pack");
+   if(addEntry())setStage("pack");
  });
  function removeEntry(id){
-   if(state.entries.length<=1){
-     state.entries=[makeEntry(1)];state.nextId=2;state.activeId=1;save();setStage("pack");return;
-   }
    state.entries=state.entries.filter(entry=>entry.id!==id);
+   if(!state.entries.length){
+     state.activeId=null;state.nextId=1;state.stage="pack";
+     save();showError("");render();el("basket-start").focus();return;
+   }
    if(state.activeId===id)state.activeId=state.entries.at(-1).id;
-   save();setStage(complete(active())?"details":"pack");
+   save();setStage(complete(active())?"details":active().frequency?"delivery":active().pack?"order":"pack");
  }
  el("basket-remove-entry").addEventListener("click",()=>removeEntry(state.activeId));
  document.addEventListener("keydown",event=>{
@@ -381,7 +428,8 @@
  }
  const params=new URLSearchParams(location.search);
  if(params.get("checkout_cancelled")==="1"){
-   openCart();state.stage=complete(active())?"details":active().frequency?"delivery":"pack";
+   openCart();
+   state.stage=complete(active())?"details":active()?.frequency?"delivery":"pack";
    render();showError("Payment cancelled. No charge was made.");
  }
  render();status();
