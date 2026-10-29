@@ -124,11 +124,19 @@ check("Stripe collects a single UK shipping address for all delivery entries",
  checkoutWorker.includes('put(form,"name_collection[individual][enabled]","true")')&&
  checkoutWorker.includes('put(form,"name_collection[individual][optional]","false")')&&
  !cartClient.includes('el("basket-name")')&&!cartClient.includes('el("basket-email")')&&
- checkoutWorker.includes('if(hasDelivery)put(form,"shipping_address_collection[allowed_countries][0]","GB")')&&
+ checkoutWorker.includes('put(form,"shipping_address_collection[allowed_countries][0]","GB")')&&
  checkoutWorker.includes('session.collected_information?.shipping_details')&&
  read("checkout.js").includes('Enter a full UK shipping address and city.')&&
  read("checkout.html").includes('id="shipping-address-fields"')&&
  read("checkout.js").includes('el("shipping-address-fields").hidden=method()!=="delivery"'));
+check("Stripe shows preferred first date and shipping/collection beside payment",
+ checkoutWorker.includes('put(form,"custom_text[submit][message]"')&&
+ checkoutWorker.includes('put(form,"custom_text[shipping_address][message]"')&&
+ checkoutWorker.includes('const orderSummary=entries.map(itemSummary).join("; ")')&&
+ checkoutWorker.includes('preferred_date_readable:readableDate')&&
+ checkoutWorker.includes('fulfilment:fulfilment,order_summary:orderSummary')&&
+ checkoutWorker.includes('put(form,"payment_intent_data[description]"')&&
+ checkoutWorker.includes('put(form,"subscription_data[description]"'));
 check("A tap anywhere on a minimized pack expands it without reordering",
  html.includes('id="basket-current-item"')&&
  !html.includes('id="basket-back"')&&
