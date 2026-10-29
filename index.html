@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=basket-flow-1">
 
-<link rel="stylesheet" href="basket-flow.css?v=5">
+<link rel="stylesheet" href="basket-flow.css?v=6">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=9" defer></script>
+<script src="cart-preview.js?v=10" defer></script>
 
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
@@ -272,10 +272,11 @@
           </div>
           <div class="basket-flow__product">
             <img src="assets/approved/week.webp" width="110" height="110" alt="Fresh broccoli sprouts">
-            <div>
+            <div class="basket-flow__product-name">
               <strong>Broccoli Sprouts</strong>
               <p>Freshly grown in London</p>
             </div>
+            <strong class="basket-flow__current-price" id="basket-current-price" hidden></strong>
           </div>
           <div class="basket-flow__stage" id="basket-stage" aria-live="polite">
             <section data-basket-stage="pack" aria-labelledby="basket-pack-label">
@@ -315,16 +316,17 @@
           </div>
         </div>
           <div class="basket-flow__shared" id="basket-shared-details">
-            <section data-basket-stage="details" aria-labelledby="basket-details-label" hidden>
-              <h3 id="basket-details-label">Your details</h3>
+            <section data-basket-stage="details" aria-label="Order details" hidden>
               <div class="basket-flow__calendar" aria-label="Preferred date">
-                <div class="basket-flow__calendar-strip">
-                  <span class="basket-flow__calendar-caption">Date</span>
-                  <button type="button" class="basket-flow__calendar-arrow" id="basket-calendar-prev" aria-label="Previous available week">‹</button>
-                  <div class="basket-flow__calendar-grid" id="basket-calendar-grid" role="group" aria-label="Choose an available date Tuesday to Friday"></div>
-                  <button type="button" class="basket-flow__calendar-arrow" id="basket-calendar-next" aria-label="Next available week">›</button>
+                <div class="basket-flow__month-heading">
+                  <span id="basket-calendar-month" class="basket-flow__month-name"></span>
+                  <span class="basket-flow__month-hint">Choose your day</span>
                 </div>
-                <span class="basket-flow__visually-hidden" id="basket-calendar-month"></span>
+                <div class="basket-flow__calendar-strip">
+                  <button type="button" class="basket-flow__calendar-arrow" id="basket-calendar-prev" aria-label="Previous available dates">‹</button>
+                  <div class="basket-flow__calendar-grid" id="basket-calendar-grid" role="group" aria-label="Choose an available date Tuesday to Friday"></div>
+                  <button type="button" class="basket-flow__calendar-arrow" id="basket-calendar-next" aria-label="Next available dates">›</button>
+                </div>
                 <input id="basket-date" type="hidden" required>
                 <p class="basket-flow__visually-hidden" id="basket-date-label" aria-live="polite">Choose a Tuesday–Friday date</p>
               </div>
