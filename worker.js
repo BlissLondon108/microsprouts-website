@@ -196,7 +196,13 @@ const createSession=async(request,env)=>{
   const siteOrigin=new URL(request.url).origin;
   put(form,"mode",recurring?"subscription":"payment");
   put(form,"success_url",siteOrigin+"/checkout-success.html?session_id={CHECKOUT_SESSION_ID}");
-  put(form,"cancel_url",siteOrigin+"/checkout.html?cancelled=1");
+  // Restore the in-page basket after Stripe cancellation; legacy checkout
+  // links still return to their original standalone form.
+  const cancelPath=input.return_to_basket===true?
+    "/?checkout_cancelled=1&pack="+encodeURIComponent(pack)+
+    "&frequency="+encodeURIComponent(frequency)+"#basket":
+    "/checkout.html?cancelled=1";
+  put(form,"cancel_url",siteOrigin+cancelPath);
   put(form,"customer_email",email);
   put(form,"client_reference_id",crypto.randomUUID());
   put(form,"billing_address_collection","auto");
