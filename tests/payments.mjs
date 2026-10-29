@@ -252,7 +252,9 @@ try{
    sessionForm.get("metadata[delivery_pence]")==="230"&&
    sessionForm.get("metadata[renewal_pence]")==="1549"&&
    sessionForm.get("metadata[basket_entries]")==="500:w:d|200:o:d|500:o:p"&&
-   sessionForm.get("subscription_data[metadata][basket_entries]")==="500:w:d|200:o:d|500:o:p");
+   sessionForm.get("subscription_data[metadata][basket_entries]")==="500:w:d"&&
+   sessionForm.get("subscription_data[metadata][total_pence]")==="1549"&&
+   sessionForm.get("subscription_data[metadata][quantity]")==="1");
  const beforeInvalid=stats.checkouts;
  res=await submit({...mixedBasket,items:[{pack:"300",frequency:"weekly",method:"pickup"}]});
  check("Unlisted pack size in independent basket cannot create a Stripe session",
