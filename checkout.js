@@ -11,6 +11,7 @@ const isPromo=()=>frequency.value==="once"&&code.value.trim().toUpperCase()==="S
 const count=()=>Math.max(1,Math.min(10,Number(qty.value)||1));
 const getValues=()=>({pack:pack.value,quantity:count(),frequency:frequency.value,
  method:method(),date:date.value,postcode:postcode.value.trim(),
+ address:el("address").value.trim(),city:el("city").value.trim(),
  code:code.value.trim().toUpperCase(),return_to_basket:Boolean(el("cart-overlay")),name:el("name").value.trim(),
  email:el("email").value.trim(),whatsapp:el("whatsapp").value.trim()});
 function update(){
@@ -42,7 +43,10 @@ function update(){
    "One-time purchase. You pay once.";
  el("delivery-method-price").textContent=recurring?"FREE with your subscription":"£2.30 per one-time delivery";
  el("postcode-field").hidden=method()!=="delivery";
+ el("shipping-address-fields").hidden=method()!=="delivery";
  postcode.required=method()==="delivery";
+ el("address").required=method()==="delivery";
+ el("city").required=method()==="delivery";
  code.disabled=recurring;
  if(recurring&&code.value.trim())code.value="";
  el("summary-product-title").textContent=(pack.value==="500"?"Family Pack · 500g":"Single Pack · 200g")+" × "+n;
@@ -79,8 +83,12 @@ function validate(v){
  if(!v.date||v.date<date.min)return "Choose a preferred date at least seven days ahead.";
  const d=new Date(v.date+"T12:00:00Z");
  if(Number.isNaN(d.getTime())||d.toISOString().slice(0,10)!==v.date)return "Please select a valid date.";
- if(v.method==="delivery"&&![2,3,4].includes(d.getUTCDay()))return "Personal deliveries are usually Tuesday, Wednesday or Thursday.";
- if(v.method==="delivery"&&!/^(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(v.postcode))return "Please enter a valid delivery postcode.";
+ if(v.method==="delivery"&&![2,3,4,5].includes(d.getUTCDay()))return "Shipping dates are Tuesday to Friday.";
+ if(v.method==="delivery"&&(!/^(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(v.postcode)||
+   !/^(?:EC|NW|SW|SE|WC|BR|CR|DA|EN|HA|IG|KT|RM|SM|TW|UB|E|N|W)\d/i.test(v.postcode)))
+   return "Please enter an eligible London postcode.";
+ if(v.method==="delivery"&&(v.address.length<8||v.address.length>160||v.city.toLowerCase()!=="london"))
+   return "Please enter your full London street address and city.";
  if(v.code&&v.code!=="SPROUT")return "This promo code is not recognised.";
  if(v.code&&v.frequency!=="once")return "SPROUT applies only to one-time purchases.";
  return "";
