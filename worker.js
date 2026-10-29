@@ -141,6 +141,131 @@ const inspectLiveStripe=async env=>{
     note:"No payment or Checkout Session was created. Write permission and notifications still need testing."});
 };
 const put=(params,key,value)=>params.append(key,String(value));
+// Multi-entry basket: each broccoli pack has its own size, frequency and
+// fulfilment method. Mixed weekly + one-time packs share one Stripe Checkout;
+// one-time prices appear on its first invoice only. No custom product prices.
+const createBasketSession=async(input,request,env)=>{
+  const raw=input.items;
+  if(!Array.isArray(raw)||raw.length<1||raw.length>10)
+    return issue("Choose between 1 and 10 broccoli packs.");
+  const entries=[];
+  for(const item of raw){
+    if(!item||typeof item!=="object"||Array.isArray(item)||
+      !["200","500"].includes(item.pack)||
+      !["once","weekly"].includes(item.frequency)||
+      !["pickup","delivery"].includes(item.method))
+      return issue("Choose a valid pack, order type and collection or delivery for each item.");
+    entries.push({pack:item.pack,frequency:item.frequency,method:item.method});
+  }
+  const hasDelivery=entries.some(item=>item.method==="delivery");
+  const hasWeekly=entries.some(item=>item.frequency==="weekly");
+  const hasOnce=entries.some(item=>item.frequency==="once");
+  const deliveryCharge=entries.some(item=>item.method==="delivery"&&item.frequency==="once")?DELIVERY_PENCE:0;
+  const name=String(input.name||"").trim();
+  const email=String(input.email||"").trim();
+  const whatsapp=String(input.whatsapp||"").trim();
+  const date=String(input.date||"");
+  const postcode=String(input.postcode||"").trim().toUpperCase().replace(/\s+/g," ");
+  const promo=String(input.code||"").trim().toUpperCase();
+  if(name.length<2||name.length>100)return issue("Please enter your full name.");
+  if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return issue("Enter a valid email address.");
+  if(whatsapp&&(whatsapp.length>28||!/^\+?[\d\s()\-]{7,28}$/.test(whatsapp)))
+    return issue("Please check your WhatsApp number.");
+  if(!validRequestedDate(date,hasDelivery))
+    return issue("Choose a valid date at least seven days ahead; delivery is usually Tuesday–Thursday.");
+  if(hasDelivery&&!validPostcode(postcode))return issue("Enter a valid UK postcode for delivery.");
+  if(promo&&promo!=="SPROUT")return issue("That promotional code is not recognised.");
+  if(promo&&hasWeekly)return issue("SPROUT applies only to baskets with one-time orders.");
+  const goods=entries.reduce((sum,item)=>sum+
+    (item.frequency==="once"?PRICE_PENCE[item.pack]:SUBSCRIPTION_PRICE_PENCE[item.pack]),0);
+  const weekly=entries.filter(item=>item.frequency==="weekly")
+    .reduce((sum,item)=>sum+SUBSCRIPTION_PRICE_PENCE[item.pack],0);
+  const discount=promo==="SPROUT"?Math.round(goods*.2):0;
+  const total=goods-discount+deliveryCharge;
+  let catalog;
+  try{
+    catalog=await ensureCatalog((path,options)=>stripeRequest(env,path,options),{promo:discount>0});
+  }catch(error){
+    const safeStage=typeof error.stage==="string"&&/^[a-z0-9_]{1,75}$/i.test(error.stage)?error.stage:"unknown";
+    const safeCode=typeof error.stripeCode==="string"&&/^[a-z0-9_]{1,65}$/i.test(error.stripeCode)?error.stripeCode:null;
+    const safeParam=typeof error.stripeParam==="string"&&/^[a-z0-9_\[\].]{1,90}$/i.test(error.stripeParam)?error.stripeParam:null;
+    return json({error:"Stripe catalogue setup failed. No payment has been taken.",
+      setup_stage:safeStage,stripe_http_status:Number.isInteger(error.stripeStatus)?error.stripeStatus:null,
+      stripe_error_code:safeCode,stripe_error_param:safeParam},503);
+  }
+  const form=new URLSearchParams(),origin=new URL(request.url).origin;
+  put(form,"mode",hasWeekly?"subscription":"payment");
+  put(form,"success_url",origin+"/checkout-success.html?session_id={CHECKOUT_SESSION_ID}");
+  put(form,"cancel_url",origin+"/?checkout_cancelled=1#basket");
+  put(form,"customer_email",email);
+  put(form,"client_reference_id",crypto.randomUUID());
+  put(form,"billing_address_collection","auto");
+  if(hasWeekly)put(form,"payment_method_collection","always");
+  put(form,"locale","en-GB");
+  const groups=new Map();
+  for(const item of entries){
+    const k=item.pack+":"+item.frequency;
+    groups.set(k,(groups.get(k)||0)+1);
+  }
+  let index=0;
+  for(const [key,quantity] of groups){
+    const [pack,frequency]=key.split(":");
+    const product=PRODUCT_DEFINITIONS.find(p=>p.grams===Number(pack));
+    const price=catalog.prices[priceLookupKey(product,frequency)];
+    if(!price)return issue("This sprouts price is not available.",503);
+    put(form,"line_items["+index+"][price]",price);
+    put(form,"line_items["+index+"][quantity]",quantity);
+    index++;
+  }
+  if(deliveryCharge){
+    const product=PRODUCT_DEFINITIONS.find(p=>p.kind==="delivery");
+    const price=catalog.prices[priceLookupKey(product,"once")];
+    if(!price)return issue("This delivery price is not available.",503);
+    put(form,"line_items["+index+"][price]",price);
+    put(form,"line_items["+index+"][quantity]",1);
+  }
+  if(discount)put(form,"discounts[0][coupon]",catalog.coupon);
+  // Compact, explicitly validated item-level fulfilment information stays in
+  // Stripe metadata for manual packing without an extra database.
+  const encoded=entries.map(item=>item.pack+":"+
+    (item.frequency==="weekly"?"w":"o")+":"+(item.method==="delivery"?"d":"p")).join("|");
+  const first=entries[0];
+  const metadata={
+    name,email,whatsapp,
+    pack:entries.every(x=>x.pack===first.pack)?first.pack:"mixed",
+    quantity:String(entries.length),
+    frequency:hasWeekly?(hasOnce?"mixed":"weekly"):"once",
+    method:entries.every(x=>x.method===first.method)?first.method:"mixed",
+    preferred_date:date,postcode:hasDelivery?postcode:"",
+    promo:discount?"SPROUT":"",
+    subtotal_pence:String(goods),
+    delivery_pence:String(deliveryCharge),
+    subscription_savings_pence:String(entries.reduce((sum,item)=>
+      sum+(item.frequency==="weekly"?PRICE_PENCE[item.pack]-SUBSCRIPTION_PRICE_PENCE[item.pack]:0),0)),
+    total_pence:String(total),renewal_pence:String(weekly),basket_entries:encoded
+  };
+  for(const [key,value] of Object.entries(metadata))put(form,"metadata["+key+"]",value);
+  if(hasWeekly){
+    for(const [key,value] of Object.entries(metadata))put(form,"subscription_data[metadata]["+key+"]",value);
+    put(form,"subscription_data[description]","MicroSprouts "+entries.length+" packs, weekly recurring "+
+      entries.filter(item=>item.frequency==="weekly").length+" packs");
+  }else{
+    for(const [key,value] of Object.entries(metadata))put(form,"payment_intent_data[metadata]["+key+"]",value);
+  }
+  try{
+    const result=await stripeRequest(env,"checkout/sessions",{
+      method:"POST",body:form,
+      headers:{"content-type":"application/x-www-form-urlencoded","idempotency-key":crypto.randomUUID()}
+    });
+    if(result.mode!==(hasWeekly?"subscription":"payment")||
+       !result.url?.startsWith("https://checkout.stripe.com/"))throw Error("Unexpected Stripe response");
+    return json({url:result.url});
+  }catch(error){
+    console.error("Stripe multi-entry checkout session failure",error.stripeStatus||500);
+    return issue("Stripe checkout could not start. Please try again.",502);
+  }
+};
+
 const createSession=async(request,env)=>{
   if(await paymentMode(env)==="not-configured")return issue("Secure checkout is not configured. Please use the enquiry form for now.",503);
   if(request.headers.get("content-type")?.split(";")[0]!=="application/json")return issue("Send JSON.");
@@ -150,6 +275,7 @@ const createSession=async(request,env)=>{
   try{const text=await request.text();if(text.length>8192)return issue("Request too large.",413);input=JSON.parse(text)}
   catch{return issue("Invalid checkout details.")}
   if(!input||typeof input!=="object"||Array.isArray(input))return issue("Invalid checkout details.");
+  if(Object.hasOwn(input,"items"))return createBasketSession(input,request,env);
   const pack=String(input.pack);
   const count=Number(input.quantity);
   const frequency=String(input.frequency||"once");
@@ -257,11 +383,19 @@ const verifySession=async(request,env)=>{
     const expected=Number(meta.total_pence);
     const actual=Number(session.amount_total);
     if(!Number.isSafeInteger(expected)||expected<1||actual!==expected||session.currency!=="gbp")return issue("Payment details could not be verified.",409);
+    const items=typeof meta.basket_entries==="string"?
+      meta.basket_entries.split("|").map(piece=>{
+        const [pack,f,m]=piece.split(":");
+        return {
+          pack,frequency:f==="w"?"weekly":"once",
+          method:m==="d"?"delivery":"pickup"
+        };
+      }).filter(item=>["200","500"].includes(item.pack)):[];
     return json({paid:true,reference:session.client_reference_id||session.id,
       pack:meta.pack,quantity:meta.quantity,frequency:meta.frequency,
       method:meta.method,date:meta.preferred_date,
       postcode:meta.postcode||"",name:meta.name,
-      total_pence:actual});
+      total_pence:actual,renewal_pence:Number(meta.renewal_pence||0),items});
   }catch{return issue("Unable to verify this payment. Please check again.",502)}
 };
 const getPortalLogin=async(env)=>{
