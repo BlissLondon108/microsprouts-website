@@ -1,4 +1,5 @@
-import {ensureCatalog,ensurePortal,findPortal,priceLookupKey,PRODUCT_DEFINITIONS} from "./stripe-catalog.js";
+import {ensureCatalog,ensurePortal,findPortal,priceLookupKey,PRODUCT_DEFINITIONS,
+  preconfiguredLiveCatalog} from "./stripe-catalog.js";
 /* MicroSprouts server-side Stripe Checkout API. Cloudflare Worker, no secrets in source.
  * STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET must be runtime encrypted secrets.
  * Sandbox by default. Live mode uses Stripe as the sole order/payment record.
@@ -184,12 +185,16 @@ const createBasketSession=async(input,request,env)=>{
   const total=goods-discount+deliveryCharge;
   let catalog;
   try{
-    catalog=await ensureCatalog((path,options)=>stripeRequest(env,path,options),{promo:discount>0});
+    // The live account already has all seven verified prices. Checkout needs
+    // permission to create a Session, not to edit the Stripe catalogue.
+    catalog=await paymentMode(env)==="live"&&!discount?preconfiguredLiveCatalog():
+      await ensureCatalog((path,options)=>stripeRequest(env,path,options),{promo:discount>0});
   }catch(error){
     const safeStage=typeof error.stage==="string"&&/^[a-z0-9_]{1,75}$/i.test(error.stage)?error.stage:"unknown";
     const safeCode=typeof error.stripeCode==="string"&&/^[a-z0-9_]{1,65}$/i.test(error.stripeCode)?error.stripeCode:null;
     const safeParam=typeof error.stripeParam==="string"&&/^[a-z0-9_\[\].]{1,90}$/i.test(error.stripeParam)?error.stripeParam:null;
-    return json({error:"Stripe catalogue setup failed. No payment has been taken.",
+    console.error("MicroSprouts basket catalogue error",safeStage,Number(error.stripeStatus)||0,safeCode,safeParam);
+    return json({error:"Payment is temporarily unavailable. Please try again.",
       setup_stage:safeStage,stripe_http_status:Number.isInteger(error.stripeStatus)?error.stripeStatus:null,
       stripe_error_code:safeCode,stripe_error_param:safeParam},503);
   }
@@ -328,17 +333,19 @@ const createSession=async(request,env)=>{
   const chargedGoods=discounted?subtotal-Math.round(subtotal*.2):subtotal;
   const deliveryCharge=delivery&&!recurringPurchase?DELIVERY_PENCE:0;
   const recurring=frequency==="weekly"?{interval:"week",interval_count:1}:frequency==="fortnightly"?{interval:"week",interval_count:2}:null;
-  // Provision fixed products and reusable prices in the SAME Stripe environment as
-  // the test API key stored in Cloudflare. Stripe Price IDs are not portable.
+  // The verified live account uses preconfigured price IDs; no live product
+  // write/read permissions are needed on every checkout. Sandboxes still use
+  // environment-specific catalogue provisioning.
   let catalog;
-  try{catalog=await ensureCatalog((path,options)=>stripeRequest(env,path,options),{promo:discounted});}
+  try{catalog=await paymentMode(env)==="live"&&!discounted?preconfiguredLiveCatalog():
+    await ensureCatalog((path,options)=>stripeRequest(env,path,options),{promo:discounted});}
   catch(error){
     const safeStage=typeof error.stage==="string"&&/^[a-z0-9_]{1,75}$/i.test(error.stage)?error.stage:"unknown";
     const safeCode=typeof error.stripeCode==="string"&&/^[a-z0-9_]{1,65}$/i.test(error.stripeCode)?error.stripeCode:null;
     const safeParam=typeof error.stripeParam==="string"&&/^[a-z0-9_\[\].]{1,90}$/i.test(error.stripeParam)?error.stripeParam:null;
     const stripeStatus=Number.isInteger(error.stripeStatus)?error.stripeStatus:null;
     console.error("Stripe catalogue setup failed",safeStage,stripeStatus,safeCode,safeParam);
-    return json({error:"Stripe catalogue setup failed. No payment has been taken.",
+    return json({error:"Payment is temporarily unavailable. Please try again.",
       setup_stage:safeStage,stripe_http_status:stripeStatus,stripe_error_code:safeCode,
       stripe_error_param:safeParam},503);
   }
