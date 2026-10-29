@@ -168,15 +168,10 @@ const createBasketSession=async(input,request,env)=>{
   const hasWeekly=entries.some(item=>item.frequency==="weekly");
   const hasOnce=entries.some(item=>item.frequency==="once");
   const deliveryCharge=entries.some(item=>item.method==="delivery"&&item.frequency==="once")?DELIVERY_PENCE:0;
-  const name=String(input.name||"").trim();
-  const email=String(input.email||"").trim();
-  const whatsapp=String(input.whatsapp||"").trim();
+  // The basket sends no personal details. Stripe Checkout collects the
+  // customer's required full name and email, plus UK shipping address when needed.
   const date=String(input.date||"");
   const promo=String(input.code||"").trim().toUpperCase();
-  if(name.length<2||name.length>100)return issue("Please enter your full name.");
-  if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return issue("Enter a valid email address.");
-  if(whatsapp&&(whatsapp.length>28||!/^\+?[\d\s()\-]{7,28}$/.test(whatsapp)))
-    return issue("Please check your WhatsApp number.");
   if(!validRequestedDate(date))
     return issue("Choose an available Tuesday–Friday date at least seven days ahead.");
   if(promo&&promo!=="SPROUT")return issue("That promotional code is not recognised.");
@@ -202,7 +197,10 @@ const createBasketSession=async(input,request,env)=>{
   put(form,"mode",hasWeekly?"subscription":"payment");
   put(form,"success_url",origin+"/checkout-success.html?session_id={CHECKOUT_SESSION_ID}");
   put(form,"cancel_url",origin+"/?checkout_cancelled=1#basket");
-  put(form,"customer_email",email);
+  // Omitting customer_email makes Stripe request an email address at checkout.
+  // First-class individual name collection is supported from Clover onward.
+  put(form,"name_collection[individual][enabled]","true");
+  put(form,"name_collection[individual][optional]","false");
   put(form,"client_reference_id",crypto.randomUUID());
   put(form,"billing_address_collection","auto");
   // Stripe gathers one complete UK shipping address for all shipped entries,
@@ -239,7 +237,6 @@ const createBasketSession=async(input,request,env)=>{
     (item.frequency==="weekly"?"w":"o")+":"+(item.method==="delivery"?"d":"p")).join("|");
   const first=entries[0];
   const metadata={
-    name,email,whatsapp,
     pack:entries.every(x=>x.pack===first.pack)?first.pack:"mixed",
     quantity:String(entries.length),
     frequency:hasWeekly?(hasOnce?"mixed":"weekly"):"once",
@@ -277,7 +274,9 @@ const createBasketSession=async(input,request,env)=>{
   try{
     const result=await stripeRequest(env,"checkout/sessions",{
       method:"POST",body:form,
-      headers:{"content-type":"application/x-www-form-urlencoded","idempotency-key":crypto.randomUUID()}
+      headers:{"content-type":"application/x-www-form-urlencoded",
+        "Stripe-Version":"2025-09-30.clover",
+        "idempotency-key":crypto.randomUUID()}
     });
     if(result.mode!==(hasWeekly?"subscription":"payment")||
        !result.url?.startsWith("https://checkout.stripe.com/"))throw Error("Unexpected Stripe response");
@@ -422,7 +421,12 @@ const verifySession=async(request,env)=>{
       method:meta.method,date:meta.preferred_date,
       postcode:session.collected_information?.shipping_details?.address?.postal_code||
         session.shipping_details?.address?.postal_code||meta.postcode||"",
-      name:meta.name,
+      name:session.collected_information?.individual_name||
+        session.customer_details?.individual_name||
+        session.customer_details?.name||
+        session.collected_information?.shipping_details?.name||
+        session.shipping_details?.name||meta.name||"",
+      email:session.customer_details?.email||session.customer_email||meta.email||"",
       shipping:session.collected_information?.shipping_details||session.shipping_details||null,
       total_pence:actual,renewal_pence:Number(meta.renewal_pence||0),items});
   }catch{return issue("Unable to verify this payment. Please check again.",502)}
