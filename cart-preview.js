@@ -27,16 +27,22 @@
  try{
    const saved=JSON.parse(sessionStorage.getItem(storeKey)||"null");
    if(saved&&Array.isArray(saved.entries)&&saved.entries.length>=1&&saved.entries.length<=10){
-     const parsed=saved.entries.map((v,i)=>({
-       id:i+1,
-       pack:["200","500"].includes(v.pack)?v.pack:null,
-       frequency:["once","weekly"].includes(v.frequency)?v.frequency:null,
-       method:["pickup","delivery"].includes(v.method)?v.method:null
-     }));
+     const used=new Set();
+     const parsed=saved.entries.map((v,i)=>{
+       let id=Number.isInteger(v.id)&&v.id>=1&&v.id<=100000&&!used.has(v.id)?
+         v.id:i+1;
+       while(used.has(id))id++;
+       used.add(id);
+       return {
+         id,
+         pack:["200","500"].includes(v.pack)?v.pack:null,
+         frequency:["once","weekly"].includes(v.frequency)?v.frequency:null,
+         method:["pickup","delivery"].includes(v.method)?v.method:null
+       };
+     });
      state.entries=parsed;
-     state.nextId=parsed.length+1;
-     state.activeId=Number.isInteger(saved.activeId)&&saved.activeId>=1&&
-       saved.activeId<=parsed.length?saved.activeId:parsed[0].id;
+     state.nextId=Math.max(...parsed.map(x=>x.id))+1;
+     state.activeId=parsed.some(x=>x.id===saved.activeId)?saved.activeId:parsed[0].id;
      const item=active();
      state.stage=complete(item)?"details":item.method?"details":
        item.frequency?"delivery":item.pack?"order":"pack";
@@ -70,12 +76,6 @@
    for(const entry of state.entries){
      if(entry.id===state.activeId)continue;
      const article=appendNode(box,"article","basket-flow__previous-item");
-     const head=appendNode(article,"div","basket-flow__previous-head");
-     appendNode(head,"span","basket-flow__previous-name","Broccoli Sprouts");
-     const remove=appendNode(head,"button","basket-flow__mini-remove","×");
-     remove.type="button";
-     remove.dataset.removeEntry=String(entry.id);
-     remove.setAttribute("aria-label","Remove this broccoli pack");
      const chips=appendNode(article,"div","basket-flow__previous-chips");
      const selections=[
        ["pack",entry.pack?entry.pack+"g":"Choose pack"],
@@ -87,6 +87,12 @@
        chip.type="button";chip.dataset.entryId=String(entry.id);
        chip.dataset.entryStage=step;chip.setAttribute("aria-label","Edit "+label+" for this broccoli pack");
      }
+     const head=appendNode(article,"div","basket-flow__previous-head");
+     appendNode(head,"span","basket-flow__previous-name","Broccoli Sprouts");
+     const remove=appendNode(head,"button","basket-flow__mini-remove","×");
+     remove.type="button";
+     remove.dataset.removeEntry=String(entry.id);
+     remove.setAttribute("aria-label","Remove this broccoli pack");
      if(complete(entry))appendNode(article,"span","basket-flow__previous-price",
        money(prices[entry.frequency][entry.pack]));
    }
