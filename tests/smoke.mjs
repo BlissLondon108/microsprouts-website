@@ -22,82 +22,62 @@ const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
 const idSet = new Set(ids);
 check("No duplicate IDs", ids.length === idSet.size);
 check("All in-page links resolve", [...html.matchAll(/href="#([^"]+)"/g)].every(m => idSet.has(m[1])));
-const required = ["sprout-showcase-title","explore-sprouts","basket","basket-title","basket-count","basket-items","basket-subtotal","basket-unpriced","basket-feedback","hero-photo","checkout-button","open-cart","nav-cart-count","cart-overlay","close-cart","sprout-picker","sprout-picker-choices","sprout-picker-title","sprout-picker-description","close-picker"];
-check("Navigation basket button and both dialogs are available",required.every(id=>idSet.has(id))&&
-  html.includes('class="nav-cart" id="open-cart"')&&
-  html.includes('class="cart-overlay" hidden')&&
-  html.includes('class="sprout-picker" hidden')&&
-  html.includes('role="dialog" aria-modal="true" aria-labelledby="basket-title"')&&
-  html.includes('role="dialog" aria-modal="true" aria-labelledby="sprout-picker-title"'));
-check("FAQ is a clean questions-only two-column layout",
-  html.includes('class="faq-questions"')&&
-  !html.slice(html.indexOf('<section class="faq"'),html.indexOf('</section>',html.indexOf('<section class="faq"'))).includes('class="basket-preview"')&&
-  css.includes('grid-template-columns:minmax(220px,.76fr) minmax(320px,1.24fr)'));
-check("Top Stripe checkout stays available while preview cannot create payments",
-  html.includes('id="checkout-button" href="checkout.html?pack=200"')&&
-  !html.includes("bottom-checkout-button")&&
-  app.includes("checkout.href = 'checkout.html?pack='")&&
-  paymentClient.includes('fetch("/api/checkout/status"')&&
-  checkoutWorker.includes('if(await paymentMode(env)==="not-configured")return issue(')&&
-  !cartClient.includes("/api/checkout")&&
-  !cartClient.includes("checkout.stripe.com")&&
-  !cartClient.includes("fetch("));
-check("Four circular sprout photos link to each matching variety detail section",
-  ["broccoli","radish","mung-bean","leek"].every(slug=>
-    html.includes('class="sprout-tile" href="sprouts.html#'+slug+'"')&&
-    sproutsDetails.includes('id="'+slug+'"'))&&
-  (html.match(/class="sprout-tile"/g)||[]).length===4&&
-  !html.includes('data-sprout-choice=')&&
-  !html.includes('class="sprout-marquee__group"')&&
-  !html.includes('sprout-showcase__footer')&&
-  !html.includes('View your basket <span'));
-check("Sprout collection is static until manually scrolled",
-  !css.includes("@keyframes microSproutsMoveRight")&&
-  !css.includes("animation:microSproutsMoveRight")&&
-  css.includes("overflow-x:auto")&&
-  css.includes("scroll-snap-type:x proximity")&&
-  html.includes("Select a sprout to learn more.")&&
-  html.includes('src="carousel-interaction.js?v=2"')&&
-  carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})')&&
-  carouselClient.includes('event.pointerType !== "mouse"')&&
-  carouselClient.includes('viewport.addEventListener("pointermove"')&&
-  carouselClient.includes('viewport.addEventListener("click"')&&
-  carouselClient.includes('event.stopImmediatePropagation()')&&
-  !carouselClient.includes("getAnimations"));
-check("Exactly three clear ordering cards follow sprout selection",
-  (html.match(/<article class="order-choice-card(?: order-choice-card--custom)?"/g)||[]).length===3&&
-  html.indexOf('id="explore-sprouts"')<html.indexOf('id="order-options"')&&
-  html.indexOf('id="order-options"')<html.indexOf('id="faq"')&&
-  html.includes("Fresh sprouts, <em>your way.</em>")&&
-  ["One-time order","Weekly subscription","Custom subscription"].every(label=>html.includes(label))&&
-  html.includes('href="checkout.html?pack=200&amp;frequency=once"')&&
-  html.includes('href="checkout.html?pack=200&amp;frequency=weekly"')&&
-  html.includes('href="https://wa.me/447386853514?text=Hello%20MicroSprouts%21%20I%27d%20like%20to%20discuss%20a%20custom%20sprouts%20subscription."')&&
-  html.includes('target="_blank" rel="noopener noreferrer"')&&
-  css.includes("grid-template-columns:repeat(3,minmax(0,1fr))")&&
-  css.includes(".order-choice-card__action--whatsapp"));
-check("Checkout preselects billing frequency only from allowed new card modes",
-  paymentClient.includes('if(["once","weekly"].includes(chosen.get("frequency")))frequency.value=chosen.get("frequency")')&&
-  paymentClient.includes('if(["200","500"].includes(chosen.get("pack")))pack.value=chosen.get("pack")')&&
-  checkoutWorker.includes('"fortnightly"'));
-check("Narrow cart slides from the right without displacing top navigation links",
-  css.includes('.comp-nav{position:relative}')&&
-  css.includes('.comp-nav nav{margin-left:0}')&&
-  css.includes('position:absolute;right:10px;top:10px;left:auto')&&
-  css.includes('width:clamp(265px,21.5vw,340px)')&&
-  css.includes('inset:auto 0 0 auto;top:0;right:0;bottom:0;left:auto')&&
-  css.includes('@keyframes microCartEnter{from{transform:translateX(100%)}to{transform:translateX(0)}}')&&
-  css.includes('width:min(88vw,355px)')&&
-  cartClient.includes('event.key==="Escape"')&&
-  cartClient.includes('event.key==="Tab"')&&
-  cartClient.includes('focusables(dialog)'));
-check("Existing circular variety photographs retained, without page-load image swapping",
-  ["8538298","6761088","7420818","4965038"].every(id=>
-    (html.match(new RegExp('pexels-photo-'+id+'\\.jpeg','g'))||[]).length===1)&&
-  (html.match(/class="sprout-orb__photo"/g)||[]).length===4&&
-  css.includes('.sprout-orb .sprout-orb__photo{')&&
-  cartClient.includes('photo.addEventListener("error"')&&
-  cartClient.includes("photo.hidden=true"));
+const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","close-cart","basket","basket-title",
+ "stripe-checkout-form","checkout-state","pack","quantity","frequency","date","postcode","code",
+ "name","email","whatsapp","pay-button","checkout-message","subtotal","total","deliveryfee",
+ "subscription-disclosure","subscription-perk","subscription-savings-row","discount-row","sprout-scroll",
+ "order-options","explore-sprouts"];
+check("Real in-page shopping basket contains every essential Stripe checkout field",
+ required.every(id=>idSet.has(id))&&
+ html.includes('id="basket" role="dialog" aria-modal="true"')&&
+ html.includes('id="stripe-checkout-form"')&&
+ html.includes('id="checkout-button"')&&
+ html.includes('data-cart-open data-frequency="once"')&&
+ html.includes('data-cart-open data-frequency="weekly"')&&
+ !html.includes('href="checkout.html?pack=200&amp;frequency=once"')&&
+ !html.includes('href="checkout.html?pack=200&amp;frequency=weekly"'));
+check("Ordering choices appear above the static sprout gallery",
+ html.indexOf('id="order-options"')<html.indexOf('id="explore-sprouts"')&&
+ html.indexOf('id="explore-sprouts"')<html.indexOf('id="faq"')&&
+ (html.match(/<article class="order-choice-card/g)||[]).length===3&&
+ ["One-time order","Weekly subscription","Custom subscription"].every(x=>html.includes(x))&&
+ html.includes("https://wa.me/447386853514?text=Hello%20MicroSprouts%21"));
+check("Product circles remain links to matching sprout information",
+ ["broccoli","radish","mung-bean","leek"].every(name=>
+ html.includes('class="sprout-tile" href="sprouts.html#'+name+'"'))&&
+ !html.includes('data-sprout-choice')&&
+ !html.includes("animation:microSproutsMoveRight"));
+check("Drawer keeps pack prices, date and delivery rules from secure checkout",
+ paymentClient.includes('fetch("/api/checkout/status"')&&
+ paymentClient.includes('fetch("/api/checkout/session"')&&
+ checkoutWorker.includes('if(await paymentMode(env)==="not-configured")return issue(')&&
+ ["200","500","once","weekly","fortnightly"].every(x=>html.includes('value="'+x+'"'))&&
+ html.includes('id="subscription-disclosure"')&&
+ html.includes('id="discount-row"')&&
+ html.includes('id="postcode-field"')&&
+ html.includes('href="manage-subscription.html"')&&
+ html.includes('src="checkout.js?v=drawer-1"')&&
+ html.includes('href="basket-checkout.css?v=1"'));
+check("Hero and order options open drawer rather than taking customers to a second form",
+ html.includes('id="checkout-button" aria-label="Open shopping basket')&&
+ cartClient.includes('document.querySelectorAll("[data-cart-open]")')&&
+ cartClient.includes('frequency.value = option.frequency')&&
+ cartClient.includes('pack.value = option.pack')&&
+ cartClient.includes('closeCart()')&&
+ !app.includes("checkout.href = 'checkout.html?pack='"));
+check("Drawer has a narrow responsive layout and supports keyboard use",
+ css.includes('width:clamp(265px,21.5vw,340px)')&&
+ read("basket-checkout.css").includes('width:min(490px,100vw)')&&
+ cartClient.includes('event.key==="Escape"')&&
+ cartClient.includes('event.key!=="Tab"'));
+check("Generated sprout collection is manually navigable",
+ html.includes('src="carousel-interaction.js?v=2"')&&
+ css.includes('scroll-snap-type:x proximity')&&
+ carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})')&&
+ !carouselClient.includes("getAnimations"));
+check("Standalone checkout remains intact as a direct fallback",
+ read("checkout.html").includes('id="stripe-checkout-form"')&&
+ read("checkout.html").includes('src="checkout.js?v=stripe-only-live-1"'));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
