@@ -181,6 +181,14 @@ el("basket-remove-entry").listeners.click();
 check("Remove active entry leaves other entry independently configured",
  el("nav-cart-count").textContent==="1"&&
  el("basket-total").textContent==="£12.29");
+el("basket-selected-delivery").listeners.click();
+methodButtons[0].listeners.click();
+const collectionDates=el("basket-date").children.map(option=>option.value).filter(Boolean);
+check("Collection hides all shipping address fields",
+ el("basket-postcode-wrap").hidden&&el("basket-address-wrap").hidden&&
+ el("basket-city-wrap").hidden&&
+ !el("basket-postcode").required&&!el("basket-address").required&&!el("basket-city").required&&
+ collectionDates.some(iso=>new Date(iso+"T12:00:00Z").getUTCDay()===1));
 document.events.keydown({key:"Escape",preventDefault(){}});
 check("Escape closes basket",el("cart-overlay").hidden);
 photo.listeners.error();
