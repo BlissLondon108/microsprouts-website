@@ -252,7 +252,27 @@ try{
    sessionForm.get("line_items[0][price]")===prices.get("ms_broccoli_500g_weekly_v2").id&&
    sessionForm.get("line_items[1][price]")===prices.get("ms_broccoli_200g_once_v1").id&&
    sessionForm.get("line_items[2][price]")===prices.get("ms_broccoli_500g_once_v1").id);
- check("Stripe Checkout requires individual name and collects email automatically",
+ check("Checkout clearly shows preferred date and fulfilment type for mixed baskets",
+   res.status===200&&
+   sessionForm.get("custom_text[submit][message]").includes("Preferred first date: ")&&
+   sessionForm.get("custom_text[submit][message]").includes("Shipping + collection")&&
+   sessionForm.get("custom_text[submit][message]").includes("We will confirm fulfilment")&&
+   sessionForm.get("metadata[preferred_date_readable]")&&
+   sessionForm.get("metadata[fulfilment]")==="Shipping + collection"&&
+   sessionForm.get("metadata[order_summary]")===
+     "500g weekly shipping; 200g one-time shipping; 500g one-time collection");
+ check("UK shipping address is collected by Stripe with postcode and town/city guidance",
+   sessionForm.get("shipping_address_collection[allowed_countries][0]")==="GB"&&
+   sessionForm.get("custom_text[shipping_address][message]")?.includes("street, town/city and postcode")&&
+   !sessionForm.has("metadata[shipping_address]")&&
+   !sessionForm.has("metadata[shipping_city]"));
+ check("Subscription description and metadata describe recurring packs and first requested date",
+   sessionForm.get("subscription_data[description]")?.includes("First preferred date: ")&&
+   sessionForm.get("subscription_data[description]")?.includes("500g weekly shipping")&&
+   !sessionForm.get("subscription_data[description]").includes("200g one-time")&&
+   sessionForm.get("subscription_data[metadata][order_summary]")==="500g weekly shipping"&&
+   sessionForm.get("subscription_data[metadata][fulfilment]")==="UK shipping");
+  check("Stripe Checkout requires individual name and collects email automatically",
    sessionForm.get("name_collection[individual][enabled]")==="true"&&
    sessionForm.get("name_collection[individual][optional]")==="false"&&
    !sessionForm.has("customer_email")&&
@@ -319,6 +339,23 @@ try{
    sessionForm.get("metadata[total_pence]")==="3188"&&
    sessionForm.get("metadata[renewal_pence]")==="0"&&
    sessionForm.get("metadata[delivery_pence]")==="230");
+ check("One-time payment Dashboard description includes date, shipping and collection",
+   sessionForm.get("payment_intent_data[description]")?.includes("Preferred date: ")&&
+   sessionForm.get("payment_intent_data[description]")?.includes("200g one-time shipping")&&
+   sessionForm.get("payment_intent_data[description]")?.includes("200g one-time collection")&&
+   sessionForm.get("payment_intent_data[metadata][fulfilment]")==="Shipping + collection"&&
+   sessionForm.get("payment_intent_data[metadata][order_summary]")===
+     sessionForm.get("metadata[order_summary]"));
+ const collectionOnlyBasket={date:requestedDate(),items:[
+   {pack:"200",frequency:"once",method:"pickup"}]};
+ res=await submit(collectionOnlyBasket);
+ check("Collection-only Stripe checkout asks for no shipping address",
+   res.status===200&&
+   !sessionForm.has("shipping_address_collection[allowed_countries][0]")&&
+   !sessionForm.has("custom_text[shipping_address][message]")&&
+   sessionForm.get("custom_text[submit][message]").includes("Collection")&&
+   sessionForm.get("metadata[fulfilment]")==="Collection");
+ res=await submit(allOnceBasket);
  session={payment_status:"paid",amount_total:4477,currency:"gbp",client_reference_id:"mixed-123",
    collected_information:{individual_name:"Stripe Customer",
      shipping_details:{name:"Stripe Customer",
