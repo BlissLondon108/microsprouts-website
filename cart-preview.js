@@ -127,7 +127,11 @@
    el("basket-shared-details").hidden=isEmpty;
    if(isEmpty){
      el("basket-remove-entry").hidden=true;
-     el("basket-other-items").replaceChildren();
+     // Keep the reusable editor connected to the document even when no
+     // products exist. Detaching it makes getElementById return null when
+     // the visitor adds the first pack, breaking the live basket render.
+     const current=el("basket-current-item");
+     el("basket-other-items").replaceChildren(current);
      el("basket-items-control").hidden=true;
      el("basket-stage").hidden=true;
      el("basket-pay").hidden=true;
@@ -157,7 +161,10 @@
    el("basket-items-control").hidden=!complete(entry);
    el("basket-add-another").disabled=state.entries.length>=10;
    el("basket-remove-entry").hidden=false;
-   const count=state.entries.filter(i=>i.pack).length;
+   // A newly added (not-yet-configured) pack is still an item in the basket.
+   // The nav badge updates immediately, before its size is chosen.
+   const count=state.entries.length;
+   const pricedCount=state.entries.filter(i=>i.pack).length;
    setText("nav-cart-count",String(count));
    trigger.setAttribute("aria-label","Open shopping basket, "+count+(count===1?" pack":" packs"));
    setText("basket-pack-200-price",money(prices[entry.frequency||"once"]["200"]));
@@ -171,11 +178,11 @@
    currentShipping.textContent=line;
    setText("basket-delivery-price",entry.frequency==="weekly"?"UK · Free":"UK · £2.30");
    const amounts=calc();
-   setText("basket-total",count?money(amounts.due):"—");
+   setText("basket-total",pricedCount?money(amounts.due):"—");
    setText("basket-total-type","Due today");
    const lines=state.entries.filter(i=>i.pack).map(i=>i.pack+"g "+(i.frequency==="weekly"?"weekly":"once"));
    const note=amounts.weekly?money(amounts.weekly)+" / week after today":
-     count?lines.join(" · "):"Choose a pack to begin";
+     pricedCount?lines.join(" · "):"Choose a pack to begin";
    setText("basket-total-note",note);
    renderCalendar();
    const details=state.stage==="details";
