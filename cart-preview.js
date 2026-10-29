@@ -141,8 +141,6 @@
    const note=amounts.weekly?money(amounts.weekly)+" / week after today":
      count?lines.join(" · "):"Choose a pack to begin";
    setText("basket-total-note",note);
-   const anyDelivery=state.entries.some(i=>i.method==="delivery");
-   el("basket-shipping-notice").hidden=!anyDelivery;
    renderCalendar();
    const details=state.stage==="details";
    pay.hidden=!details;
@@ -339,16 +337,12 @@
    return {
      items:state.entries.map(item=>({pack:item.pack,frequency:item.frequency,method:item.method})),
      date:el("basket-date").value,
-     code:"",whatsapp:"",
-     name:el("basket-name").value.trim(),email:el("basket-email").value.trim(),
      return_to_basket:true
    };
  }
  function validate(v){
    if(!state.entries.every(complete))return "Complete each broccoli pack before continuing.";
    if(!validDate(v.date))return "Choose an available Tuesday–Friday date at least seven days ahead.";
-   if(v.name.length<2||v.name.length>100)return "Please enter your full name.";
-   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))return "Enter a valid email address.";
    return "";
  }
  form.addEventListener("submit",async event=>{
