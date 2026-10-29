@@ -27,7 +27,7 @@ const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","c
  "basket-flow-form","basket-pack-label","basket-order-label","basket-delivery-label",
  "basket-current-price","basket-total","basket-pay","basket-date","basket-calendar-grid",
  "basket-calendar-month","basket-calendar-prev","basket-calendar-next","basket-date-label",
- "basket-name","basket-email","basket-other-items","basket-add-another","basket-shared-details",
+ "basket-other-items","basket-add-another","basket-shared-details",
  "basket-remove-entry","sprout-scroll","order-options","explore-sprouts"];
 check("Multi-entry basket keeps the four minimal decision stages",
  required.every(id=>idSet.has(id))&&
@@ -40,8 +40,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=10"')&&
- html.includes('href="basket-flow.css?v=6"'));
+ html.includes('src="cart-preview.js?v=11"')&&
+ html.includes('href="basket-flow.css?v=7"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -73,8 +73,9 @@ check("Multi-entry basket shows due-today and weekly renewal totals with correct
  cartClient.includes('state.method==="delivery"')===false&&
  checkoutWorker.includes('entries.some(item=>item.method==="delivery"&&item.frequency==="once")?DELIVERY_PENCE:0')&&
  cartClient.includes('calc()'));
-check("Universal customer details appear once, outside per-product cards",
- html.includes('id="basket-name"')&&html.includes('id="basket-email"')&&
+check("Only the preferred date is collected in the basket, with identity at Stripe",
+ !html.includes('id="basket-name"')&&!html.includes('id="basket-email"')&&
+ !html.includes('id="basket-shipping-notice"')&&
  html.includes('id="basket-date" type="hidden"')&&
  html.includes('id="basket-shared-details"')&&
  html.indexOf('id="basket-shared-details"')>html.indexOf('id="basket-items-control"')&&
@@ -101,8 +102,10 @@ check("One-row calendar offers only Tuesday–Friday across browsable weeks",
  cartClient.includes('renderCalendar()')&&
  checkoutWorker.includes('[2,3,4,5].includes(d.getUTCDay())'));
 check("Stripe collects a single UK shipping address for all delivery entries",
- html.includes('id="basket-shipping-notice"')&&
- html.includes('Your UK shipping address and postcode are collected securely at Stripe checkout.')&&
+ !html.includes('id="basket-shipping-notice"')&&
+ checkoutWorker.includes('put(form,"name_collection[individual][enabled]","true")')&&
+ checkoutWorker.includes('put(form,"name_collection[individual][optional]","false")')&&
+ !cartClient.includes('el("basket-name")')&&!cartClient.includes('el("basket-email")')&&
  checkoutWorker.includes('if(hasDelivery)put(form,"shipping_address_collection[allowed_countries][0]","GB")')&&
  checkoutWorker.includes('session.collected_information?.shipping_details')&&
  read("checkout.js").includes('Enter a full UK shipping address and city.')&&
@@ -116,6 +119,12 @@ check("A tap anywhere on a minimized pack expands it without reordering",
  cartClient.includes('expandEntry(Number(row.dataset.openEntry))')&&
  cartClient.includes('el("basket-other-items").addEventListener("keydown"')&&
  cartClient.includes('if(event.key!=="Enter"&&event.key!==" ")return;'));
+check("Expanded broccoli pack also has a top-right remove button",
+ html.includes('class="basket-flow__mini-remove basket-flow__current-remove" id="basket-remove-entry"')&&
+ html.indexOf('id="basket-remove-entry"')<html.indexOf('id="basket-selections"')&&
+ flowCss.includes('.basket-flow__current{position:relative}')&&
+ flowCss.includes('.basket-flow__current-remove{')&&
+ cartClient.includes('el("basket-remove-entry").addEventListener("click",()=>removeEntry(state.activeId))'));
 check("Collapsed pack price sits beside its name, with remove button at upper right",
  cartClient.includes('appendNode(head,"strong","basket-flow__previous-price"')&&
  cartClient.includes('appendNode(article,"button","basket-flow__mini-remove"')&&
