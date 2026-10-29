@@ -7,14 +7,14 @@
  const el=id=>document.getElementById(id);
  const overlay=el("cart-overlay"),trigger=el("open-cart"),form=el("basket-flow-form");
  if(!overlay||!trigger||!form)return;
- const panel=el("basket"),back=el("basket-back"),pay=el("basket-pay");
+ const panel=el("basket"),pay=el("basket-pay");
  const stages=["pack","order","delivery","details"];
  const prices={once:{"200":999,"500":1699},weekly:{"200":899,"500":1549}};
  const makeEntry=id=>({id,pack:null,frequency:null,method:null});
  const state={entries:[makeEntry(1)],activeId:1,stage:"pack",nextId:2};
  const storeKey="microsprouts-basket-entries-v2";
  let enabled=false,working=false,returnFocus=null;
- let minimumDate="",calendarMonth="";
+ let minimumDate="",calendarWeek="";
  const money=p=>"£"+(p/100).toFixed(2);
  const setText=(id,value)=>{el(id).textContent=value};
  const active=()=>state.entries.find(entry=>entry.id===state.activeId)||state.entries[0];
@@ -80,6 +80,10 @@
        continue;
      }
      const article=appendNode(box,"article","basket-flow__previous-item");
+     article.dataset.openEntry=String(entry.id);
+     article.tabIndex=0;
+     article.setAttribute("role","group");
+     article.setAttribute("aria-label","Broccoli Sprouts pack "+entry.pack+" grams. Click or press Enter to expand.");
      const chips=appendNode(article,"div","basket-flow__previous-chips");
      const selections=[
        ["pack",entry.pack?entry.pack+"g":"Choose pack"],
@@ -93,12 +97,12 @@
      }
      const head=appendNode(article,"div","basket-flow__previous-head");
      appendNode(head,"span","basket-flow__previous-name","Broccoli Sprouts");
-     const remove=appendNode(head,"button","basket-flow__mini-remove","×");
+     if(entry.pack)appendNode(head,"strong","basket-flow__previous-price",
+       money(prices[entry.frequency||"once"][entry.pack]));
+     const remove=appendNode(article,"button","basket-flow__mini-remove","×");
      remove.type="button";
      remove.dataset.removeEntry=String(entry.id);
      remove.setAttribute("aria-label","Remove this broccoli pack");
-     if(complete(entry))appendNode(article,"span","basket-flow__previous-price",
-       money(prices[entry.frequency][entry.pack]));
    }
  }
  function render(){
@@ -141,14 +145,14 @@
    pay.hidden=!details;
    pay.disabled=!details||!enabled||working||!state.entries.every(complete);
    pay.textContent=working?"Connecting securely…":"Continue to secure payment →";
-   back.hidden=state.stage==="pack";
+
  }
  function setStage(stage,focus=true){
    if(!stages.includes(stage))return;
    state.stage=stage;showError("");render();
    if(focus){
      const section=form.querySelector('[data-basket-stage="'+stage+'"]');
-     (section?.querySelector("button,input")||el("basket-back")).focus();
+     (section?.querySelector("button,input")||el("close-cart")).focus();
    }
  }
  function openCart(options={}){
@@ -187,16 +191,34 @@
  form.querySelectorAll("[data-edit-step]").forEach(button=>button.addEventListener("click",()=>{
    setStage(button.dataset.editStep);
  }));
+ const expandEntry=id=>{
+   const entry=state.entries.find(item=>item.id===id);
+   if(!entry)return;
+   state.activeId=entry.id;
+   save();
+   // An already configured pack reopens its last decision; the chips let
+   // customers jump straight to any earlier choice.
+   const step=!entry.pack?"pack":!entry.frequency?"order":"delivery";
+   setStage(step);
+ };
  el("basket-other-items").addEventListener("click",event=>{
    const edit=event.target.closest("[data-entry-id]");
    const remove=event.target.closest("[data-remove-entry]");
+   if(remove){removeEntry(Number(remove.dataset.removeEntry));return;}
    if(edit){
      state.activeId=Number(edit.dataset.entryId);save();setStage(edit.dataset.entryStage);
-   }else if(remove){
-     removeEntry(Number(remove.dataset.removeEntry));
+     return;
    }
+   const row=event.target.closest("[data-open-entry]");
+   if(row)expandEntry(Number(row.dataset.openEntry));
  });
- back.addEventListener("click",()=>setStage(stages[Math.max(0,stages.indexOf(state.stage)-1)]));
+ el("basket-other-items").addEventListener("keydown",event=>{
+   if(event.key!=="Enter"&&event.key!==" ")return;
+   // Keyboard activation of the group itself, never hijack the inner buttons.
+   if(!event.target.dataset.openEntry)return;
+   event.preventDefault();
+   expandEntry(Number(event.target.dataset.openEntry));
+ });
  el("basket-add-another").addEventListener("click",()=>{
    if(state.entries.length>=10||!complete(active()))return;
    const entry=makeEntry(state.nextId++);
@@ -225,64 +247,74 @@
  const isoDate=day=>day.toISOString().slice(0,10);
  const fullLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",
    weekday:"long",day:"numeric",month:"long",year:"numeric"});
- const monthLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",month:"long",year:"numeric"});
+ const monthLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",month:"short",year:"numeric"});
+ const weekdayLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",weekday:"short"});
  const allowedDay=day=>[2,3,4,5].includes(day.getUTCDay());
- const monthKey=day=>isoDate(day).slice(0,7);
  const maxDate=()=>{
    const end=new Date(minimumDate+"T12:00:00Z");
    end.setUTCDate(end.getUTCDate()+90);
    return isoDate(end);
  };
+ const weekStart=day=>{
+   const monday=new Date(day.getTime());
+   monday.setUTCDate(monday.getUTCDate()-(monday.getUTCDay()+6)%7);
+   return monday;
+ };
+ const shiftWeek=(value,offset)=>{
+   const day=new Date(value+"T12:00:00Z");
+   day.setUTCDate(day.getUTCDate()+7*offset);
+   return isoDate(day);
+ };
+ const firstAvailableWeek=()=>{
+   const day=new Date(minimumDate+"T12:00:00Z");
+   // If the seven-day lead falls on a weekend, begin with next Tuesday.
+   while(!allowedDay(day))day.setUTCDate(day.getUTCDate()+1);
+   return isoDate(weekStart(day));
+ };
  function renderCalendar(){
    if(!minimumDate)return;
-   const date=el("basket-date");
-   if(!calendarMonth)calendarMonth=minimumDate.slice(0,7);
-   const [year,month]=calendarMonth.split("-").map(Number);
-   const first=new Date(Date.UTC(year,month-1,1,12));
-   setText("basket-calendar-month",monthLabel.format(first));
-   el("basket-calendar-prev").disabled=calendarMonth<=minimumDate.slice(0,7);
-   el("basket-calendar-next").disabled=calendarMonth>=maxDate().slice(0,7);
+   const firstWeek=firstAvailableWeek();
+   if(!calendarWeek||calendarWeek<firstWeek)calendarWeek=firstWeek;
+   const selected=el("basket-date").value;
+   el("basket-calendar-prev").disabled=calendarWeek<=firstWeek;
+   el("basket-calendar-next").disabled=shiftWeek(calendarWeek,1)>maxDate();
    const grid=el("basket-calendar-grid");
    grid.replaceChildren();
-   for(const short of ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])
-     appendNode(grid,"span","basket-flow__calendar-weekday",short);
-   const padding=(first.getUTCDay()+6)%7;
-   for(let i=0;i<padding;i++){
-     const blank=appendNode(grid,"span","basket-flow__calendar-empty","");
-     blank.setAttribute("aria-hidden","true");
-   }
-   const days=new Date(Date.UTC(year,month,0,12)).getUTCDate();
-   for(let dayNumber=1;dayNumber<=days;dayNumber++){
-     const day=new Date(Date.UTC(year,month-1,dayNumber,12));
+   const monday=new Date(calendarWeek+"T12:00:00Z");
+   setText("basket-calendar-month","Week of "+fullLabel.format(monday));
+   // A week always contains four availability chips in one horizontal row.
+   for(const offset of [1,2,3,4]){
+     const day=new Date(monday.getTime());
+     day.setUTCDate(monday.getUTCDate()+offset);
      const value=isoDate(day);
-     const available=value>=minimumDate&&value<=maxDate()&&allowedDay(day);
-     const button=appendNode(grid,"button","basket-flow__calendar-day",String(dayNumber));
-     button.type="button";button.dataset.calendarDate=value;
-     button.disabled=!available;
-     button.setAttribute("aria-label",fullLabel.format(day)+(available?"":" unavailable"));
-     button.setAttribute("aria-pressed",String(value===date.value));
-     if(value===date.value)button.classList.add("is-selected");
+     if(value<minimumDate||value>maxDate())continue;
+     const button=appendNode(grid,"button","basket-flow__calendar-day");
+     button.type="button";
+     button.dataset.calendarDate=value;
+     button.setAttribute("aria-label",fullLabel.format(day));
+     button.setAttribute("aria-pressed",String(value===selected));
+     if(value===selected)button.classList.add("is-selected");
+     appendNode(button,"span","basket-flow__date-weekday",weekdayLabel.format(day));
+     appendNode(button,"strong","basket-flow__date-number",String(day.getUTCDate()));
+     appendNode(button,"span","basket-flow__date-month",monthLabel.format(day).split(" ")[0]);
    }
-   const selected=date.value;
    setText("basket-date-label",selected?
      "Selected: "+fullLabel.format(new Date(selected+"T12:00:00Z")):
-     "Available Tuesday to Friday");
+     "Choose an available date from Tuesday to Friday");
  }
  function validDate(value){
    if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||!minimumDate||
-     value<minimumDate||value>maxDate())return false;
+      value<minimumDate||value>maxDate())return false;
    const day=new Date(value+"T12:00:00Z");
    return !Number.isNaN(day.getTime())&&isoDate(day)===value&&allowedDay(day);
  }
  el("basket-calendar-prev").addEventListener("click",()=>{
-   const [year,month]=calendarMonth.split("-").map(Number);
-   calendarMonth=monthKey(new Date(Date.UTC(year,month-2,1,12)));
-   renderCalendar();
+   if(calendarWeek<=firstAvailableWeek())return;
+   calendarWeek=shiftWeek(calendarWeek,-1);renderCalendar();
  });
  el("basket-calendar-next").addEventListener("click",()=>{
-   const [year,month]=calendarMonth.split("-").map(Number);
-   calendarMonth=monthKey(new Date(Date.UTC(year,month,1,12)));
-   renderCalendar();
+   if(shiftWeek(calendarWeek,1)>maxDate())return;
+   calendarWeek=shiftWeek(calendarWeek,1);renderCalendar();
  });
  el("basket-calendar-grid").addEventListener("click",event=>{
    const button=event.target.closest("button[data-calendar-date]");
