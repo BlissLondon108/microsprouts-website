@@ -14,6 +14,7 @@
  const state={entries:[makeEntry(1)],activeId:1,stage:"pack",nextId:2};
  const storeKey="microsprouts-basket-entries-v2";
  let enabled=false,working=false,returnFocus=null;
+ let minimumDate="",dateMode="";
  const money=p=>"£"+(p/100).toFixed(2);
  const setText=(id,value)=>{el(id).textContent=value};
  const active=()=>state.entries.find(entry=>entry.id===state.activeId)||state.entries[0];
@@ -52,16 +53,13 @@
  const focusable=()=>[...panel.querySelectorAll(
    'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),summary'
  )].filter(node=>!node.closest("[hidden]")&&node.getClientRects().length);
- const getCode=()=>el("basket-code").value.trim().toUpperCase();
  const calc=()=>{
    const valid=state.entries.filter(entry=>["200","500"].includes(entry.pack));
    const goods=valid.reduce((sum,entry)=>sum+prices[entry.frequency||"once"][entry.pack],0);
    const weekly=valid.filter(entry=>entry.frequency==="weekly")
      .reduce((sum,entry)=>sum+prices.weekly[entry.pack],0);
-   const allOnce=state.entries.every(entry=>entry.frequency==="once");
-   const discount=allOnce&&getCode()==="SPROUT"?Math.round(goods*.2):0;
    const delivery=valid.some(entry=>entry.method==="delivery"&&entry.frequency!=="weekly")?230:0;
-   return {due:goods-discount+delivery,weekly,discount,delivery};
+   return {due:goods+delivery,weekly,delivery};
  };
  function appendNode(parent,tag,className,value){
    const element=document.createElement(tag);
@@ -80,7 +78,7 @@
      const selections=[
        ["pack",entry.pack?entry.pack+"g":"Choose pack"],
        ["order",entry.frequency==="weekly"?"Weekly":entry.frequency==="once"?"One-time":"Choose type"],
-       ["delivery",entry.method==="pickup"?"Collection":entry.method==="delivery"?"Delivery":"Choose delivery"]
+       ["delivery",entry.method==="pickup"?"Collection":entry.method==="delivery"?"Shipping":"Choose shipping"]
      ];
      for(const [step,label] of selections){
        const chip=appendNode(chips,"button","basket-flow__mini-chip",label);
@@ -105,7 +103,7 @@
    const choices={
      pack:entry.pack?entry.pack+"g":null,
      order:entry.frequency==="weekly"?"Weekly":entry.frequency==="once"?"One-time":null,
-     delivery:entry.method==="pickup"?"Collection":entry.method==="delivery"?"Delivery":null
+     delivery:entry.method==="pickup"?"Collection":entry.method==="delivery"?"Shipping":null
    };
    for(const [key,label] of Object.entries(choices)){
      const button=el("basket-selected-"+key);
@@ -121,7 +119,7 @@
    trigger.setAttribute("aria-label","Open shopping basket, "+count+(count===1?" pack":" packs"));
    setText("basket-pack-200-price",money(prices[entry.frequency||"once"]["200"]));
    setText("basket-pack-500-price",money(prices[entry.frequency||"once"]["500"]));
-   setText("basket-delivery-price",entry.frequency==="weekly"?"Free":"£2.30");
+   setText("basket-delivery-price",entry.frequency==="weekly"?"London · Free":"London · £2.30");
    const amounts=calc();
    setText("basket-total",count?money(amounts.due):"—");
    setText("basket-total-type","Due today");
@@ -130,11 +128,11 @@
      count?lines.join(" · "):"Choose a pack to begin";
    setText("basket-total-note",note);
    const anyDelivery=state.entries.some(i=>i.method==="delivery");
-   el("basket-postcode-wrap").hidden=!anyDelivery;
-   el("basket-postcode").required=anyDelivery;
-   const allOnce=state.entries.every(i=>i.frequency==="once");
-   el("basket-code").disabled=!allOnce;
-   if(!allOnce)el("basket-code").value="";
+   for(const name of ["postcode","address","city"]){
+     el("basket-"+name+"-wrap").hidden=!anyDelivery;
+     el("basket-"+name).required=anyDelivery;
+   }
+   refreshDates(anyDelivery);
    const details=state.stage==="details";
    pay.hidden=!details;
    pay.disabled=!details||!enabled||working||!state.entries.every(complete);
@@ -209,7 +207,6 @@
    save();setStage(complete(active())?"details":"pack");
  }
  el("basket-remove-entry").addEventListener("click",()=>removeEntry(state.activeId));
- el("basket-code").addEventListener("input",render);
  document.addEventListener("keydown",event=>{
    if(overlay.hidden)return;
    if(event.key==="Escape"){event.preventDefault();closeCart();return;}
@@ -222,33 +219,60 @@
    }
  });
  const validUKPostcode=s=>/^(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(s);
+ const dateLabel=new Intl.DateTimeFormat("en-GB",{
+   timeZone:"UTC",weekday:"short",day:"numeric",month:"short"
+ });
+ function refreshDates(shipping){
+   if(!minimumDate)return;
+   const mode=minimumDate+":"+(shipping?"shipping":"collection");
+   if(dateMode===mode)return;
+   const select=el("basket-date"),previous=select.value;
+   select.replaceChildren();
+   const placeholder=document.createElement("option");
+   placeholder.value="";placeholder.textContent="Choose a date";select.append(placeholder);
+   const start=new Date(minimumDate+"T12:00:00Z");
+   for(let i=0;i<70;i++){
+     const day=new Date(start);day.setUTCDate(start.getUTCDate()+i);
+     const weekday=day.getUTCDay();
+     if(shipping&&![2,3,4,5].includes(weekday))continue;
+     const iso=day.toISOString().slice(0,10);
+     const option=document.createElement("option");
+     option.value=iso;option.textContent=dateLabel.format(day);
+     select.append(option);
+   }
+   const validOption=[...select.children].some(option=>option.value===previous);
+   select.value=validOption?previous:"";
+   dateMode=mode;
+ }
  function validDate(s){
-   if(!s||s<el("basket-date").min)return false;
+   if(!s||s<minimumDate)return false;
    const d=new Date(s+"T12:00:00Z");
    if(Number.isNaN(d.getTime())||d.toISOString().slice(0,10)!==s)return false;
-   if(state.entries.some(i=>i.method==="delivery")&&![2,3,4].includes(d.getUTCDay()))return false;
-   return true;
+   if(state.entries.some(i=>i.method==="delivery")&&![2,3,4,5].includes(d.getUTCDay()))return false;
+   return [...el("basket-date").children].some(option=>option.value===s);
  }
  function values(){
    return {
      items:state.entries.map(item=>({pack:item.pack,frequency:item.frequency,method:item.method})),
-     date:el("basket-date").value,postcode:el("basket-postcode").value.trim(),
-     code:el("basket-code").value.trim().toUpperCase(),
+     date:el("basket-date").value,
+     address:el("basket-address").value.trim(),
+     city:el("basket-city").value.trim(),
+     postcode:el("basket-postcode").value.trim(),
+     code:"",whatsapp:"",
      name:el("basket-name").value.trim(),email:el("basket-email").value.trim(),
-     whatsapp:el("basket-whatsapp").value.trim(),return_to_basket:true
+     return_to_basket:true
    };
  }
  function validate(v){
    if(!state.entries.every(complete))return "Complete each broccoli pack before continuing.";
-   if(!validDate(v.date))return "Choose a date at least seven days ahead. Delivery is Tuesday to Thursday.";
-   if(v.items.some(i=>i.method==="delivery")&&!validUKPostcode(v.postcode))
-     return "Enter a valid UK delivery postcode.";
+   if(!validDate(v.date))return "Choose an available date at least seven days ahead. Shipping runs Tuesday to Friday.";
+   if(v.items.some(i=>i.method==="delivery")){
+     if(v.address.length<8||v.address.length>160)return "Enter your full street address, including house or flat number.";
+     if(v.city.toLowerCase()!=="london")return "Shipping is available in London only. Contact us for other areas.";
+     if(!validUKPostcode(v.postcode))return "Enter a valid London postcode.";
+   }
    if(v.name.length<2||v.name.length>100)return "Please enter your full name.";
    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))return "Enter a valid email address.";
-   if(v.whatsapp&&!/^\+?[\d\s()\-]{7,28}$/.test(v.whatsapp))return "Please check your WhatsApp number.";
-   if(v.code&&v.code!=="SPROUT")return "The promo code is not recognised.";
-   if(v.code&&v.items.some(i=>i.frequency==="weekly"))
-     return "SPROUT is only available for baskets containing one-time orders.";
    return "";
  }
  form.addEventListener("submit",async event=>{
@@ -277,11 +301,11 @@
      enabled=response.ok&&data.enabled===true&&
        (data.mode==="test"||(data.mode==="live"&&data.manual_order_handling===true));
      if(/^\d{4}-\d{2}-\d{2}$/.test(data.minimum_date||""))
-       el("basket-date").min=data.minimum_date;
+       minimumDate=data.minimum_date;
    }catch{enabled=false;}
-   if(!el("basket-date").min){
+   if(!minimumDate){
      const dt=new Date();dt.setUTCDate(dt.getUTCDate()+7);
-     el("basket-date").min=dt.toISOString().slice(0,10);
+     minimumDate=dt.toISOString().slice(0,10);
    }
    render();
  }
