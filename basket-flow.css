@@ -355,3 +355,52 @@
  .basket-flow__date-number{font-size:12px}
  .basket-flow__calendar-day{min-height:34px;gap:2px}
 }
+
+
+/* Expanded product price uses the same typographic weight as the collapsed
+   product and the due-today total, without enlarging the drawer. */
+.basket-flow__product-name{min-width:0;flex:1 1 auto}
+.basket-flow__current-price{
+ flex:0 0 auto;margin-left:auto;
+ font-family:Arial,Helvetica,sans-serif!important;
+ font-size:clamp(19px,4.2vw,25px)!important;
+ font-weight:800!important;letter-spacing:-.035em;
+ line-height:1.15;color:#153923;white-space:nowrap
+}
+.basket-flow__current-price[hidden]{display:none!important}
+/* Clean month label above a constant four-day availability strip.
+   Cross-week dates are continuous, not an incomplete calendar row. */
+.basket-flow__calendar{padding:10px 10px 9px;background:#f3f8ed}
+.basket-flow__month-heading{
+ display:flex;align-items:center;
+ justify-content:center;margin:0 0 7px
+}
+.basket-flow__month-name{
+ color:#2c633d;font-size:11px;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:750;text-align:center
+}
+.basket-flow__calendar-strip{
+ display:grid;grid-template-columns:25px minmax(0,1fr) 25px;
+ gap:6px;align-items:center
+}
+.basket-flow__calendar-grid{
+ grid-template-columns:repeat(4,minmax(0,1fr));gap:5px
+}
+.basket-flow__calendar-day{
+ min-height:39px;gap:3px;
+ border:1px solid #d9e9d0;background:#fff;
+ box-shadow:0 1px 0 rgba(28,68,36,.045)
+}
+.basket-flow__date-month{
+ display:inline;font-size:9px;color:inherit;opacity:.76;
+ text-transform:uppercase;letter-spacing:.01em
+}
+.basket-flow__calendar-day[aria-pressed="true"] .basket-flow__date-month{opacity:.85}
+@media(max-width:520px){
+ .basket-flow__product-name strong{font-size:19px}
+ .basket-flow__current-price{font-size:20px!important}
+ .basket-flow__calendar-strip{grid-template-columns:22px minmax(0,1fr) 22px;gap:3px}
+ .basket-flow__calendar-grid{gap:3px}
+ .basket-flow__date-month{font-size:8px}
+ .basket-flow__calendar-day{min-height:37px;gap:2px}
+}
