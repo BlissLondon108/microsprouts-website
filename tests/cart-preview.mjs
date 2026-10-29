@@ -103,7 +103,7 @@ document={
 };
 const fetch=async(url,options={})=>{
  if(url==="/api/checkout/status")return {ok:true,json:async()=>({
-  enabled:true,mode:"live",manual_order_handling:true,minimum_date:"2026-11-08"
+  enabled:true,mode:"live",manual_order_handling:true,minimum_date:"2026-11-05"
  })};
  if(url==="/api/checkout/session"){
   submitted=JSON.parse(options.body);
@@ -120,24 +120,27 @@ check("Basket begins with one editable unconfigured pack in its permanent first 
 el("checkout-button").focus();
 el("checkout-button").listeners.click({preventDefault(){}});
 packs[1].listeners.click();orders[1].listeners.click();methods[1].listeners.click();
-check("First item is 500g weekly UK shipping",
+check("First item is 500g weekly UK shipping with an expanded price",
  el("basket-total").textContent==="£15.49"&&
+ el("basket-current-price").textContent==="£15.49"&&
+ !el("basket-current-price").hidden&&
  el("basket-delivery-price").textContent==="UK · Free"&&
  !el("basket-shipping-notice").hidden);
 const grid=el("basket-calendar-grid");
 const available=grid.children.filter(button=>button.dataset.calendarDate&&!button.disabled);
 check("Small single-line date strip appears at the shared details stage",
  !stages[3].hidden&&grid.children.length===4&&available.length===4);
-check("Date strip contains only Tuesday–Friday dates",
+check("Partial first week still shows four consecutive available dates",
  available.every(button=>[2,3,4,5].includes(new Date(button.dataset.calendarDate+"T12:00:00Z").getUTCDay()))&&
- !grid.children.some(x=>x.dataset.calendarDate==="2026-11-14")&&
- grid.children.some(x=>x.dataset.calendarDate==="2026-11-13"));
+ grid.children.map(x=>x.dataset.calendarDate).join(",")==="2026-11-05,2026-11-06,2026-11-10,2026-11-11"&&
+ el("basket-calendar-month").textContent==="November 2026");
 el("basket-calendar-next").listeners.click();
-check("Next arrow presents following available week",
- grid.children.length===4&&grid.children[0].dataset.calendarDate==="2026-11-17");
+check("Next arrow advances four available dates, not a partial calendar week",
+ grid.children.length===4&&
+ grid.children.map(x=>x.dataset.calendarDate).join(",")==="2026-11-12,2026-11-13,2026-11-17,2026-11-18");
 el("basket-calendar-prev").listeners.click();
-check("Previous arrow returns to initial eligible week",
- grid.children[0].dataset.calendarDate==="2026-11-10"&&el("basket-calendar-prev").disabled);
+check("Previous arrow restores the four earliest choices",
+ grid.children[0].dataset.calendarDate==="2026-11-05"&&el("basket-calendar-prev").disabled);
 el("basket-add-another").listeners.click();
 const list=el("basket-other-items");
 check("Adding a second item leaves first product at top and editor at bottom",
@@ -150,6 +153,7 @@ check("Collapsed pack shows large price beside name and top-right remove control
 packs[0].listeners.click();orders[0].listeners.click();methods[0].listeners.click();
 check("Second item gets its own 200g one-time collection",
  el("basket-total").textContent==="£25.48"&&
+ el("basket-current-price").textContent==="£9.99"&&
  el("basket-selected-pack").textContent==="200g"&&
  el("nav-cart-count").textContent==="2");
 const firstRow=list.children[0];
