@@ -401,7 +401,10 @@ const verifySession=async(request,env)=>{
   const id=new URL(request.url).searchParams.get("session_id");
   if(!id||!SESS_RE.test(id))return issue("Invalid checkout session.");
   try{
-    const session=await stripeRequest(env,"checkout/sessions/"+encodeURIComponent(id));
+    // Request a Checkout API version that includes first-class individual names.
+    const session=await stripeRequest(env,"checkout/sessions/"+encodeURIComponent(id),{
+      headers:{"Stripe-Version":"2025-09-30.clover"}
+    });
     const paid=session.payment_status==="paid";
     const meta=session.metadata||{};
     if(!paid)return json({paid:false});
