@@ -14,7 +14,7 @@
  const state={entries:[makeEntry(1)],activeId:1,stage:"pack",nextId:2};
  const storeKey="microsprouts-basket-entries-v2";
  let enabled=false,working=false,returnFocus=null;
- let minimumDate="",dateMode="";
+ let minimumDate="",calendarMonth="";
  const money=p=>"£"+(p/100).toFixed(2);
  const setText=(id,value)=>{el(id).textContent=value};
  const active=()=>state.entries.find(entry=>entry.id===state.activeId)||state.entries[0];
@@ -70,9 +70,15 @@
  }
  function renderOther(){
    const box=el("basket-other-items");
+   const current=el("basket-current-item");
    box.replaceChildren();
    for(const entry of state.entries){
-     if(entry.id===state.activeId)continue;
+     // Move the same editor into its original slot rather than moving products
+     // above one another when a previously completed entry is edited.
+     if(entry.id===state.activeId){
+       box.append(current);
+       continue;
+     }
      const article=appendNode(box,"article","basket-flow__previous-item");
      const chips=appendNode(article,"div","basket-flow__previous-chips");
      const selections=[
@@ -119,7 +125,7 @@
    trigger.setAttribute("aria-label","Open shopping basket, "+count+(count===1?" pack":" packs"));
    setText("basket-pack-200-price",money(prices[entry.frequency||"once"]["200"]));
    setText("basket-pack-500-price",money(prices[entry.frequency||"once"]["500"]));
-   setText("basket-delivery-price",entry.frequency==="weekly"?"London · Free":"London · £2.30");
+   setText("basket-delivery-price",entry.frequency==="weekly"?"UK · Free":"UK · £2.30");
    const amounts=calc();
    setText("basket-total",count?money(amounts.due):"—");
    setText("basket-total-type","Due today");
@@ -128,11 +134,8 @@
      count?lines.join(" · "):"Choose a pack to begin";
    setText("basket-total-note",note);
    const anyDelivery=state.entries.some(i=>i.method==="delivery");
-   for(const name of ["postcode","address","city"]){
-     el("basket-"+name+"-wrap").hidden=!anyDelivery;
-     el("basket-"+name).required=anyDelivery;
-   }
-   refreshDates(anyDelivery);
+   el("basket-shipping-notice").hidden=!anyDelivery;
+   renderCalendar();
    const details=state.stage==="details";
    pay.hidden=!details;
    pay.disabled=!details||!enabled||working||!state.entries.every(complete);
@@ -218,48 +221,80 @@
      event.preventDefault();nodes[0].focus();
    }
  });
- const validUKPostcode=s=>/^(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(s);
- const validLondonPostcode=s=>validUKPostcode(s)&&
-   /^(?:EC|NW|SW|SE|WC|BR|CR|DA|EN|HA|IG|KT|RM|SM|TW|UB|E|N|W)\d/i.test(s);
- const dateLabel=new Intl.DateTimeFormat("en-GB",{
-   timeZone:"UTC",weekday:"short",day:"numeric",month:"short"
- });
- function refreshDates(shipping){
+ const isoDate=day=>day.toISOString().slice(0,10);
+ const fullLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",
+   weekday:"long",day:"numeric",month:"long",year:"numeric"});
+ const monthLabel=new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",month:"long",year:"numeric"});
+ const allowedDay=day=>[2,3,4,5].includes(day.getUTCDay());
+ const monthKey=day=>isoDate(day).slice(0,7);
+ const maxDate=()=>{
+   const end=new Date(minimumDate+"T12:00:00Z");
+   end.setUTCDate(end.getUTCDate()+90);
+   return isoDate(end);
+ };
+ function renderCalendar(){
    if(!minimumDate)return;
-   const mode=minimumDate+":"+(shipping?"shipping":"collection");
-   if(dateMode===mode)return;
-   const select=el("basket-date"),previous=select.value;
-   select.replaceChildren();
-   const placeholder=document.createElement("option");
-   placeholder.value="";placeholder.textContent="Choose a date";select.append(placeholder);
-   const start=new Date(minimumDate+"T12:00:00Z");
-   for(let i=0;i<70;i++){
-     const day=new Date(start);day.setUTCDate(start.getUTCDate()+i);
-     const weekday=day.getUTCDay();
-     if(shipping&&![2,3,4,5].includes(weekday))continue;
-     const iso=day.toISOString().slice(0,10);
-     const option=document.createElement("option");
-     option.value=iso;option.textContent=dateLabel.format(day);
-     select.append(option);
+   const date=el("basket-date");
+   if(!calendarMonth)calendarMonth=minimumDate.slice(0,7);
+   const [year,month]=calendarMonth.split("-").map(Number);
+   const first=new Date(Date.UTC(year,month-1,1,12));
+   setText("basket-calendar-month",monthLabel.format(first));
+   el("basket-calendar-prev").disabled=calendarMonth<=minimumDate.slice(0,7);
+   el("basket-calendar-next").disabled=calendarMonth>=maxDate().slice(0,7);
+   const grid=el("basket-calendar-grid");
+   grid.replaceChildren();
+   for(const short of ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])
+     appendNode(grid,"span","basket-flow__calendar-weekday",short);
+   const padding=(first.getUTCDay()+6)%7;
+   for(let i=0;i<padding;i++){
+     const blank=appendNode(grid,"span","basket-flow__calendar-empty","");
+     blank.setAttribute("aria-hidden","true");
    }
-   const validOption=[...select.children].some(option=>option.value===previous);
-   select.value=validOption?previous:"";
-   dateMode=mode;
+   const days=new Date(Date.UTC(year,month,0,12)).getUTCDate();
+   for(let dayNumber=1;dayNumber<=days;dayNumber++){
+     const day=new Date(Date.UTC(year,month-1,dayNumber,12));
+     const value=isoDate(day);
+     const available=value>=minimumDate&&value<=maxDate()&&allowedDay(day);
+     const button=appendNode(grid,"button","basket-flow__calendar-day",String(dayNumber));
+     button.type="button";button.dataset.calendarDate=value;
+     button.disabled=!available;
+     button.setAttribute("aria-label",fullLabel.format(day)+(available?"":" unavailable"));
+     button.setAttribute("aria-pressed",String(value===date.value));
+     if(value===date.value)button.classList.add("is-selected");
+   }
+   const selected=date.value;
+   setText("basket-date-label",selected?
+     "Selected: "+fullLabel.format(new Date(selected+"T12:00:00Z")):
+     "Available Tuesday to Friday");
  }
- function validDate(s){
-   if(!s||s<minimumDate)return false;
-   const d=new Date(s+"T12:00:00Z");
-   if(Number.isNaN(d.getTime())||d.toISOString().slice(0,10)!==s)return false;
-   if(state.entries.some(i=>i.method==="delivery")&&![2,3,4,5].includes(d.getUTCDay()))return false;
-   return [...el("basket-date").children].some(option=>option.value===s);
+ function validDate(value){
+   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)||!minimumDate||
+     value<minimumDate||value>maxDate())return false;
+   const day=new Date(value+"T12:00:00Z");
+   return !Number.isNaN(day.getTime())&&isoDate(day)===value&&allowedDay(day);
  }
+ el("basket-calendar-prev").addEventListener("click",()=>{
+   const [year,month]=calendarMonth.split("-").map(Number);
+   calendarMonth=monthKey(new Date(Date.UTC(year,month-2,1,12)));
+   renderCalendar();
+ });
+ el("basket-calendar-next").addEventListener("click",()=>{
+   const [year,month]=calendarMonth.split("-").map(Number);
+   calendarMonth=monthKey(new Date(Date.UTC(year,month,1,12)));
+   renderCalendar();
+ });
+ el("basket-calendar-grid").addEventListener("click",event=>{
+   const button=event.target.closest("button[data-calendar-date]");
+   if(!button||button.disabled||!validDate(button.dataset.calendarDate))return;
+   el("basket-date").value=button.dataset.calendarDate;
+   renderCalendar();
+   el("basket-calendar-grid").querySelector('[data-calendar-date="'+button.dataset.calendarDate+'"]')?.focus();
+   showError("");
+ });
  function values(){
    return {
      items:state.entries.map(item=>({pack:item.pack,frequency:item.frequency,method:item.method})),
      date:el("basket-date").value,
-     address:el("basket-address").value.trim(),
-     city:el("basket-city").value.trim(),
-     postcode:el("basket-postcode").value.trim(),
      code:"",whatsapp:"",
      name:el("basket-name").value.trim(),email:el("basket-email").value.trim(),
      return_to_basket:true
@@ -267,12 +302,7 @@
  }
  function validate(v){
    if(!state.entries.every(complete))return "Complete each broccoli pack before continuing.";
-   if(!validDate(v.date))return "Choose an available date at least seven days ahead. Shipping runs Tuesday to Friday.";
-   if(v.items.some(i=>i.method==="delivery")){
-     if(v.address.length<8||v.address.length>160)return "Enter your full street address, including house or flat number.";
-     if(v.city.toLowerCase()!=="london")return "Shipping is available in London only. Contact us for other areas.";
-     if(!validLondonPostcode(v.postcode))return "Enter an eligible London postcode.";
-   }
+   if(!validDate(v.date))return "Choose an available Tuesday–Friday date at least seven days ahead.";
    if(v.name.length<2||v.name.length>100)return "Please enter your full name.";
    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))return "Enter a valid email address.";
    return "";
