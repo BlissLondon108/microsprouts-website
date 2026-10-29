@@ -149,6 +149,19 @@ const inspectLiveStripe=async env=>{
     note:"No payment or Checkout Session was created. Write permission and notifications still need testing."});
 };
 const put=(params,key,value)=>params.append(key,String(value));
+// Customer-facing fulfilment details are generated from validated choices,
+// never from customer-supplied descriptions. Stripe keeps these summaries on
+// the Checkout Session and (as appropriate) PaymentIntent or Subscription.
+const fulfilmentDay=value=>new Intl.DateTimeFormat("en-GB",{
+  timeZone:"UTC",weekday:"short",day:"numeric",month:"short",year:"numeric"
+}).format(new Date(value+"T12:00:00Z"));
+const itemSummary=entry=>entry.pack+"g "+(entry.frequency==="weekly"?"weekly":"one-time")+
+  " "+(entry.method==="delivery"?"shipping":"collection");
+const fulfilmentType=entries=>{
+  const methods=new Set(entries.map(item=>item.method));
+  return methods.size===2?"Shipping + collection":
+    methods.has("delivery")?"UK shipping":"Collection";
+};
 // Multi-entry basket: each broccoli pack has its own size, frequency and
 // fulfilment method. Mixed weekly + one-time packs share one Stripe Checkout;
 // one-time prices appear on its first invoice only. No custom product prices.
@@ -208,9 +221,21 @@ const createBasketSession=async(input,request,env)=>{
   put(form,"name_collection[individual][optional]","false");
   put(form,"client_reference_id",crypto.randomUUID());
   put(form,"billing_address_collection","auto");
-  // Stripe gathers one complete UK shipping address for all shipped entries,
-  // including mixed one-time and weekly orders, and retains it in Checkout.
-  if(hasDelivery)put(form,"shipping_address_collection[allowed_countries][0]","GB");
+  // Shipping addresses in Stripe include line 1, city/town and postal code.
+  // We do not create duplicate personal-information fields on the website.
+  if(hasDelivery){
+    put(form,"shipping_address_collection[allowed_countries][0]","GB");
+    put(form,"custom_text[shipping_address][message]",
+      "Please enter your full UK shipping address, including street, town/city and postcode.");
+  }
+  const readableDate=fulfilmentDay(date);
+  const fulfilment=fulfilmentType(entries);
+  const orderSummary=entries.map(itemSummary).join("; ");
+  // Checkout displays this beside the payment button even though the
+  // reusable product description cannot change per customer.
+  put(form,"custom_text[submit][message]",
+    "Preferred first date: "+readableDate+". "+fulfilment+
+    ". We will confirm fulfilment arrangements after checkout.");
   if(hasWeekly)put(form,"payment_method_collection","always");
   put(form,"locale","en-GB");
   const groups=new Map();
@@ -246,7 +271,9 @@ const createBasketSession=async(input,request,env)=>{
     quantity:String(entries.length),
     frequency:hasWeekly?(hasOnce?"mixed":"weekly"):"once",
     method:entries.every(x=>x.method===first.method)?first.method:"mixed",
-    preferred_date:date,shipping_country:hasDelivery?"GB":"",
+    preferred_date:date,preferred_date_readable:readableDate,
+    fulfilment:fulfilment,order_summary:orderSummary,
+    shipping_country:hasDelivery?"GB":"",
     promo:discount?"SPROUT":"",
     subtotal_pence:String(goods),
     delivery_pence:String(deliveryCharge),
@@ -268,13 +295,21 @@ const createBasketSession=async(input,request,env)=>{
       method:renewals.every(item=>item.method===renewalFirst.method)?renewalFirst.method:"mixed",
       promo:"",subtotal_pence:String(weekly),delivery_pence:"0",
       total_pence:String(weekly),basket_entries:renewals.map(item=>
-        item.pack+":w:"+(item.method==="delivery"?"d":"p")).join("|")
+        item.pack+":w:"+(item.method==="delivery"?"d":"p")).join("|"),
+      order_summary:renewals.map(itemSummary).join("; "),
+      fulfilment:fulfilmentType(renewals)
     };
     for(const [key,value] of Object.entries(recurringMetadata))
       put(form,"subscription_data[metadata]["+key+"]",value);
-    put(form,"subscription_data[description]","MicroSprouts "+renewals.length+" recurring broccoli packs");
+    // A Subscription description covers recurring items only. The Checkout
+    // Session metadata still describes *all* items in a mixed first order.
+    put(form,"subscription_data[description]",
+      "MicroSprouts | First preferred date: "+readableDate+
+      " | "+renewals.map(itemSummary).join("; "));
   }else{
     for(const [key,value] of Object.entries(metadata))put(form,"payment_intent_data[metadata]["+key+"]",value);
+    put(form,"payment_intent_data[description]",
+      "MicroSprouts | Preferred date: "+readableDate+" | "+orderSummary);
   }
   try{
     const result=await stripeRequest(env,"checkout/sessions",{
