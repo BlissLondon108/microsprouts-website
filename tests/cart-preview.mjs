@@ -33,8 +33,9 @@ class Fake {
 const ids=[
  "cart-overlay","open-cart","basket-flow-form","basket","basket-back","basket-pay",
  "basket-total","basket-total-type","basket-total-note","basket-add-another",
- "basket-remove-entry","nav-cart-count","basket-postcode-wrap","basket-postcode","basket-code",
- "basket-name","basket-email","basket-whatsapp","basket-date","basket-error",
+ "basket-remove-entry","nav-cart-count","basket-postcode-wrap","basket-postcode",
+ "basket-address-wrap","basket-address","basket-city-wrap","basket-city",
+ "basket-name","basket-email","basket-date","basket-error",
  "basket-pack-200-price","basket-pack-500-price","basket-delivery-price",
  "basket-items-control","basket-selected-pack","basket-selected-order","basket-selected-delivery",
  "basket-other-items","close-cart","checkout-button"
@@ -44,6 +45,7 @@ const el=id=>elements.get(id);
 el("cart-overlay").hidden=true;
 el("checkout-button").dataset.pack="500";
 el("checkout-button").dataset.frequency="once";
+el("basket-city").value="London";
 const stages=["pack","order","delivery","details"].map(id=>{
  const section=new Fake(id);section.dataset.basketStage=id;return section;
 });
@@ -115,7 +117,7 @@ orderButtons[1].listeners.click();methodButtons[1].listeners.click();
 check("First entry is an independent 500g weekly delivery",
  el("basket-total").textContent==="£15.49"&&
  el("basket-total-note").textContent==="£15.49 / week after today"&&
- el("basket-delivery-price").textContent==="Free");
+ el("basket-delivery-price").textContent==="London · Free");
 el("basket-add-another").listeners.click();
 check("Add another creates an unconfigured second product, not a quantity increment",
  !stages[0].hidden&&el("nav-cart-count").textContent==="1"&&
@@ -138,7 +140,9 @@ el("basket-selected-delivery").listeners.click();
 methodButtons[1].listeners.click();
 check("One-time London delivery fee is charged once alongside free weekly delivery",
  el("basket-total").textContent==="£27.78"&&
- !el("basket-postcode-wrap").hidden);
+ !el("basket-postcode-wrap").hidden&&
+ !el("basket-address-wrap").hidden&&
+ !el("basket-city-wrap").hidden);
 const previous=el("basket-other-items").children[0];
 const firstPackChip=previous.children[0].children[0];
 el("basket-other-items").listeners.click({target:firstPackChip});
@@ -153,6 +157,13 @@ el("basket-date").value="2026-11-10";
 el("basket-name").value="Test Customer";
 el("basket-email").value="test@example.com";
 el("basket-postcode").value="SE1 1AA";
+el("basket-address").value="12 Sprout Street";
+const shippingOptions=el("basket-date").children.map(option=>option.value).filter(Boolean);
+check("Shipping date selector contains Tuesday–Friday, not Monday or weekends",
+ shippingOptions.length>0&&
+ shippingOptions.every(iso=>[2,3,4,5].includes(new Date(iso+"T12:00:00Z").getUTCDay()))&&
+ shippingOptions.includes("2026-11-13")&&
+ !shippingOptions.includes("2026-11-14"));
 el("basket-flow-form").listeners.submit({preventDefault(){}});
 await new Promise(resolve=>setTimeout(resolve,0));
 check("Stripe receives two individually configured line items, not quantity=2",
@@ -162,6 +173,8 @@ check("Stripe receives two individually configured line items, not quantity=2",
  submitted.items[1].pack==="200"&&submitted.items[1].frequency==="once"&&
  submitted.items[1].method==="delivery"&&
  submitted.quantity===undefined&&
+ submitted.address==="12 Sprout Street"&&submitted.city==="London"&&
+ submitted.code===""&&submitted.whatsapp===""&&
  submitted.return_to_basket===true&&
  paymentUrl==="https://checkout.stripe.com/c/pay/test");
 el("basket-remove-entry").listeners.click();
