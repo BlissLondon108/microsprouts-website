@@ -14,6 +14,22 @@ export const PRODUCT_DEFINITIONS=Object.freeze([
 ]);
 export const BILLING_FREQUENCIES=Object.freeze(["once","weekly","fortnightly"]);
 export const PROMO_COUPON_ID="MS_SPROUT20_V1";
+// Existing live catalogue price IDs verified against the MicroSprouts live
+// Stripe account. Public Price IDs are NOT credentials. Live checkout uses
+// these known-good prices directly, without product/price administration
+// permissions or catalogue mutations on a customer's payment request.
+// Test mode still provisions its own catalogue via ensureCatalog.
+export const LIVE_CHECKOUT_PRICE_IDS=Object.freeze({
+ "ms_broccoli_200g_once_v1":"price_1UVWtqJ8HaF2s5A9mv0sKE88",
+ "ms_broccoli_200g_weekly_v2":"price_1UVWtsJ8HaF2s5A91bHykeG3",
+ "ms_broccoli_200g_fortnightly_v2":"price_1UVWtuJ8HaF2s5A9q6jOhr5h",
+ "ms_broccoli_500g_once_v1":"price_1UVWtwJ8HaF2s5A9opSQ3iMM",
+ "ms_broccoli_500g_weekly_v2":"price_1UVWtyJ8HaF2s5A99jbQEhBD",
+ "ms_broccoli_500g_fortnightly_v2":"price_1UVWu1J8HaF2s5A9JRQ7S3MC",
+ "ms_delivery_london_once_v1":"price_1UVWu3J8HaF2s5A9pAaBiSTF"
+});
+export const preconfiguredLiveCatalog=()=>({prices:LIVE_CHECKOUT_PRICE_IDS,coupon:null});
+
 const PORTAL_NAME="MicroSprouts customer subscription portal";
 const SITE_ORIGIN="https://microsprouts.bhaktivedanta-london.workers.dev";
 
