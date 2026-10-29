@@ -15,7 +15,7 @@ function requestedDate(delivery=false){
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
  const dt=new Date([parts.year,parts.month,parts.day].join("-")+"T12:00:00Z");
  dt.setUTCDate(dt.getUTCDate()+9);
- if(delivery)while(![2,3,4,5].includes(dt.getUTCDay()))dt.setUTCDate(dt.getUTCDate()+1);
+ while(![2,3,4,5].includes(dt.getUTCDay()))dt.setUTCDate(dt.getUTCDate()+1);
  return dt.toISOString().slice(0,10);
 }
 function dateOn(weekday){
@@ -239,8 +239,7 @@ try{
  // while remaining in a single Stripe Checkout session.
  const mixedBasket={
    name:"Test Customer",email:"test@example.com",whatsapp:"",
-   date:requestedDate(true),postcode:"SE1 1AA",address:"12 Sprout Street",
-   city:"London",code:"",return_to_basket:true,
+   date:requestedDate(true),code:"",return_to_basket:true,
    items:[
      {pack:"500",frequency:"weekly",method:"delivery"},
      {pack:"200",frequency:"once",method:"delivery"},
@@ -257,26 +256,27 @@ try{
    sessionForm.get("line_items[3][price]")===prices.get("ms_delivery_london_once_v1").id&&
    sessionForm.get("metadata[total_pence]")==="4477"&&
    sessionForm.get("metadata[delivery_pence]")==="230"&&
-   sessionForm.get("metadata[shipping_address]")==="12 Sprout Street"&&
-   sessionForm.get("metadata[shipping_city]")==="London"&&
+   sessionForm.get("shipping_address_collection[allowed_countries][0]")==="GB"&&
+   sessionForm.get("metadata[shipping_country]")==="GB"&&
+   !sessionForm.has("metadata[shipping_address]")&&
+   !sessionForm.has("metadata[shipping_city]")&&
    sessionForm.get("metadata[renewal_pence]")==="1549"&&
    sessionForm.get("metadata[basket_entries]")==="500:w:d|200:o:d|500:o:p"&&
    sessionForm.get("subscription_data[metadata][basket_entries]")==="500:w:d"&&
    sessionForm.get("subscription_data[metadata][total_pence]")==="1549"&&
    sessionForm.get("subscription_data[metadata][quantity]")==="1");
  res=await submit({...mixedBasket,date:dateOn(5)});
- check("Friday is accepted for London shipping",
+ check("Friday is accepted for UK shipping",
    res.status===200&&sessionForm.get("metadata[preferred_date]")===dateOn(5));
  res=await submit({...mixedBasket,date:dateOn(6)});
  check("Saturday shipping is rejected at the Worker",res.status===400);
  res=await submit({...mixedBasket,date:dateOn(1)});
  check("Monday shipping is rejected at the Worker",res.status===400);
- res=await submit({...mixedBasket,address:""});
- check("Missing shipping street address cannot start payment",res.status===400);
- res=await submit({...mixedBasket,city:"Manchester"});
- check("Shipping outside London is rejected",res.status===400);
- res=await submit({...mixedBasket,postcode:"M1 1AA"});
- check("Non-London postcode cannot use the London shipping rate",res.status===400);
+ res=await submit({...mixedBasket});
+ check("UK shipping address is collected only by Stripe without prefilled browser details",
+   res.status===200&&
+   sessionForm.get("shipping_address_collection[allowed_countries][0]")==="GB"&&
+   !sessionForm.has("customer_shipping[address][line1]"));
  const beforeInvalid=stats.checkouts;
  res=await submit({...mixedBasket,items:[{pack:"300",frequency:"weekly",method:"pickup"}]});
  check("Unlisted pack size in independent basket cannot create a Stripe session",
@@ -309,9 +309,11 @@ try{
    sessionForm.get("metadata[renewal_pence]")==="0"&&
    sessionForm.get("metadata[delivery_pence]")==="230");
  session={payment_status:"paid",amount_total:4477,currency:"gbp",client_reference_id:"mixed-123",
+   collected_information:{shipping_details:{name:"Test Customer",
+     address:{line1:"12 Sample Road",city:"Manchester",postal_code:"M1 1AA",country:"GB"}}},
    metadata:{
      total_pence:"4477",pack:"mixed",quantity:"3",frequency:"mixed",method:"mixed",
-     preferred_date:requestedDate(true),name:"Test Customer",postcode:"SE1 1AA",
+     preferred_date:requestedDate(true),name:"Test Customer",
      renewal_pence:"1549",basket_entries:"500:w:d|200:o:d|500:o:p"
    }};
  res=await api("/api/checkout/verify?session_id=cs_test_example",{},envOn);
@@ -320,14 +322,22 @@ try{
    verifiedBasket.paid===true&&verifiedBasket.items?.length===3&&
    verifiedBasket.items[0].frequency==="weekly"&&
    verifiedBasket.items[1].method==="delivery"&&
-   verifiedBasket.items[2].pack==="500"&&verifiedBasket.renewal_pence===1549);
+   verifiedBasket.items[2].pack==="500"&&verifiedBasket.renewal_pence===1549&&
+   verifiedBasket.shipping?.address?.city==="Manchester"&&
+   verifiedBasket.postcode==="M1 1AA");
 
  res=await submit({...customer,email:""});
  check("Contact email required",res.status===400);
+ res=await submit({...customer,date:dateOn(1)});
+ check("Collection also rejects Monday dates",res.status===400);
  res=await submit({...customer,date:"2020-01-01"});
  check("Seven-day advance notice enforced",res.status===400);
  res=await submit({...customer,method:"delivery",date:requestedDate(true),postcode:"invalid"});
- check("Delivery postcode validated",res.status===400);
+ check("Legacy shipping postcode is still validated",res.status===400);
+ res=await submit({...customer,method:"delivery",date:requestedDate(true),
+   postcode:"M1 1AA",city:"Manchester"});
+ check("Legacy checkout accepts Manchester and other UK addresses",
+   res.status===200&&sessionForm.get("metadata[shipping_city]")==="Manchester");
  session={payment_status:"paid",amount_total:1998,currency:"gbp",client_reference_id:"test-order-123",
   metadata:{total_pence:"1998",pack:"200",quantity:"2",frequency:"once",method:"pickup",
     preferred_date:requestedDate(),name:"Test Customer",postcode:""}};
