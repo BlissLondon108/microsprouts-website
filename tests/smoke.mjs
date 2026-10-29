@@ -27,8 +27,26 @@ const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","c
  "basket-flow-form","basket-pack-label","basket-order-label","basket-delivery-label",
  "basket-current-price","basket-total","basket-pay","basket-date","basket-calendar-grid",
  "basket-calendar-month","basket-calendar-prev","basket-calendar-next","basket-date-label",
- "basket-other-items","basket-add-another","basket-shared-details",
+ "basket-other-items","basket-empty","basket-start","basket-current-shipping","basket-add-another","basket-shared-details",
  "basket-remove-entry","sprout-scroll","order-options","explore-sprouts"];
+check("Cart starts genuinely empty until a shopper adds broccoli",
+ cartClient.includes('const state={entries:[],activeId:null,stage:"pack",nextId:1}')&&
+ cartClient.includes('const storeKey="microsprouts-basket-entries-v3"')&&
+ html.includes('id="basket-empty"')&&html.includes('Your basket is empty.')&&
+ html.includes('id="basket-start"')&&
+ cartClient.includes('if(options.add)addEntry(options)')&&
+ cartClient.includes('el("basket-start").addEventListener("click"')&&
+ cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
+check("Pack banners show product price and fee without double-counting shipping",
+ html.includes('id="basket-current-shipping"')&&
+ cartClient.includes('const shippingLine=entry=>')&&
+ cartClient.includes('"+ £2.30 shipping"')&&
+ cartClient.includes('"Collection · Free"')&&
+ cartClient.includes('"Shipping · Free"')&&
+ cartClient.includes('const charged=state.entries.find(')&&
+ cartClient.includes('delivery=valid.some(')&&
+ !html.includes('Continue to secure payment')&&
+ html.includes('>Continue to payment <span'));
 check("Multi-entry basket keeps the four minimal decision stages",
  required.every(id=>idSet.has(id))&&
  ["pack","order","delivery","details"].every(stage=>
@@ -40,8 +58,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=11"')&&
- html.includes('href="basket-flow.css?v=7"'));
+ html.includes('src="cart-preview.js?v=12"')&&
+ html.includes('href="basket-flow.css?v=8"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
