@@ -15,11 +15,17 @@ function requestedDate(delivery=false){
  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
  const dt=new Date([parts.year,parts.month,parts.day].join("-")+"T12:00:00Z");
  dt.setUTCDate(dt.getUTCDate()+9);
- if(delivery)while(![2,3,4].includes(dt.getUTCDay()))dt.setUTCDate(dt.getUTCDate()+1);
+ if(delivery)while(![2,3,4,5].includes(dt.getUTCDay()))dt.setUTCDate(dt.getUTCDate()+1);
+ return dt.toISOString().slice(0,10);
+}
+function dateOn(weekday){
+ const dt=new Date(requestedDate()+"T12:00:00Z");
+ while(dt.getUTCDay()!==weekday)dt.setUTCDate(dt.getUTCDate()+1);
  return dt.toISOString().slice(0,10);
 }
 const customer={pack:"200",quantity:2,frequency:"once",method:"pickup",date:requestedDate(),
- postcode:"",code:"",name:"Test Customer",email:"test@example.com",whatsapp:""};
+ postcode:"",address:"12 Sprout Street",city:"London",code:"",
+ name:"Test Customer",email:"test@example.com",whatsapp:""};
 let res=await api("/api/checkout/status");
 const initialStatus=await res.json();
 check("Checkout remains off without sandbox runtime settings",initialStatus.enabled===false);
@@ -233,7 +239,8 @@ try{
  // while remaining in a single Stripe Checkout session.
  const mixedBasket={
    name:"Test Customer",email:"test@example.com",whatsapp:"",
-   date:requestedDate(true),postcode:"SE1 1AA",code:"",return_to_basket:true,
+   date:requestedDate(true),postcode:"SE1 1AA",address:"12 Sprout Street",
+   city:"London",code:"",return_to_basket:true,
    items:[
      {pack:"500",frequency:"weekly",method:"delivery"},
      {pack:"200",frequency:"once",method:"delivery"},
@@ -250,11 +257,26 @@ try{
    sessionForm.get("line_items[3][price]")===prices.get("ms_delivery_london_once_v1").id&&
    sessionForm.get("metadata[total_pence]")==="4477"&&
    sessionForm.get("metadata[delivery_pence]")==="230"&&
+   sessionForm.get("metadata[shipping_address]")==="12 Sprout Street"&&
+   sessionForm.get("metadata[shipping_city]")==="London"&&
    sessionForm.get("metadata[renewal_pence]")==="1549"&&
    sessionForm.get("metadata[basket_entries]")==="500:w:d|200:o:d|500:o:p"&&
    sessionForm.get("subscription_data[metadata][basket_entries]")==="500:w:d"&&
    sessionForm.get("subscription_data[metadata][total_pence]")==="1549"&&
    sessionForm.get("subscription_data[metadata][quantity]")==="1");
+ res=await submit({...mixedBasket,date:dateOn(5)});
+ check("Friday is accepted for London shipping",
+   res.status===200&&sessionForm.get("metadata[preferred_date]")===dateOn(5));
+ res=await submit({...mixedBasket,date:dateOn(6)});
+ check("Saturday shipping is rejected at the Worker",res.status===400);
+ res=await submit({...mixedBasket,date:dateOn(1)});
+ check("Monday shipping is rejected at the Worker",res.status===400);
+ res=await submit({...mixedBasket,address:""});
+ check("Missing shipping street address cannot start payment",res.status===400);
+ res=await submit({...mixedBasket,city:"Manchester"});
+ check("Shipping outside London is rejected",res.status===400);
+ res=await submit({...mixedBasket,postcode:"M1 1AA"});
+ check("Non-London postcode cannot use the London shipping rate",res.status===400);
  const beforeInvalid=stats.checkouts;
  res=await submit({...mixedBasket,items:[{pack:"300",frequency:"weekly",method:"pickup"}]});
  check("Unlisted pack size in independent basket cannot create a Stripe session",
