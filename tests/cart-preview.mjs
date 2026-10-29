@@ -44,7 +44,7 @@ class Fake {
 const ids=[
  "cart-overlay","open-cart","basket-flow-form","basket","basket-pay",
  "basket-total","basket-total-type","basket-total-note","basket-add-another",
- "basket-remove-entry","nav-cart-count","basket-date","basket-error",
+ "basket-remove-entry","nav-cart-count","basket-date","basket-error","basket-empty","basket-start","basket-current-shipping",
  "basket-pack-200-price","basket-pack-500-price","basket-delivery-price",
  "basket-items-control","basket-stage","basket-current-item","basket-current-price",
  "basket-calendar-grid","basket-calendar-month","basket-calendar-prev","basket-calendar-next",
@@ -88,6 +88,8 @@ photo.complete=false;photo.naturalWidth=100;
 photo.parentElement={classList:{add(k){photo.fallback=k}}};
 let submitted=null,paymentUrl=null;
 const saved=new Map();
+saved.set("microsprouts-basket-entries-v2",JSON.stringify({entries:[
+ {id:1,pack:"200",frequency:"once",method:"delivery"}],activeId:1,nextId:2}));
 const sessionStorage={getItem:key=>saved.get(key)||null,setItem:(key,value)=>saved.set(key,value)};
 document={
  activeElement:null,events:{},body:new Fake("body"),
@@ -114,9 +116,29 @@ const fetch=async(url,options={})=>{
 vm.runInNewContext(source,{document,sessionStorage,fetch,location:{search:""},
  window:{location:{assign(url){paymentUrl=url}}},URLSearchParams,Date,Intl});
 await new Promise(resolve=>setTimeout(resolve,0));
-check("Basket begins with one editable unconfigured pack in its permanent first slot",
+check("Nav basket opens truly empty, ignoring old v2 placeholder",
+ el("basket-other-items").children.length===0&&
+ !el("basket-empty").hidden&&
+ el("basket-other-items").hidden&&
+ el("nav-cart-count").textContent==="0"&&
+ el("basket-total").textContent==="—"&&
+ el("basket-pay").hidden);
+el("open-cart").listeners.click();
+check("Opening nav basket doesn't add broccoli or start checkout",
+ !el("cart-overlay").hidden&&
+ el("basket-other-items").children.length===0&&
+ el("nav-cart-count").textContent==="0");
+el("close-cart").listeners.click();
+el("basket-start").listeners.click();
+check("Clicking Add broccoli sprouts explicitly creates a new draft",
+ !el("basket-empty").hidden===false&&
  el("basket-other-items").children[0]===el("basket-current-item")&&
- !stages[0].hidden&&el("nav-cart-count").textContent==="0");
+ !stages[0].hidden);
+el("basket-remove-entry").listeners.click();
+check("Removing last unconfigured pack returns to truly empty basket",
+ el("basket-other-items").children.length===0&&
+ !el("basket-empty").hidden&&
+ el("nav-cart-count").textContent==="0");
 el("checkout-button").focus();
 el("checkout-button").listeners.click({preventDefault(){}});
 packs[1].listeners.click();orders[1].listeners.click();methods[1].listeners.click();
@@ -124,6 +146,7 @@ check("First item is 500g weekly UK shipping with an expanded price",
  el("basket-total").textContent==="£15.49"&&
  el("basket-current-price").textContent==="£15.49"&&
  !el("basket-current-price").hidden&&
+ el("basket-current-shipping").textContent==="Shipping · Free"&&
  el("basket-delivery-price").textContent==="UK · Free"&&
  !el("basket-remove-entry").hidden);
 const grid=el("basket-calendar-grid");
@@ -146,14 +169,16 @@ const list=el("basket-other-items");
 check("Adding a second item leaves first product at top and editor at bottom",
  list.children.length===2&&list.children[0].textContent.includes("500g")&&
  list.children[1]===el("basket-current-item"));
-check("Collapsed pack shows large price beside name and top-right remove control",
+check("Collapsed pack shows price, free shipping and top-right remove control",
  list.children[0].children[1].children[0].textContent==="Broccoli Sprouts"&&
- list.children[0].children[1].children[1].textContent==="£15.49"&&
+ list.children[0].children[1].children[1].children[0].textContent==="£15.49"&&
+ list.children[0].children[1].children[1].children[1].textContent==="Shipping · Free"&&
  list.children[0].children[2].dataset.removeEntry==="1");
 packs[0].listeners.click();orders[0].listeners.click();methods[0].listeners.click();
 check("Second item gets its own 200g one-time collection",
  el("basket-total").textContent==="£25.48"&&
  el("basket-current-price").textContent==="£9.99"&&
+ el("basket-current-shipping").textContent==="Collection · Free"&&
  el("basket-selected-pack").textContent==="200g"&&
  el("nav-cart-count").textContent==="2");
 const firstRow=list.children[0];
@@ -170,9 +195,12 @@ el("basket-other-items").listeners.click({target:secondEdit});
 check("Editing second item puts the editor back in second position, never on top",
  list.children[0].textContent.includes("500g")&&list.children[1]===el("basket-current-item"));
 methods[1].listeners.click();
-check("One-time UK shipping charges £2.30, with no shipping form in the basket",
+check("One-time UK shipping charges £2.30 once, shown beneath pack price",
  el("basket-total").textContent==="£27.78"&&
- el("basket-name")===undefined&&el("basket-email")===undefined);
+ el("basket-current-price").textContent==="£9.99"&&
+ el("basket-current-shipping").textContent==="+ £2.30 shipping"&&
+ el("basket-name")===undefined&&el("basket-email")===undefined&&
+ el("basket-pay").textContent==="Continue to payment →");
 const november10=el("basket-calendar-grid").children.find(x=>x.dataset.calendarDate==="2026-11-10");
 el("basket-calendar-grid").listeners.click({target:november10});
 check("Calendar click chooses a real date with no separate date input",
@@ -187,14 +215,19 @@ check("Stripe gets both unique pack schedules and date but no customer details",
  submitted.date==="2026-11-10"&&submitted.address===undefined&&submitted.postcode===undefined&&
  paymentUrl==="https://checkout.stripe.com/c/pay/test");
 check("Browser basket storage contains only pack selections",
- !saved.get("microsprouts-basket-entries-v2").includes("email")&&
- !saved.get("microsprouts-basket-entries-v2").includes("SE1"));
+ !saved.get("microsprouts-basket-entries-v3").includes("email")&&
+ !saved.get("microsprouts-basket-entries-v3").includes("SE1"));
 check("Active item exposes the top-right removal control",
  !el("basket-remove-entry").hidden&&
  typeof el("basket-remove-entry").listeners.click==="function");
 el("basket-remove-entry").listeners.click();
 check("Removing active item preserves first card and its settings",
  el("nav-cart-count").textContent==="1"&&el("basket-total").textContent==="£15.49");
+el("basket-remove-entry").listeners.click();
+check("Removing all packs leaves a truly empty basket",
+ el("nav-cart-count").textContent==="0"&&
+ el("basket-total").textContent==="—"&&
+ !el("basket-empty").hidden&&el("basket-pay").hidden);
 document.events.keydown({key:"Escape",preventDefault(){}});
 check("Escape closes basket",el("cart-overlay").hidden);
 photo.listeners.error();
