@@ -11,7 +11,7 @@ const isPromo=()=>frequency.value==="once"&&code.value.trim().toUpperCase()==="S
 const count=()=>Math.max(1,Math.min(10,Number(qty.value)||1));
 const getValues=()=>({pack:pack.value,quantity:count(),frequency:frequency.value,
  method:method(),date:date.value,postcode:postcode.value.trim(),
- code:code.value.trim().toUpperCase(),name:el("name").value.trim(),
+ code:code.value.trim().toUpperCase(),return_to_basket:Boolean(el("cart-overlay")),name:el("name").value.trim(),
  email:el("email").value.trim(),whatsapp:el("whatsapp").value.trim()});
 function update(){
  const n=count(),base=basePrice(),recurring=frequency.value!=="once";
