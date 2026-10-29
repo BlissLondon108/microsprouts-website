@@ -5,6 +5,7 @@ import vm from "node:vm";
 const root = path.resolve(import.meta.dirname, "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const html = read("index.html");
+const sproutsDetails = read("sprouts.html");
 const css = read("comp.css");
 const app = read("comp.js");
 const cartClient = read("cart-preview.js");
@@ -41,39 +42,44 @@ check("Top Stripe checkout stays available while preview cannot create payments"
   !cartClient.includes("/api/checkout")&&
   !cartClient.includes("checkout.stripe.com")&&
   !cartClient.includes("fetch("));
-check("Sprout carousel presents four varieties, one tile per variety in each cycle",
-  ["broccoli","radish","mung","leek"].every(sprout=>
-    (html.match(new RegExp('data-sprout-choice="'+sprout+'"','g'))||[]).length===4)&&
-  !html.includes('data-cart-sku=')&&
-  (html.match(/class="sprout-marquee__group"/g)||[]).length===2&&
-  html.includes('class="sprout-marquee__group" aria-hidden="true"')&&
+check("Four circular sprout photos link to each matching variety detail section",
+  ["broccoli","radish","mung-bean","leek"].every(slug=>
+    html.includes('class="sprout-tile" href="sprouts.html#'+slug+'"')&&
+    sproutsDetails.includes('id="'+slug+'"'))&&
+  (html.match(/class="sprout-tile"/g)||[]).length===4&&
+  !html.includes('data-sprout-choice=')&&
+  !html.includes('class="sprout-marquee__group"')&&
   !html.includes('sprout-showcase__footer')&&
-  !html.includes('Broccoli packs are ready to order')&&
   !html.includes('View your basket <span'));
-check("Broccoli selector exposes the two real pack prices and avoids invented prices",
-  cartClient.includes('options:["broccoli-200","broccoli-500"]')&&
-  ["radish","mung","leek"].every(sprout=>cartClient.includes('options:["'+sprout+'"]'))&&
-  cartClient.includes('Price on request')&&
-  html.includes("Basket design preview only"));
-check("Marquee continues rightward across the full page and respects reduced motion",
-  css.includes("@keyframes microSproutsMoveRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}")&&
-  css.includes(".sprout-marquee:focus-within .sprout-marquee__track")&&
-  css.includes("prefers-reduced-motion:reduce")&&
-  css.includes('.sprout-marquee__group[aria-hidden="true"]{display:none}'));
-check("Moving sprout carousel is swipeable by touch, mouse, trackpad and keyboard",
-  html.includes("Discover distinctive flavours and natural goodness in every sprout.")&&
-  html.includes("Swipe left or right to explore")&&
-  html.includes('src="carousel-interaction.js?v=1"')&&
-  css.includes("touch-action:pan-y")&&
-  css.includes(".sprout-marquee.is-dragging")&&
-  carouselClient.includes('marquee.addEventListener("pointerdown"')&&
-  carouselClient.includes('marquee.addEventListener("pointermove"')&&
-  carouselClient.includes('marquee.addEventListener("pointerup"')&&
-  carouselClient.includes('marquee.addEventListener("pointercancel"')&&
-  carouselClient.includes('marquee.addEventListener("wheel"')&&
-  carouselClient.includes('marquee.addEventListener("keydown"')&&
-  carouselClient.includes("event.stopImmediatePropagation()")&&
-  !carouselClient.includes("Stripe"));
+check("Sprout collection is static until manually scrolled",
+  !css.includes("@keyframes microSproutsMoveRight")&&
+  !css.includes("animation:microSproutsMoveRight")&&
+  css.includes("overflow-x:auto")&&
+  css.includes("scroll-snap-type:x proximity")&&
+  html.includes("Select a sprout to learn more.")&&
+  html.includes('src="carousel-interaction.js?v=2"')&&
+  carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})')&&
+  carouselClient.includes('event.pointerType !== "mouse"')&&
+  carouselClient.includes('viewport.addEventListener("pointermove"')&&
+  carouselClient.includes('viewport.addEventListener("click"')&&
+  carouselClient.includes('event.stopImmediatePropagation()')&&
+  !carouselClient.includes("getAnimations"));
+check("Exactly three clear ordering cards follow sprout selection",
+  (html.match(/<article class="order-choice-card(?: order-choice-card--custom)?"/g)||[]).length===3&&
+  html.indexOf('id="explore-sprouts"')<html.indexOf('id="order-options"')&&
+  html.indexOf('id="order-options"')<html.indexOf('id="faq"')&&
+  html.includes("Fresh sprouts, <em>your way.</em>")&&
+  ["One-time order","Weekly subscription","Custom subscription"].every(label=>html.includes(label))&&
+  html.includes('href="checkout.html?pack=200&amp;frequency=once"')&&
+  html.includes('href="checkout.html?pack=200&amp;frequency=weekly"')&&
+  html.includes('href="https://wa.me/447386853514?text=Hello%20MicroSprouts%21%20I%27d%20like%20to%20discuss%20a%20custom%20sprouts%20subscription."')&&
+  html.includes('target="_blank" rel="noopener noreferrer"')&&
+  css.includes("grid-template-columns:repeat(3,minmax(0,1fr))")&&
+  css.includes(".order-choice-card__action--whatsapp"));
+check("Checkout preselects billing frequency only from allowed new card modes",
+  paymentClient.includes('if(["once","weekly"].includes(chosen.get("frequency")))frequency.value=chosen.get("frequency")')&&
+  paymentClient.includes('if(["200","500"].includes(chosen.get("pack")))pack.value=chosen.get("pack")')&&
+  checkoutWorker.includes('"fortnightly"'));
 check("Narrow cart slides from the right without displacing top navigation links",
   css.includes('.comp-nav{position:relative}')&&
   css.includes('.comp-nav nav{margin-left:0}')&&
@@ -85,11 +91,10 @@ check("Narrow cart slides from the right without displacing top navigation links
   cartClient.includes('event.key==="Escape"')&&
   cartClient.includes('event.key==="Tab"')&&
   cartClient.includes('focusables(dialog)'));
-check("Carousel uses real mature-vegetable photo examples in the same circles",
+check("Existing circular variety photographs retained, without page-load image swapping",
   ["8538298","6761088","7420818","4965038"].every(id=>
-    (html.match(new RegExp('pexels-photo-'+id+'\\.jpeg','g'))||[]).length===4)&&
-  (html.match(/class="sprout-orb__photo"/g)||[]).length===16&&
-  html.includes("Discover distinctive flavours and natural goodness in every sprout.")&&
+    (html.match(new RegExp('pexels-photo-'+id+'\\.jpeg','g'))||[]).length===1)&&
+  (html.match(/class="sprout-orb__photo"/g)||[]).length===4&&
   css.includes('.sprout-orb .sprout-orb__photo{')&&
   cartClient.includes('photo.addEventListener("error"')&&
   cartClient.includes("photo.hidden=true"));
