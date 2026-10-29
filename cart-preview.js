@@ -268,7 +268,7 @@
      "Available Tuesday to Friday");
  }
  function validDate(value){
-   if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)||!minimumDate||
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||!minimumDate||
      value<minimumDate||value>maxDate())return false;
    const day=new Date(value+"T12:00:00Z");
    return !Number.isNaN(day.getTime())&&isoDate(day)===value&&allowedDay(day);
