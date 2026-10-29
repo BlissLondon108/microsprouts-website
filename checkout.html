@@ -46,11 +46,15 @@
 <div class="field"><span class="field-label">Collection or delivery</span>
 <div class="method-options">
 <label class="method-option"><input type="radio" name="method" value="pickup" checked><strong>Free collection</strong><small>By appointment</small></label>
-<label class="method-option"><input type="radio" name="method" value="delivery"><strong>London delivery</strong><small id="delivery-method-price">£2.30 one-time · FREE on subscription</small></label>
+<label class="method-option"><input type="radio" name="method" value="delivery"><strong>Shipping (London)</strong><small id="delivery-method-price">£2.30 one-time · FREE on subscription</small></label>
 </div></div>
 <div class="order-form-grid">
 <div class="field"><label for="date">Preferred first date</label><input id="date" type="date" required><p class="checkout-hint">Subject to confirmation. Allow at least seven days.</p></div>
-<div class="field" id="postcode-field" hidden><label for="postcode">Delivery postcode</label><input id="postcode" autocomplete="postal-code" maxlength="10" placeholder="e.g. SE1 1AA"></div>
+<div class="field" id="postcode-field" hidden><label for="postcode">London postcode</label><input id="postcode" autocomplete="postal-code" maxlength="10" placeholder="e.g. SE1 1AA"></div>
+</div>
+<div class="order-form-grid" id="shipping-address-fields" hidden>
+<div class="field"><label for="address">Full street address</label><input id="address" autocomplete="street-address" maxlength="160" placeholder="House / flat number and street"></div>
+<div class="field"><label for="city">City</label><input id="city" autocomplete="address-level2" maxlength="80" value="London" placeholder="London"></div>
 </div>
 <div class="field"><label for="code">Promo code (optional)</label><input id="code" autocomplete="off" maxlength="20" placeholder="SPROUT"><p class="checkout-hint">SPROUT gives 20% off sprouts on eligible one-time orders.</p></div>
 <h2 class="serif checkout-subheading">Your details</h2>
