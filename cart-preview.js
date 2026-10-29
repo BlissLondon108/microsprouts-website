@@ -219,6 +219,8 @@
    }
  });
  const validUKPostcode=s=>/^(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(s);
+ const validLondonPostcode=s=>validUKPostcode(s)&&
+   /^(?:EC|NW|SW|SE|WC|BR|CR|DA|EN|HA|IG|KT|RM|SM|TW|UB|E|N|W)\d/i.test(s);
  const dateLabel=new Intl.DateTimeFormat("en-GB",{
    timeZone:"UTC",weekday:"short",day:"numeric",month:"short"
  });
@@ -269,7 +271,7 @@
    if(v.items.some(i=>i.method==="delivery")){
      if(v.address.length<8||v.address.length>160)return "Enter your full street address, including house or flat number.";
      if(v.city.toLowerCase()!=="london")return "Shipping is available in London only. Contact us for other areas.";
-     if(!validUKPostcode(v.postcode))return "Enter a valid London postcode.";
+     if(!validLondonPostcode(v.postcode))return "Enter an eligible London postcode.";
    }
    if(v.name.length<2||v.name.length>100)return "Please enter your full name.";
    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))return "Enter a valid email address.";
