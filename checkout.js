@@ -38,10 +38,10 @@ function update(){
  el("subscription-perk").hidden=!recurring;
  el("subscription-delivery-hint").hidden=!recurring;
  el("frequency-note").textContent=recurring?
-   "Save "+money(base-subscriptionPrice())+" per pack on each order, with free London delivery. "+
+   "Save "+money(base-subscriptionPrice())+" per pack on each order, with free UK shipping. "+
    (frequency.value==="weekly"?"Billed weekly.":"Billed every two weeks."):
    "One-time purchase. You pay once.";
- el("delivery-method-price").textContent=recurring?"FREE with your subscription":"£2.30 per one-time delivery";
+ el("delivery-method-price").textContent=recurring?"FREE with your subscription":"£2.30 UK shipping per one-time order";
  el("postcode-field").hidden=method()!=="delivery";
  el("shipping-address-fields").hidden=method()!=="delivery";
  postcode.required=method()==="delivery";
