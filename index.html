@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=basket-flow-1">
 
-<link rel="stylesheet" href="basket-flow.css?v=6">
+<link rel="stylesheet" href="basket-flow.css?v=7">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=10" defer></script>
+<script src="cart-preview.js?v=11" defer></script>
 
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
@@ -265,6 +265,7 @@
         <div class="basket-flow__body">
           <div class="basket-flow__previous" id="basket-other-items" aria-label="Your broccoli packs in order of addition">
           <section class="basket-flow__current" id="basket-current-item" aria-label="Broccoli pack being configured">
+          <button type="button" class="basket-flow__mini-remove basket-flow__current-remove" id="basket-remove-entry" aria-label="Remove this broccoli pack" hidden>×</button>
           <div class="basket-flow__selections" id="basket-selections" aria-label="Current pack selections">
             <button type="button" data-edit-step="pack" id="basket-selected-pack" hidden></button>
             <button type="button" data-edit-step="order" id="basket-selected-order" hidden></button>
@@ -312,7 +313,6 @@
           </div>
           <div class="basket-flow__items" id="basket-items-control" hidden>
             <button type="button" id="basket-add-another">+ Add another broccoli pack</button>
-            <button type="button" id="basket-remove-entry" hidden>Remove this pack</button>
           </div>
         </div>
           <div class="basket-flow__shared" id="basket-shared-details">
@@ -329,15 +329,6 @@
                 <input id="basket-date" type="hidden" required>
                 <p class="basket-flow__visually-hidden" id="basket-date-label" aria-live="polite">Choose a Tuesday–Friday date</p>
               </div>
-              <div class="basket-flow__fields">
-                <label class="basket-flow__field--name">Full name
-                  <input id="basket-name" maxlength="100" autocomplete="name" required placeholder="Your name">
-                </label>
-                <label class="basket-flow__field--email">Email
-                  <input id="basket-email" type="email" maxlength="254" autocomplete="email" required placeholder="you@example.com">
-                </label>
-              </div>
-              <p class="basket-flow__shipping-notice" id="basket-shipping-notice" hidden>Your UK shipping address and postcode are collected securely at Stripe checkout.</p>
             </section>
           </div>
         <div class="basket-flow__footer">
