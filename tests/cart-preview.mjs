@@ -140,7 +140,7 @@ check("One-time London delivery fee is charged once alongside free weekly delive
  el("basket-total").textContent==="£27.78"&&
  !el("basket-postcode-wrap").hidden);
 const previous=el("basket-other-items").children[0];
-const firstPackChip=previous.children[1].children[0];
+const firstPackChip=previous.children[0].children[0];
 el("basket-other-items").listeners.click({target:firstPackChip});
 check("Tapping previous entry's chip activates its own editor",
  !stages[0].hidden&&el("basket-selected-pack").textContent==="500g");
