@@ -15,6 +15,26 @@
  // draft; do not restore it as an item on existing visitors' next load.
  const state={entries:[],activeId:null,stage:"pack",nextId:1};
  const storeKey="microsprouts-basket-entries-v3";
+ // The picker is for discovering the seven varieties. Only broccoli has
+ // verified Stripe prices, so other varieties link to a direct enquiry.
+ const sproutPicker=el("basket-sprout-picker"),sproutTrack=el("basket-sprout-track");
+ const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")];
+ let sproutIndex=0;
+ function setSproutIndex(next,scroll=true){
+   sproutIndex=Math.max(0,Math.min(sproutCards.length-1,next));
+   el("basket-sprout-prev").disabled=sproutIndex===0;
+   el("basket-sprout-next").disabled=sproutIndex>=sproutCards.length-1;
+   setText("basket-sprout-progress",(sproutIndex+1)+" of "+sproutCards.length);
+   if(scroll&&typeof sproutTrack.scrollTo==="function"){
+     const first=sproutCards[0],selected=sproutCards[sproutIndex];
+     sproutTrack.scrollTo({left:selected.offsetLeft-first.offsetLeft,
+       behavior:window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches?"instant":"smooth"});
+   }
+ }
+ function closeSproutPicker(){
+   sproutPicker.hidden=true;
+   el("basket-start").setAttribute("aria-expanded","false");
+ }
  let enabled=false,working=false,returnFocus=null;
  let minimumDate="",dateOffset=0;
  const money=p=>"£"+(p/100).toFixed(2);
@@ -274,6 +294,29 @@
    expandEntry(Number(event.target.dataset.openEntry));
  });
  el("basket-start").addEventListener("click",()=>{
+   const opening=sproutPicker.hidden;
+   sproutPicker.hidden=!opening;
+   el("basket-start").setAttribute("aria-expanded",String(opening));
+   if(opening)setSproutIndex(0);
+ });
+ el("basket-sprout-prev").addEventListener("click",()=>setSproutIndex(sproutIndex-1));
+ el("basket-sprout-next").addEventListener("click",()=>setSproutIndex(sproutIndex+1));
+ sproutTrack.addEventListener("keydown",event=>{
+   if(event.key!=="ArrowRight"&&event.key!=="ArrowLeft")return;
+   event.preventDefault();
+   setSproutIndex(sproutIndex+(event.key==="ArrowRight"?1:-1));
+ });
+ sproutTrack.addEventListener("scroll",()=>{
+   if(sproutPicker.hidden||!sproutCards.length)return;
+   const x=sproutTrack.scrollLeft+sproutCards[0].offsetLeft;
+   const nearest=sproutCards.reduce((best,card,i)=>
+     Math.abs(card.offsetLeft-x)<Math.abs(sproutCards[best].offsetLeft-x)?i:best,0);
+   if(nearest!==sproutIndex)setSproutIndex(nearest,false);
+ });
+ sproutTrack.addEventListener("click",event=>{
+   const button=event.target.closest("[data-sprout-add]");
+   if(button?.dataset.sproutAdd!=="broccoli")return;
+   closeSproutPicker();
    if(addEntry())setStage("pack");
  });
  el("basket-add-another").addEventListener("click",()=>{
@@ -284,6 +327,7 @@
    state.entries=state.entries.filter(entry=>entry.id!==id);
    if(!state.entries.length){
      state.activeId=null;state.nextId=1;state.stage="pack";
+     closeSproutPicker();
      save();showError("");render();el("basket-start").focus();return;
    }
    if(state.activeId===id)state.activeId=state.entries.at(-1).id;
