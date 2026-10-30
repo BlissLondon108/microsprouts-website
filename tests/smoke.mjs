@@ -27,7 +27,7 @@ const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","c
  "basket-flow-form","basket-pack-label","basket-order-label","basket-delivery-label",
  "basket-current-price","basket-total","basket-pay","basket-date","basket-calendar-grid",
  "basket-calendar-month","basket-calendar-prev","basket-calendar-next","basket-date-label",
- "basket-other-items","basket-empty","basket-start","basket-current-shipping","basket-add-another","basket-shared-details",
+ "basket-other-items","basket-empty","basket-start","basket-sprout-picker","basket-sprout-track","basket-sprout-prev","basket-sprout-next","basket-sprout-progress","basket-current-shipping","basket-add-another","basket-shared-details",
  "basket-remove-entry","sprout-scroll","order-options","explore-sprouts"];
 check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('const state={entries:[],activeId:null,stage:"pack",nextId:1}')&&
@@ -37,6 +37,18 @@ check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('if(options.add)addEntry(options)')&&
  cartClient.includes('el("basket-start").addEventListener("click"')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
+check("Add Sprouts opens an accessible seven-variety carousel, without selling unpriced varieties",
+ html.includes('>Add Sprouts <span')&&
+ html.includes('id="basket-sprout-picker"')&&
+ (html.match(/data-sprout-card="/g)||[]).length===7&&
+ html.includes('data-sprout-add="broccoli"')&&
+ (html.match(/class="basket-sprout-card__action" href="https:\/\/wa\.me\//g)||[]).length===6&&
+ cartClient.includes('const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")]')&&
+ cartClient.includes('sproutTrack.addEventListener("scroll"')&&
+ cartClient.includes('sproutTrack.addEventListener("click"')&&
+ cartClient.includes('if(button?.dataset.sproutAdd!=="broccoli")return;')&&
+ flowCss.includes('.basket-flow [hidden]{display:none!important}')&&
+ flowCss.includes('scroll-snap-type:x mandatory'));
 check("Pack banners show product price and fee without double-counting shipping",
  html.includes('id="basket-current-shipping"')&&
  cartClient.includes('const shippingLine=entry=>')&&
@@ -58,8 +70,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=12"')&&
- html.includes('href="basket-flow.css?v=8"'));
+ html.includes('src="cart-preview.js?v=13"')&&
+ html.includes('href="basket-flow.css?v=9"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -262,9 +274,14 @@ for (const [name,markup] of Object.entries(docs)) {
 }
 const navMatches = markup => /href="sprouts\.html"[^>]*>More Sprouts<\/a><\/li>\s*<li><a href="science\.html"[^>]*>Science of Sprouts<\/a>/.test(markup);
 check("New navigation tabs in requested order on all pages", Object.values(docs).every(navMatches));
-check("Four distinct collection varieties", (sprouts.match(/<article class="sprout-card"/g) || []).length === 4 && ["broccoli","radish","mung-bean","leek"].every(id => sprouts.includes('id="'+id+'"')));
+check("All seven varieties appear on More Sprouts", (sprouts.match(/<article class="sprout-card"/g) || []).length === 7 && ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa"].every(id => sprouts.includes('id="'+id+'"')));
+check("Redundant discovery and scheduling notes are removed, hero jar design untouched",
+ !sprouts.includes('Broccoli packs are available through our secure checkout.')&&
+ !sprouts.includes('All varieties are subject to growing schedules')&&
+ sprouts.includes('assets/approved/harvest.webp')&&
+ sprouts.includes('Small seeds. Fresh beginnings.'));
 check("Broccoli retains checkout link, price and pack size", sprouts.includes('href="index.html#products"') && ["£9.99","£16.99","200g","500g"].every(t => sprouts.includes(t)));
-check("Other sprouts use unique WhatsApp availability enquiries", ["radish%20sprouts","mung%20bean%20sprouts","leek%20sprouts"].every(q => sprouts.includes(q)) && !sprouts.includes("£0.00"));
+check("All six unpriced varieties retain direct WhatsApp enquiries", ["radish%20sprouts","mung%20bean%20sprouts","leek%20sprouts","mustard%20sprouts","fenugreek%20sprouts","alfalfa%20sprouts"].every(q => sprouts.includes(q)) && !sprouts.includes("£0.00"));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#glucoraphanin">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
