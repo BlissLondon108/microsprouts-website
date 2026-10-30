@@ -458,3 +458,110 @@
  .basket-flow__previous-cost .basket-flow__previous-price{font-size:21px}
  .basket-flow__shipping-note{font-size:9px;max-width:128px}
 }
+
+
+/* Seven-variety picker, deliberately contained within the basket drawer.
+   CSS also honours the HTML hidden attribute on flex/grid surfaces. */
+.basket-flow [hidden]{display:none!important}
+.basket-flow__empty{width:100%;align-items:stretch;gap:13px;text-align:center}
+.basket-flow__empty>p{font-size:21px}
+.basket-flow__start{align-self:center;min-width:165px}
+.basket-sprout-picker{width:100%;min-width:0;margin-top:7px;text-align:left}
+.basket-sprout-picker__heading{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:8px;padding:0 3px;margin-bottom:12px
+}
+.basket-sprout-picker__heading>span{
+ color:#658269;font-size:10px;font-weight:780;letter-spacing:.13em
+}
+.basket-sprout-picker__navigation{display:flex;align-items:center;gap:8px}
+.basket-sprout-picker__navigation button{
+ display:grid;place-items:center;width:29px;height:29px;
+ border:1px solid #d5e2d2;border-radius:50%;background:#fff;
+ font-size:22px;color:#285438;line-height:1;cursor:pointer
+}
+.basket-sprout-picker__navigation button:disabled{opacity:.34;cursor:default}
+.basket-sprout-picker__navigation button:hover:not(:disabled){background:#e8f2e4}
+.basket-sprout-picker__navigation output{
+ color:#496b50;font-weight:750;font-size:11px;font-variant-numeric:tabular-nums;
+ white-space:nowrap
+}
+.basket-sprout-track{
+ display:grid;grid-auto-flow:column;grid-auto-columns:minmax(185px,77%);
+ overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+ scroll-snap-type:x mandatory;scroll-padding-inline:3px;
+ gap:11px;min-width:0;padding:3px 3px 12px;
+ -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+ scrollbar-color:#c5d6c0 transparent
+}
+.basket-sprout-card{
+ display:flex;flex-direction:column;overflow:hidden;scroll-snap-align:start;
+ background:#fffdf9;border:1px solid #dce6d5;border-radius:17px;
+ min-width:0;min-height:254px;box-shadow:0 8px 20px rgba(24,63,36,.055)
+}
+.basket-sprout-card__visual{
+ height:111px;position:relative;display:grid;place-items:center;
+ background:radial-gradient(ellipse at 72% 22%,#d2e7b9,#7fba82 66%,#39765c)
+}
+.basket-sprout-card__visual::after{
+ content:"";position:absolute;width:125px;height:125px;border-radius:50%;
+ border:1px solid rgba(255,255,255,.35);right:-30px;top:-52px;
+ box-shadow:0 0 0 18px rgba(255,255,255,.07)
+}
+.basket-sprout-card__visual img{width:100%;height:100%;object-fit:cover;display:block}
+.basket-sprout-card__initial{
+ font:normal 91px/1 Georgia,"Times New Roman",serif;
+ color:rgba(255,255,255,.72);letter-spacing:-.11em;margin-left:-11px
+}
+.basket-sprout-card__number{
+ position:absolute;bottom:9px;left:10px;font-size:10px;font-weight:800;
+ padding:4px 7px;border-radius:10px;background:rgba(255,255,255,.82);
+ color:#264534;letter-spacing:.1em
+}
+.basket-sprout-card--radish .basket-sprout-card__visual{background:radial-gradient(ellipse at 68% 22%,#f6dbe2,#d39ab0 68%,#9d607e)}
+.basket-sprout-card--mung-bean .basket-sprout-card__visual{background:radial-gradient(ellipse at 68% 22%,#f8eec3,#c5d4a0 65%,#899966)}
+.basket-sprout-card--leek .basket-sprout-card__visual{background:radial-gradient(ellipse at 68% 22%,#d7ebc3,#91b391 65%,#52765c)}
+.basket-sprout-card--mustard .basket-sprout-card__visual{background:radial-gradient(ellipse at 68% 22%,#ffe7a9,#dbbb61 65%,#a18439)}
+.basket-sprout-card--fenugreek .basket-sprout-card__visual{background:radial-gradient(ellipse at 68% 22%,#f2dbba,#c3a97f 65%,#806e51)}
+.basket-sprout-card--alfalfa .basket-sprout-card__visual{background:radial-gradient(ellipse at 68% 22%,#d6eede,#8fbaa9 65%,#4c857b)}
+.basket-sprout-card__content{
+ padding:13px 13px 14px;display:flex;flex:1;flex-direction:column;align-items:stretch
+}
+.basket-sprout-card__name{
+ font:normal 24px/1.07 Georgia,"Times New Roman",serif;
+ letter-spacing:-.035em;color:#1a3d28
+}
+.basket-sprout-card__name span{font-size:18px}
+.basket-sprout-card__content p{
+ margin:5px 0 8px;color:#69816d;font-size:11px;line-height:1.4
+}
+.basket-sprout-card__availability{
+ color:#617a62;font-size:10px;font-weight:720;margin:0 0 12px
+}
+.basket-sprout-card__action{
+ display:flex;justify-content:center;align-items:center;gap:7px;
+ background:#edf3e8;border:1px solid #d5e4ce;border-radius:10px;
+ color:#245d38;font-size:11px;line-height:1.3;font-weight:760;
+ text-decoration:none;padding:10px 8px;min-height:40px;
+ margin-top:auto;cursor:pointer
+}
+.basket-sprout-card__action--primary{background:#15432b;color:#fff;border-color:#15432b}
+.basket-sprout-card__action:hover{filter:brightness(.96)}
+.basket-sprout-card__action:focus-visible,
+.basket-sprout-picker__navigation button:focus-visible{
+ outline:2px solid #2c7040;outline-offset:2px
+}
+.basket-sprout-picker__all{
+ display:inline-flex;gap:5px;align-items:center;
+ color:#3b6943;font-size:11px;font-weight:700;
+ margin:9px 3px 0;text-underline-offset:3px
+}
+@media(max-width:520px){
+ .basket-sprout-track{grid-auto-columns:minmax(180px,78%);gap:9px}
+ .basket-sprout-card{min-height:245px}
+ .basket-sprout-card__visual{height:102px}
+ .basket-sprout-picker__heading>span{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ .basket-sprout-track{scroll-behavior:auto}
+}
