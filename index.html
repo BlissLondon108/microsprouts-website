@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=basket-flow-1">
 
-<link rel="stylesheet" href="basket-flow.css?v=8">
+<link rel="stylesheet" href="basket-flow.css?v=9">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=12" defer></script>
+<script src="cart-preview.js?v=13" defer></script>
 
 <script src="carousel-interaction.js?v=2" defer></script>
 </head>
@@ -265,7 +265,83 @@
         <div class="basket-flow__body">
           <div class="basket-flow__empty" id="basket-empty">
             <p>Your basket is empty.</p>
-            <button type="button" id="basket-start" class="basket-flow__start">Add broccoli sprouts <span aria-hidden="true">+</span></button>
+            <button type="button" id="basket-start" class="basket-flow__start" aria-expanded="false" aria-controls="basket-sprout-picker">Add Sprouts <span aria-hidden="true">+</span></button>
+            <section class="basket-sprout-picker" id="basket-sprout-picker" aria-label="Choose your sprouts" hidden>
+              <div class="basket-sprout-picker__heading">
+                <span>EXPLORE THE COLLECTION</span>
+                <div class="basket-sprout-picker__navigation">
+                  <button type="button" id="basket-sprout-prev" aria-label="Previous sprout" disabled>‹</button>
+                  <output id="basket-sprout-progress" aria-live="polite" aria-atomic="true">1 of 7</output>
+                  <button type="button" id="basket-sprout-next" aria-label="Next sprout">›</button>
+                </div>
+              </div>
+              <div id="basket-sprout-track" class="basket-sprout-track" role="list" aria-label="Seven sprout varieties">
+                <article role="listitem" class="basket-sprout-card basket-sprout-card--broccoli" data-sprout-card="broccoli" aria-label="Broccoli sprouts">
+                  <div class="basket-sprout-card__visual"><img src="assets/approved/week.webp" width="260" height="136" alt="Fresh broccoli sprouts" loading="lazy"><span class="basket-sprout-card__number">01 / 07</span></div>
+                  <div class="basket-sprout-card__content">
+                    <div class="basket-sprout-card__name">Broccoli <span>sprouts</span></div>
+                    <p>Fresh · gently peppery</p>
+                    <span class="basket-sprout-card__availability">Ready to order</span>
+                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="broccoli">Choose broccoli <span aria-hidden="true">→</span></button>
+                  </div>
+                </article>
+                <article role="listitem" class="basket-sprout-card basket-sprout-card--radish" data-sprout-card="radish" aria-label="Radish sprouts">
+                  <div class="basket-sprout-card__visual"><span class="basket-sprout-card__initial" aria-hidden="true">R</span><span class="basket-sprout-card__number">02 / 07</span></div>
+                  <div class="basket-sprout-card__content">
+                    <div class="basket-sprout-card__name">Radish <span>sprouts</span></div>
+                    <p>Bold · peppery</p>
+                    <span class="basket-sprout-card__availability">Enquire for availability</span>
+                    <a class="basket-sprout-card__action" href="https://wa.me/447386853514?text=Hello!%20I'm%20interested%20in%20radish%20sprouts.%20Could%20you%20tell%20me%20the%20availability%2C%20pack%20sizes%2C%20prices%20and%20shipping%20or%20collection%20options%3F" target="_blank" rel="noopener noreferrer" aria-label="Enquire about Radish sprouts on WhatsApp">Enquire about radish <span aria-hidden="true">↗</span></a>
+                  </div>
+                </article>
+                <article role="listitem" class="basket-sprout-card basket-sprout-card--mung-bean" data-sprout-card="mung-bean" aria-label="Mung bean sprouts">
+                  <div class="basket-sprout-card__visual"><span class="basket-sprout-card__initial" aria-hidden="true">M</span><span class="basket-sprout-card__number">03 / 07</span></div>
+                  <div class="basket-sprout-card__content">
+                    <div class="basket-sprout-card__name">Mung bean <span>sprouts</span></div>
+                    <p>Crunchy · mild</p>
+                    <span class="basket-sprout-card__availability">Enquire for availability</span>
+                    <a class="basket-sprout-card__action" href="https://wa.me/447386853514?text=Hello!%20I'm%20interested%20in%20mung%20bean%20sprouts.%20Could%20you%20tell%20me%20the%20availability%2C%20pack%20sizes%2C%20prices%20and%20shipping%20or%20collection%20options%3F" target="_blank" rel="noopener noreferrer" aria-label="Enquire about Mung bean sprouts on WhatsApp">Enquire about mung bean <span aria-hidden="true">↗</span></a>
+                  </div>
+                </article>
+                <article role="listitem" class="basket-sprout-card basket-sprout-card--leek" data-sprout-card="leek" aria-label="Leek sprouts">
+                  <div class="basket-sprout-card__visual"><span class="basket-sprout-card__initial" aria-hidden="true">L</span><span class="basket-sprout-card__number">04 / 07</span></div>
+                  <div class="basket-sprout-card__content">
+                    <div class="basket-sprout-card__name">Leek <span>sprouts</span></div>
+                    <p>Delicate · savoury</p>
+                    <span class="basket-sprout-card__availability">Enquire for availability</span>
+                    <a class="basket-sprout-card__action" href="https://wa.me/447386853514?text=Hello!%20I'm%20interested%20in%20leek%20sprouts.%20Could%20you%20tell%20me%20the%20availability%2C%20pack%20sizes%2C%20prices%20and%20shipping%20or%20collection%20options%3F" target="_blank" rel="noopener noreferrer" aria-label="Enquire about Leek sprouts on WhatsApp">Enquire about leek <span aria-hidden="true">↗</span></a>
+                  </div>
+                </article>
+                <article role="listitem" class="basket-sprout-card basket-sprout-card--mustard" data-sprout-card="mustard" aria-label="Mustard sprouts">
+                  <div class="basket-sprout-card__visual"><span class="basket-sprout-card__initial" aria-hidden="true">M</span><span class="basket-sprout-card__number">05 / 07</span></div>
+                  <div class="basket-sprout-card__content">
+                    <div class="basket-sprout-card__name">Mustard <span>sprouts</span></div>
+                    <p>Bright · spicy</p>
+                    <span class="basket-sprout-card__availability">Enquire for availability</span>
+                    <a class="basket-sprout-card__action" href="https://wa.me/447386853514?text=Hello!%20I'm%20interested%20in%20mustard%20sprouts.%20Could%20you%20tell%20me%20the%20availability%2C%20pack%20sizes%2C%20prices%20and%20shipping%20or%20collection%20options%3F" target="_blank" rel="noopener noreferrer" aria-label="Enquire about Mustard sprouts on WhatsApp">Enquire about mustard <span aria-hidden="true">↗</span></a>
+                  </div>
+                </article>
+                <article role="listitem" class="basket-sprout-card basket-sprout-card--fenugreek" data-sprout-card="fenugreek" aria-label="Fenugreek sprouts">
+                  <div class="basket-sprout-card__visual"><span class="basket-sprout-card__initial" aria-hidden="true">F</span><span class="basket-sprout-card__number">06 / 07</span></div>
+                  <div class="basket-sprout-card__content">
+                    <div class="basket-sprout-card__name">Fenugreek <span>sprouts</span></div>
+                    <p>Earthy · aromatic</p>
+                    <span class="basket-sprout-card__availability">Enquire for availability</span>
+                    <a class="basket-sprout-card__action" href="https://wa.me/447386853514?text=Hello!%20I'm%20interested%20in%20fenugreek%20sprouts.%20Could%20you%20tell%20me%20the%20availability%2C%20pack%20sizes%2C%20prices%20and%20shipping%20or%20collection%20options%3F" target="_blank" rel="noopener noreferrer" aria-label="Enquire about Fenugreek sprouts on WhatsApp">Enquire about fenugreek <span aria-hidden="true">↗</span></a>
+                  </div>
+                </article>
+                <article role="listitem" class="basket-sprout-card basket-sprout-card--alfalfa" data-sprout-card="alfalfa" aria-label="Alfalfa sprouts">
+                  <div class="basket-sprout-card__visual"><span class="basket-sprout-card__initial" aria-hidden="true">A</span><span class="basket-sprout-card__number">07 / 07</span></div>
+                  <div class="basket-sprout-card__content">
+                    <div class="basket-sprout-card__name">Alfalfa <span>sprouts</span></div>
+                    <p>Tender · mild</p>
+                    <span class="basket-sprout-card__availability">Enquire for availability</span>
+                    <a class="basket-sprout-card__action" href="https://wa.me/447386853514?text=Hello!%20I'm%20interested%20in%20alfalfa%20sprouts.%20Could%20you%20tell%20me%20the%20availability%2C%20pack%20sizes%2C%20prices%20and%20shipping%20or%20collection%20options%3F" target="_blank" rel="noopener noreferrer" aria-label="Enquire about Alfalfa sprouts on WhatsApp">Enquire about alfalfa <span aria-hidden="true">↗</span></a>
+                  </div>
+                </article>
+              </div>
+              <a class="basket-sprout-picker__all" href="sprouts.html#varieties">Discover all seven varieties <span aria-hidden="true">↗</span></a>
+            </section>
           </div>
           <div class="basket-flow__previous" id="basket-other-items" aria-label="Your broccoli packs in order of addition">
           <section class="basket-flow__current" id="basket-current-item" aria-label="Broccoli pack being configured">
