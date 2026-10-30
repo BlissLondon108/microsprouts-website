@@ -37,6 +37,7 @@ class Fake {
    if(sel==="[data-entry-id]"&&node.dataset.entryId)return node;
    if(sel==="[data-remove-entry]"&&node.dataset.removeEntry)return node;
    if(sel==="[data-open-entry]"&&node.dataset.openEntry)return node;
+   if(sel==="[data-sprout-add]"&&node.dataset.sproutAdd)return node;
    if(sel==="button[data-calendar-date]"&&node.dataset.calendarDate)return node;
    node=node.parentElement;
   }
@@ -54,7 +55,7 @@ class Fake {
 const ids=[
  "cart-overlay","open-cart","basket-flow-form","basket","basket-pay",
  "basket-total","basket-total-type","basket-total-note","basket-add-another",
- "basket-remove-entry","nav-cart-count","basket-date","basket-error","basket-empty","basket-start","basket-current-shipping",
+ "basket-remove-entry","nav-cart-count","basket-date","basket-error","basket-empty","basket-start","basket-sprout-picker","basket-sprout-track","basket-sprout-prev","basket-sprout-next","basket-sprout-progress","basket-current-shipping",
  "basket-pack-200-price","basket-pack-500-price","basket-delivery-price",
  "basket-items-control","basket-stage","basket-current-item","basket-current-price","basket-shared-details",
  "basket-calendar-grid","basket-calendar-month","basket-calendar-prev","basket-calendar-next",
@@ -66,6 +67,18 @@ const el=id=>elements.get(id);
 // Simulate real document connectivity: removing the reusable editor from
 // its parent makes getElementById fail until the editor is reattached.
 el("basket-other-items").append(el("basket-current-item"));
+const sproutSlugs=["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa"];
+const sproutCards=sproutSlugs.map((slug,i)=>{
+ const card=new Fake("article");card.dataset.sproutCard=slug;card.offsetLeft=220*i;return card;
+});
+const broccoliAdd=new Fake("button");
+broccoliAdd.dataset.sproutAdd="broccoli";sproutCards[0].append(broccoliAdd);
+const sproutTrack=el("basket-sprout-track");
+sproutTrack.append(...sproutCards);
+sproutTrack.scrollLeft=0;
+sproutTrack.querySelectorAll=selector=>selector==="[data-sprout-card]"?sproutCards:[];
+sproutTrack.scrollTo=({left})=>{sproutTrack.scrollLeft=left;};
+el("basket-sprout-picker").hidden=true;
 el("cart-overlay").hidden=true;
 el("checkout-button").dataset.pack="500";
 el("checkout-button").dataset.frequency="once";
@@ -149,8 +162,31 @@ check("Opening nav basket doesn't add broccoli or start checkout",
  el("nav-cart-count").textContent==="0");
 el("close-cart").listeners.click();
 el("basket-start").listeners.click();
-check("Clicking Add broccoli sprouts immediately reveals editor and updates badge",
+check("Add Sprouts opens the seven-variety picker without adding a product",
+ !el("basket-sprout-picker").hidden&&
+ el("basket-start").attributes["aria-expanded"]==="true"&&
+ el("nav-cart-count").textContent==="0"&&
+ el("basket-other-items").hidden&&
+ el("basket-sprout-progress").textContent==="1 of 7"&&
+ el("basket-sprout-prev").disabled&&
+ !el("basket-sprout-next").disabled);
+el("basket-sprout-next").listeners.click();
+check("Carousel next arrow advances to radish, updating progress and scroll",
+ el("basket-sprout-progress").textContent==="2 of 7"&&
+ sproutTrack.scrollLeft===220);
+sproutTrack.scrollLeft=1320;
+sproutTrack.listeners.scroll();
+check("Touch scrolling updates picker progress and arrow bounds",
+ el("basket-sprout-progress").textContent==="7 of 7"&&
+ el("basket-sprout-next").disabled);
+el("basket-sprout-prev").listeners.click();
+check("Previous arrow returns to fenugreek",
+ el("basket-sprout-progress").textContent==="6 of 7"&&
+ sproutTrack.scrollLeft===1100);
+sproutTrack.listeners.click({target:broccoliAdd});
+check("Selecting broccoli reveals the pack editor and updates badge",
  el("basket-empty").hidden&&!el("basket-other-items").hidden&&
+ el("basket-sprout-picker").hidden&&
  !el("basket-remove-entry").hidden&&
  el("basket-other-items").children[0]===el("basket-current-item")&&
  document.getElementById("basket-current-item")===el("basket-current-item")&&
@@ -275,7 +311,12 @@ check("Removing all packs leaves an empty basket with reusable editor intact",
  !el("basket-empty").hidden&&el("basket-pay").hidden&&
  document.getElementById("basket-current-item")===el("basket-current-item"));
 el("basket-start").listeners.click();
-check("Adding again after emptying works without refresh",
+check("Picker reopens after emptying without auto-adding broccoli",
+ el("nav-cart-count").textContent==="0"&&
+ !el("basket-sprout-picker").hidden&&
+ el("basket-sprout-progress").textContent==="1 of 7");
+sproutTrack.listeners.click({target:broccoliAdd});
+check("Choosing broccoli again works without refresh",
  el("nav-cart-count").textContent==="1"&&
  el("basket-empty").hidden&&
  !el("basket-other-items").hidden&&
