@@ -154,3 +154,16 @@
  .diet-section h2{font-size:34px}
  .diet-ideas{font-size:13px}
 }
+
+
+/* Additional varieties in the existing More Sprouts card system. */
+.sprout-card__visual--mustard{
+ background:radial-gradient(ellipse at 72% 22%,#ffe9b1,#d4b55f 68%,#90773c)
+}
+.sprout-card__visual--fenugreek{
+ background:radial-gradient(ellipse at 72% 22%,#f2ddbf,#c6ac84 68%,#80674c)
+}
+.sprout-card__visual--alfalfa{
+ background:radial-gradient(ellipse at 72% 22%,#d9eedb,#97c2a5 68%,#527b6b)
+}
+.sprout-card__visual--fenugreek .sprout-card__visual-label{color:#fff}
