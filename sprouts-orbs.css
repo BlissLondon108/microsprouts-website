@@ -1,8 +1,9 @@
-/* MicroSprouts botanical spheres — clean artwork, no duplicate glass backing. */
+/* MicroSprouts — clear water bubbles with a single continuous surface. */
 .ms-orb-scene{
  position:relative;isolation:isolate;min-width:0;width:100%;
- height:clamp(390px,37vw,490px);overflow:hidden;background:transparent;
- --orb-zoom:1;
+ height:clamp(390px,37vw,490px);
+ /* Glows can extend past this invisible animation area without a square clipping line. */
+ overflow:visible;background:transparent;--orb-zoom:1;
 }
 .ms-orb-floating{
  position:absolute;left:var(--orb-x);top:var(--orb-y);width:0;height:0;
@@ -15,29 +16,62 @@
  box-sizing:border-box;display:block;position:absolute;top:0;left:0;
  width:calc(var(--orb-size) * var(--orb-zoom));
  height:calc(var(--orb-size) * var(--orb-zoom));
- transform:translate(-50%,-50%);scale:1;
- border:0;background:transparent;box-shadow:none;border-radius:50%;
+ transform:translate(-50%,-50%);scale:1;border-radius:50%;
+ /* The sprout lives inside this one translucent liquid-glass sphere,
+    not on top of a separate opaque backing disk. */
+ border:1px solid rgba(234,255,252,.68);
+ background:
+  radial-gradient(ellipse at 25% 18%,rgba(255,255,255,.19),transparent 43%),
+  radial-gradient(ellipse at 79% 84%,rgba(102,216,229,.17),transparent 50%),
+  radial-gradient(circle at 50% 50%,rgba(235,255,246,.028) 40%,
+    rgba(199,245,239,.065) 67%,rgba(235,255,252,.16) 95%);
+ box-shadow:
+  inset 5px 7px 12px rgba(255,255,255,.19),
+  inset -8px -10px 14px rgba(57,154,175,.15),
+  inset 0 0 0 1px rgba(228,255,250,.12),
+  0 5px 19px rgba(0,24,17,.25),
+  0 0 11px rgba(181,247,224,.11);
  color:#f9ffe9;text-decoration:none;outline:none;
- transition:scale .24s ease;-webkit-tap-highlight-color:transparent;
+ transition:scale .24s ease,box-shadow .24s ease;
+ -webkit-tap-highlight-color:transparent;
 }
 .ms-orb-link::before{
- content:"";pointer-events:none;position:absolute;inset:0;z-index:0;
- border-radius:50%;opacity:0;
- background:radial-gradient(circle 44px at var(--orb-pointer-x) var(--orb-pointer-y),
-   hsl(var(--glow-hue) 95% 82% / .48),transparent 85%);
- filter:blur(8px);transition:opacity .2s ease;
+ content:"";pointer-events:none;position:absolute;inset:0;z-index:2;
+ border-radius:inherit;opacity:0;
+ background:radial-gradient(circle 57px at var(--orb-pointer-x) var(--orb-pointer-y),
+  hsl(var(--glow-hue) 95% 83% / .38),transparent 85%);
+ transition:opacity .2s ease;
 }
-.ms-orb-link::after{content:none}
+.ms-orb-link::after{
+ /* Curved specular glints make the single sphere read as a water bubble. */
+ content:"";pointer-events:none;position:absolute;inset:2px;z-index:3;
+ border-radius:inherit;border-top:1px solid rgba(255,255,255,.62);
+ border-right:1px solid rgba(216,255,255,.28);
+ border-bottom:1px solid rgba(178,229,233,.25);
+ background:
+  radial-gradient(ellipse 43% 19% at 31% 15%,rgba(255,255,255,.56),
+    rgba(255,255,255,.09) 68%,transparent 100%),
+  radial-gradient(ellipse 22% 13% at 77% 84%,rgba(223,255,252,.2),transparent 100%);
+}
 .ms-orb-art{
- position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;
- pointer-events:none;filter:drop-shadow(0 4px 5px #00190a58);
+ position:absolute;inset:7%;width:86%;height:86%;object-fit:contain;z-index:1;
+ pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,26,14,.32));
  transition:filter .24s ease;
 }
-.ms-orb-link:hover,.ms-orb-link:focus-visible{scale:1.13}
+.ms-orb-link:hover,.ms-orb-link:focus-visible{
+ scale:1.12;
+ box-shadow:
+  inset 6px 7px 14px rgba(255,255,255,.29),
+  inset -8px -10px 16px rgba(77,192,200,.18),
+  inset 0 0 0 1px rgba(244,255,255,.2),
+  0 8px 22px rgba(0,22,15,.3),
+  0 0 9px hsl(var(--glow-hue) 90% 82% / .30),
+  0 0 25px hsl(var(--glow-hue) 80% 74% / .39);
+}
 .ms-orb-link:hover::before,.ms-orb-link:focus-visible::before{opacity:1}
 .ms-orb-link:hover .ms-orb-art,.ms-orb-link:focus-visible .ms-orb-art{
- filter:drop-shadow(0 0 9px hsl(var(--glow-hue) 90% 77% / .72))
- drop-shadow(0 0 22px hsl(var(--glow-hue) 85% 69% / .50));
+ filter:drop-shadow(0 0 8px hsl(var(--glow-hue) 90% 78% / .58))
+ drop-shadow(0 0 15px hsl(var(--glow-hue) 82% 70% / .37));
 }
 .ms-orb-link:focus-visible{outline:2px solid #e0f9c3;outline-offset:4px}
 .ms-orb-caption{
@@ -48,9 +82,9 @@
 }
 .ms-orb-link:hover .ms-orb-caption,.ms-orb-link:focus-visible .ms-orb-caption{color:#fff}
 @media(max-width:1050px){.ms-orb-scene{--orb-zoom:.89}}
-@media(max-width:770px){.ms-orb-scene{height:370px;--orb-zoom:.87;width:min(100%,580px);margin:0 auto}}
-@media(max-width:480px){.ms-orb-scene{height:300px;--orb-zoom:.59}.ms-orb-caption{font-size:10px;bottom:-18px}}
-@media(max-width:360px){.ms-orb-scene{--orb-zoom:.52}}
+@media(max-width:770px){.ms-orb-scene{height:390px;--orb-zoom:.82;width:min(100%,580px);margin:0 auto}}
+@media(max-width:480px){.ms-orb-scene{height:350px;--orb-zoom:.56}.ms-orb-caption{font-size:10px;bottom:-18px}}
+@media(max-width:360px){.ms-orb-scene{--orb-zoom:.5}}
 @media(prefers-reduced-motion:reduce){
  .ms-orb-floating{will-change:auto}
  .ms-orb-link,.ms-orb-art,.ms-orb-link::before{transition:none}
@@ -60,7 +94,9 @@
  grid-template-columns:minmax(0,1fr) minmax(0,1.03fr);
  gap:clamp(25px,4vw,55px)
 }
-.sprout-card__visual--green-pea{background:radial-gradient(ellipse at 72% 25%,#e1f2be,#94c686 67%,#56875b)}
+.sprout-card__visual--green-pea{
+ background:radial-gradient(ellipse at 72% 25%,#e1f2be,#94c686 67%,#56875b)
+}
 @media(max-width:770px){
  .sprouts-page .subpage-hero__inner{grid-template-columns:1fr;gap:12px}
 }

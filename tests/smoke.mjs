@@ -338,7 +338,7 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=2')&&sproutsDetails.includes('sprouts-orbs.js?v=2')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=3')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
  read('sprouts-orbs.js').includes('pointermove')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
@@ -349,10 +349,21 @@ check("Orb artwork has no opaque secondary glass disk, and unnecessary counter i
  !sproutsDetails.includes('Explore the collection')&&
  !read('sprouts-orbs.css').includes('backdrop-filter')&&
  read('sprouts-orbs.css').includes('background:transparent')&&
- read('sprouts-orbs.css').includes('.ms-orb-link::after{content:none}'));
+ read('sprouts-orbs.css').includes('.ms-orb-link::after{'));
 check("Animated orbs use bounded collision physics instead of CSS drift",
  read('sprouts-orbs.js').includes('requestAnimationFrame')&&
  read('sprouts-orbs.js').includes('const separate=elastic=>')&&
  read('sprouts-orbs.js').includes('const within=s=>')&&
  read('sprouts-orbs.js').includes('prefers-reduced-motion: reduce')&&
  !read('sprouts-orbs.css').includes('@keyframes ms-orb-drift'));
+
+check("Water bubbles retain translucent surface and curved highlights",
+ read("sprouts-orbs.css").includes("radial-gradient(ellipse 43% 19%")&&
+ read("sprouts-orbs.css").includes("rgba(234,255,252,.68)")&&
+ read("sprouts-orbs.css").includes("inset -8px -10px")&&
+ !read("sprouts-orbs.css").includes("backdrop-filter"));
+check("Hover glows never meet the rectangular sphere viewport boundary",
+ read("sprouts-orbs.css").includes("overflow:visible;background:transparent")&&
+ read("sprouts-orbs.js").includes("s.r*1.12+32")&&
+ read("sprouts-orbs.js").includes("s.r*1.12+36")&&
+ read("sprouts-orbs.js").includes("const separate=elastic=>"));

@@ -37,10 +37,17 @@
  let width=0,height=0,last=0,frameId=0,visible=true,laidOut=false;
  const pinned=s=>s.hovered||s.focused;
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
- const limits=s=>({
-   minX:s.r+9,maxX:Math.max(s.r+9,width-s.r-9),
-   minY:s.r+9,maxY:Math.max(s.r+9,height-s.r-28)
- });
+ // Leave room for the enlarged bubble, its soft glow, and its label.
+ // This is also why the animation viewport can remain overflow:visible.
+ // Nothing reaches its rectangular edge, even when a bubble is hovered.
+ const limits=s=>{
+   const edgeX=Math.min(width/2,s.r*1.12+32);
+   const edgeY=Math.min(height/2,s.r*1.12+36);
+   return {
+     minX:edgeX,maxX:width-edgeX,
+     minY:edgeY,maxY:height-edgeY
+   };
+ };
  const within=s=>{
    const b=limits(s);
    if(s.x<b.minX){s.x=b.minX;s.vx=Math.abs(s.vx)}
@@ -54,7 +61,7 @@
      for(let j=i+1;j<spheres.length;j++){
        const b=spheres[j];
        const dx=b.x-a.x,dy=b.y-a.y;
-       const separation=a.r+b.r+5;
+       const separation=a.r*(pinned(a)?1.12:1)+b.r*(pinned(b)?1.12:1)+6;
        const d2=dx*dx+dy*dy;
        if(d2>=separation*separation)continue;
        const dist=Math.sqrt(d2);
