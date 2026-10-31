@@ -37,16 +37,16 @@ check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('if(options.add)addEntry(options)')&&
  cartClient.includes('el("basket-start").addEventListener("click"')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
-check("Add Sprouts opens an accessible eight-variety carousel, without selling unpriced varieties",
+check("Add Sprouts offers all eight approved priced varieties",
  html.includes('>Add Sprouts <span')&&
  html.includes('id="basket-sprout-picker"')&&
  (html.match(/data-sprout-card="/g)||[]).length===8&&
  html.includes('data-sprout-add="broccoli"')&&
- (html.match(/class="basket-sprout-card__action" href="https:\/\/wa\.me\//g)||[]).length===7&&
+ (html.match(/data-sprout-add="/g)||[]).length===8&&
  cartClient.includes('const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")]')&&
  cartClient.includes('sproutTrack.addEventListener("scroll"')&&
  cartClient.includes('sproutTrack.addEventListener("click"')&&
- cartClient.includes('if(button?.dataset.sproutAdd!=="broccoli")return;')&&
+ cartClient.includes('validVariety(button.dataset.sproutAdd)')&&
  flowCss.includes('.basket-flow [hidden]{display:none!important}')&&
  flowCss.includes('scroll-snap-type:x mandatory'));
 check("Pack banners show product price and fee without double-counting shipping",
@@ -281,7 +281,11 @@ check("Redundant notes removed and the approved glowing hero replaces the jar",
  sprouts.includes('class="ms-orb-scene"')&&
  !sprouts.includes('Small seeds. Fresh beginnings.'));
 check("Broccoli retains checkout link, price and pack size", sprouts.includes('href="index.html#products"') && ["£9.99","£16.99","200g","500g"].every(t => sprouts.includes(t)));
-check("All seven unpriced varieties retain direct WhatsApp enquiries", ["radish%20sprouts","mung%20bean%20sprouts","leek%20sprouts","mustard%20sprouts","fenugreek%20sprouts","alfalfa%20sprouts","green%20pea%20sprouts"].every(q => sprouts.includes(q)) && !sprouts.includes("£0.00"));
+check("All eight varieties display approved online prices and ordering links",
+  (sprouts.match(/Ready to order online/g)||[]).length===8&&
+  (sprouts.match(/200g Single Pack £9.99 · 500g Family Pack £16.99/g)||[]).length===8&&
+  ["radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>
+    sprouts.includes('href="index.html?add-sprout='+slug+'#basket"')));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#glucoraphanin">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
@@ -379,12 +383,13 @@ check("Animated hero uses non-image background art without hover target arrows",
  (sprouts.match(/<span class="ms-orb-art"/g)||[]).length===8&&
  read("sprouts-orbs.css").includes("cursor:default;-webkit-user-drag:none")&&
  !html.includes('class="sprout-orb__add"'));
-check("Unpriced sprouts are visibly available to enquire about, not incorrectly priced",
- (sprouts.match(/Available by enquiry/g)||[]).length===7&&
- (html.match(/Available by enquiry/g)||[]).length===7&&
- !sprouts.includes('Ask about availability')&&
- html.includes('data-sprout-add="broccoli"')&&
- (html.match(/class="basket-sprout-card__action"/g)||[]).length===7);
+check("All basket varieties use ready-to-order buttons and proper deep links",
+ (html.match(/Ready to order<\/span>/g)||[]).length===8&&
+ (html.match(/data-sprout-add="/g)||[]).length===8&&
+ html.includes('id="basket-add-variety"')&&
+ cartClient.includes('params.get("add-sprout")')&&
+ cartClient.includes("variety:item.variety")&&
+ !html.includes("Available by enquiry"));
 
 check("All eight catalogue cards have matching colour spotlight effects", 
  (sprouts.match(/class="sprout-card" data-spotlight/g)||[]).length===8&&
@@ -401,3 +406,14 @@ check("Homepage and catalogue images never trigger native hover search arrows",
  !sprouts.includes('<img class="sprout-card__art"')&&
  !html.includes('<img class="sprout-orb__photo"')&&
  read("sprouts-orbs.css").includes(".ms-orb-link::before{content:none!important}"));
+
+check("Liquid glass bubbles have no hover target overlay",
+ read("sprouts-orbs.css").includes(".ms-orb-link::before,")&&
+ read("sprouts-orbs.css").includes("content:none!important;display:none!important")&&
+ (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8);
+check("Server validates all eight varieties and creates distinct Stripe names",
+ read("worker.js").includes('const validVariety=slug=>')&&
+ read("worker.js").includes('[product_data][name]')&&
+ read("worker.js").includes('variety:item.variety===undefined?"broccoli":item.variety')&&
+ read("worker.js").includes('variety==="broccoli"')&&
+ !read("worker.js").includes('unit_amount]","0"'));

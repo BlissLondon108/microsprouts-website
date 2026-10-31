@@ -60,7 +60,7 @@ const ids=[
  "basket-items-control","basket-stage","basket-current-item","basket-current-price","basket-shared-details",
  "basket-calendar-grid","basket-calendar-month","basket-calendar-prev","basket-calendar-next",
  "basket-date-label","basket-selected-pack","basket-selected-order","basket-selected-delivery",
- "basket-other-items","close-cart","checkout-button"
+ "basket-other-items","close-cart","checkout-button","basket-add-variety","basket-current-photo","basket-current-name"
 ];
 const elements=new Map(ids.map(id=>[id,new Fake(id)]));
 const el=id=>elements.get(id);
@@ -73,6 +73,7 @@ const sproutCards=sproutSlugs.map((slug,i)=>{
 });
 const broccoliAdd=new Fake("button");
 broccoliAdd.dataset.sproutAdd="broccoli";sproutCards[0].append(broccoliAdd);
+const radishAdd=new Fake("button");radishAdd.dataset.sproutAdd="radish";sproutCards[1].append(radishAdd);
 const sproutTrack=el("basket-sprout-track");
 sproutTrack.append(...sproutCards);
 sproutTrack.scrollLeft=0;
@@ -325,4 +326,20 @@ document.events.keydown({key:"Escape",preventDefault(){}});
 check("Escape closes basket",el("cart-overlay").hidden);
 photo.listeners.error();
 check("Broken photo fallback remains",photo.hidden&&photo.fallback==="sprout-orb--photo-missing");
+el("basket-remove-entry").listeners.click();
+el("basket-start").listeners.click();
+sproutTrack.listeners.click({target:radishAdd});
+check("Choosing radish creates a distinctly named, priced basket entry",
+ el("basket-current-name").textContent==="Radish Sprouts"&&
+ el("basket-current-photo").src==="assets/sprout-orbs/radish.webp"&&
+ el("nav-cart-count").textContent==="1");
+packs[0].listeners.click();orders[0].listeners.click();methods[0].listeners.click();
+el("basket-flow-form").listeners.submit({preventDefault(){}});
+await new Promise(resolve=>setTimeout(resolve,0));
+check("Radish checkout sends its validated variety alongside the approved 200g price",
+ submitted.items[0].variety==="radish"&&submitted.items[0].pack==="200"&&
+ el("basket-total").textContent==="£9.99");
+el("basket-add-variety").listeners.click();
+check("Customers can choose additional varieties without removing their existing pack",
+ !el("basket-sprout-picker").hidden&&el("nav-cart-count").textContent==="1");
 console.log("\nOrdered basket + inline calendar tests passed: "+checks);

@@ -435,5 +435,34 @@ try{
  res=await api("/api/checkout/portal",{},envOn);
  check("Portal setup error is isolated to customer portal, not payments",res.status===502);
  deliberatelyFailPortal=false;
+ const multiVariety={
+  date:requestedDate(),return_to_basket:true,
+  items:[
+   {variety:"broccoli",pack:"200",frequency:"once",method:"pickup"},
+   {variety:"radish",pack:"500",frequency:"weekly",method:"delivery"},
+   {variety:"green-pea",pack:"200",frequency:"once",method:"pickup"}
+  ]
+ };
+ res=await submit(multiVariety,liveBase);
+ check("All sprout varieties use the approved prices and their own Stripe names",
+  res.status===200&&sessionForm.get("mode")==="subscription"&&
+  sessionForm.get("line_items[0][price]")===LIVE_CHECKOUT_PRICE_IDS.ms_broccoli_200g_once_v1&&
+  sessionForm.get("line_items[1][price_data][unit_amount]")==="1549"&&
+  sessionForm.get("line_items[1][price_data][currency]")==="gbp"&&
+  sessionForm.get("line_items[1][price_data][recurring][interval]")==="week"&&
+  sessionForm.get("line_items[1][price_data][product_data][name]")?.includes("Radish")&&
+  sessionForm.get("line_items[2][price_data][unit_amount]")==="999"&&
+  sessionForm.get("line_items[2][price_data][product_data][name]")?.includes("Green pea")&&
+  sessionForm.get("metadata[total_pence]")==="3547"&&
+  sessionForm.get("metadata[renewal_pence]")==="1549"&&
+  sessionForm.get("metadata[varieties]")==="broccoli,radish,green-pea"&&
+  sessionForm.get("subscription_data[metadata][varieties]")==="radish");
+ const beforeInvalidVariety=stats.checkouts;
+ res=await submit({...multiVariety,items:[{variety:"not-a-variety",pack:"200",frequency:"once",method:"pickup"}]},liveBase);
+ check("Unknown sprout names are refused before Stripe",
+  res.status===400&&stats.checkouts===beforeInvalidVariety);
+ res=await submit({...multiVariety,items:[{variety:"green-pea",pack:"200",frequency:"once",method:"pickup"}],code:"SPROUT"},liveBase);
+ check("Broccoli-only coupon never silently misprices other sprouts",
+  res.status===400&&stats.checkouts===beforeInvalidVariety);
 }finally{globalThis.fetch=originalFetch}
 console.log("\nStripe catalogue, recurring billing and portal regression tests: "+checks+" passed.");

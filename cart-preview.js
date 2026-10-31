@@ -10,13 +10,16 @@
  const panel=el("basket"),pay=el("basket-pay");
  const stages=["pack","order","delivery","details"];
  const prices={once:{"200":999,"500":1699},weekly:{"200":899,"500":1549}};
- const makeEntry=id=>({id,pack:null,frequency:null,method:null});
+ const varietyNames={"broccoli":"Broccoli","radish":"Radish","mung-bean":"Mung bean","leek":"Leek","mustard":"Mustard","fenugreek":"Fenugreek","alfalfa":"Alfalfa","green-pea":"Green pea"};
+ const validVariety=variety=>Object.hasOwn(varietyNames,variety);
+ const varietyLabel=entry=>varietyNames[entry.variety||"broccoli"]||"Broccoli";
+ const makeEntry=(id,variety="broccoli")=>({id,variety,pack:null,frequency:null,method:null});
  // Truly empty by default. The old v2 key contained an implicit broccoli
  // draft; do not restore it as an item on existing visitors' next load.
  const state={entries:[],activeId:null,stage:"pack",nextId:1};
  const storeKey="microsprouts-basket-entries-v3";
  // The picker is for discovering the eight varieties. Only broccoli has
- // verified Stripe prices, so other varieties link to a direct enquiry.
+ // the same owner-approved Stripe amounts across all varieties.
  const sproutPicker=el("basket-sprout-picker"),sproutTrack=el("basket-sprout-track");
  const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")];
  let sproutIndex=0;
@@ -57,7 +60,7 @@
        while(used.has(id))id++;
        used.add(id);
        return {
-         id,
+         id,variety:validVariety(v.variety)?v.variety:"broccoli",
          pack:["200","500"].includes(v.pack)?v.pack:null,
          frequency:["once","weekly"].includes(v.frequency)?v.frequency:null,
          method:["pickup","delivery"].includes(v.method)?v.method:null
@@ -112,7 +115,7 @@
      article.dataset.openEntry=String(entry.id);
      article.tabIndex=0;
      article.setAttribute("role","group");
-     article.setAttribute("aria-label","Broccoli Sprouts pack "+entry.pack+" grams. Click or press Enter to expand.");
+     article.setAttribute("aria-label",varietyLabel(entry)+" Sprouts pack "+entry.pack+" grams. Click or press Enter to expand.");
      const chips=appendNode(article,"div","basket-flow__previous-chips");
      const selections=[
        ["pack",entry.pack?entry.pack+"g":"Choose pack"],
@@ -122,10 +125,10 @@
      for(const [step,label] of selections){
        const chip=appendNode(chips,"button","basket-flow__mini-chip",label);
        chip.type="button";chip.dataset.entryId=String(entry.id);
-       chip.dataset.entryStage=step;chip.setAttribute("aria-label","Edit "+label+" for this broccoli pack");
+       chip.dataset.entryStage=step;chip.setAttribute("aria-label","Edit "+label+" for this sprout pack");
      }
      const head=appendNode(article,"div","basket-flow__previous-head");
-     appendNode(head,"span","basket-flow__previous-name","Broccoli Sprouts");
+     appendNode(head,"span","basket-flow__previous-name",varietyLabel(entry)+" Sprouts");
      if(entry.pack){
        const cost=appendNode(head,"div","basket-flow__previous-cost");
        appendNode(cost,"strong","basket-flow__previous-price",
@@ -136,7 +139,7 @@
      const remove=appendNode(article,"button","basket-flow__mini-remove","×");
      remove.type="button";
      remove.dataset.removeEntry=String(entry.id);
-     remove.setAttribute("aria-label","Remove this broccoli pack");
+     remove.setAttribute("aria-label","Remove this "+varietyLabel(entry)+" pack");
    }
  }
  function render(){
@@ -183,6 +186,10 @@
    el("basket-remove-entry").hidden=false;
    // A newly added (not-yet-configured) pack is still an item in the basket.
    // The nav badge updates immediately, before its size is chosen.
+   const photo=el("basket-current-photo");
+   if(photo){photo.src="assets/sprout-orbs/"+(entry.variety||"broccoli")+".webp";
+     photo.alt=varietyLabel(entry)+" sprouts";}
+   if(el("basket-current-name"))setText("basket-current-name",varietyLabel(entry)+" Sprouts");
    const count=state.entries.length;
    const pricedCount=state.entries.filter(i=>i.pack).length;
    setText("nav-cart-count",String(count));
@@ -200,7 +207,7 @@
    const amounts=calc();
    setText("basket-total",pricedCount?money(amounts.due):"—");
    setText("basket-total-type","Due today");
-   const lines=state.entries.filter(i=>i.pack).map(i=>i.pack+"g "+(i.frequency==="weekly"?"weekly":"once"));
+   const lines=state.entries.filter(i=>i.pack).map(i=>varietyLabel(i)+" "+i.pack+"g "+(i.frequency==="weekly"?"weekly":"once"));
    const note=amounts.weekly?money(amounts.weekly)+" / week after today":
      pricedCount?lines.join(" · "):"Choose a pack to begin";
    setText("basket-total-note",note);
@@ -221,7 +228,7 @@
  }
  function addEntry(options={}){
    if(state.entries.length>=10)return null;
-   const entry=makeEntry(state.nextId++);
+   const entry=makeEntry(state.nextId++,validVariety(options.variety)?options.variety:"broccoli");
    if(["200","500"].includes(options.pack))entry.pack=options.pack;
    if(["once","weekly"].includes(options.frequency))entry.frequency=options.frequency;
    state.entries.push(entry);state.activeId=entry.id;state.stage="pack";
@@ -250,7 +257,7 @@
    event.preventDefault();
    openCart({add:true,
      pack:button.dataset.pack||(button.id==="checkout-button"?el("checkout-button")?.dataset.pack:null),
-     frequency:button.dataset.frequency});
+     frequency:button.dataset.frequency,variety:button.dataset.variety});
  }));
  document.querySelectorAll("[data-cart-close]").forEach(button=>button.addEventListener("click",closeCart));
  form.querySelectorAll("[data-flow-pack]").forEach(button=>button.addEventListener("click",()=>{
@@ -315,13 +322,19 @@
  });
  sproutTrack.addEventListener("click",event=>{
    const button=event.target.closest("[data-sprout-add]");
-   if(button?.dataset.sproutAdd!=="broccoli")return;
+   if(!button||!validVariety(button.dataset.sproutAdd))return;
    closeSproutPicker();
-   if(addEntry())setStage("pack");
+   if(addEntry({variety:button.dataset.sproutAdd}))setStage("pack");
  });
  el("basket-add-another").addEventListener("click",()=>{
    if(state.entries.length>=10||!complete(active()))return;
    if(addEntry())setStage("pack");
+ });
+ el("basket-add-variety")?.addEventListener("click",()=>{
+   if(state.entries.length>=10||!complete(active()))return;
+   const opening=sproutPicker.hidden;
+   sproutPicker.hidden=!opening;
+   if(opening)setSproutIndex(0);
  });
  function removeEntry(id){
    state.entries=state.entries.filter(entry=>entry.id!==id);
@@ -435,13 +448,13 @@
  });
  function values(){
    return {
-     items:state.entries.map(item=>({pack:item.pack,frequency:item.frequency,method:item.method})),
+     items:state.entries.map(item=>({variety:item.variety||"broccoli",pack:item.pack,frequency:item.frequency,method:item.method})),
      date:el("basket-date").value,
      return_to_basket:true
    };
  }
  function validate(v){
-   if(!state.entries.every(complete))return "Complete each broccoli pack before continuing.";
+   if(!state.entries.every(complete))return "Complete each sprout pack before continuing.";
    if(!validDate(v.date))return "Choose an available Tuesday–Friday date at least seven days ahead.";
    return "";
  }
@@ -480,6 +493,11 @@
    render();
  }
  const params=new URLSearchParams(location.search);
+ const incomingVariety=params.get("add-sprout");
+ if(validVariety(incomingVariety)){
+   openCart({add:true,variety:incomingVariety});
+   try{window.history?.replaceState(null,"",location.pathname+"#basket")}catch{}
+ }
  if(params.get("checkout_cancelled")==="1"){
    openCart();
    state.stage=complete(active())?"details":active()?.frequency?"delivery":"pack";

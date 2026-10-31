@@ -9,6 +9,8 @@ import {ensureCatalog,ensurePortal,findPortal,priceLookupKey,PRODUCT_DEFINITIONS
 const PRICE_PENCE = Object.freeze({ "200":999, "500":1699 });
 const SUBSCRIPTION_PRICE_PENCE = Object.freeze({ "200":899, "500":1549 });
 const DELIVERY_PENCE = 230;
+const VARIETY_NAMES=Object.freeze({"broccoli":"Broccoli","radish":"Radish","mung-bean":"Mung bean","leek":"Leek","mustard":"Mustard","fenugreek":"Fenugreek","alfalfa":"Alfalfa","green-pea":"Green pea"});
+const validVariety=slug=>Object.hasOwn(VARIETY_NAMES,slug);
 const WHATSAPP = "447386853514";
 const GOOD_FREQUENCIES = new Set(["once","weekly","fortnightly"]);
 const SESS_RE = /^cs_(?:test_|live_)[A-Za-z0-9_]+$/;
@@ -155,7 +157,7 @@ const put=(params,key,value)=>params.append(key,String(value));
 const fulfilmentDay=value=>new Intl.DateTimeFormat("en-GB",{
   timeZone:"UTC",weekday:"short",day:"numeric",month:"short",year:"numeric"
 }).format(new Date(value+"T12:00:00Z"));
-const itemSummary=entry=>entry.pack+"g "+(entry.frequency==="weekly"?"weekly":"one-time")+
+const itemSummary=entry=>(entry.variety!=="broccoli"?VARIETY_NAMES[entry.variety]+" ":"")+entry.pack+"g "+(entry.frequency==="weekly"?"weekly":"one-time")+
   " "+(entry.method==="delivery"?"shipping":"collection");
 const fulfilmentType=entries=>{
   const methods=new Set(entries.map(item=>item.method));
@@ -168,15 +170,16 @@ const fulfilmentType=entries=>{
 const createBasketSession=async(input,request,env)=>{
   const raw=input.items;
   if(!Array.isArray(raw)||raw.length<1||raw.length>10)
-    return issue("Choose between 1 and 10 broccoli packs.");
+    return issue("Choose between 1 and 10 sprout packs.");
   const entries=[];
   for(const item of raw){
     if(!item||typeof item!=="object"||Array.isArray(item)||
+      !validVariety(item.variety===undefined?"broccoli":item.variety)||
       !["200","500"].includes(item.pack)||
       !["once","weekly"].includes(item.frequency)||
       !["pickup","delivery"].includes(item.method))
       return issue("Choose a valid pack, order type and collection or delivery for each item.");
-    entries.push({pack:item.pack,frequency:item.frequency,method:item.method});
+    entries.push({variety:item.variety===undefined?"broccoli":item.variety,pack:item.pack,frequency:item.frequency,method:item.method});
   }
   const hasDelivery=entries.some(item=>item.method==="delivery");
   const hasWeekly=entries.some(item=>item.frequency==="weekly");
@@ -190,6 +193,7 @@ const createBasketSession=async(input,request,env)=>{
     return issue("Choose an available Tuesday–Friday date at least seven days ahead.");
   if(promo&&promo!=="SPROUT")return issue("That promotional code is not recognised.");
   if(promo&&hasWeekly)return issue("SPROUT applies only to baskets with one-time orders.");
+  if(promo&&entries.some(item=>item.variety!=="broccoli"))return issue("SPROUT is currently available for broccoli-only baskets.");
   const goods=entries.reduce((sum,item)=>sum+
     (item.frequency==="once"?PRICE_PENCE[item.pack]:SUBSCRIPTION_PRICE_PENCE[item.pack]),0);
   const weekly=entries.filter(item=>item.frequency==="weekly")
@@ -240,16 +244,33 @@ const createBasketSession=async(input,request,env)=>{
   put(form,"locale","en-GB");
   const groups=new Map();
   for(const item of entries){
-    const k=item.pack+":"+item.frequency;
+    const k=item.variety+":"+item.pack+":"+item.frequency;
     groups.set(k,(groups.get(k)||0)+1);
   }
   let index=0;
   for(const [key,quantity] of groups){
-    const [pack,frequency]=key.split(":");
-    const product=PRODUCT_DEFINITIONS.find(p=>p.grams===Number(pack));
-    const price=catalog.prices[priceLookupKey(product,frequency)];
-    if(!price)return issue("This sprouts price is not available.",503);
-    put(form,"line_items["+index+"][price]",price);
+    const [variety,pack,frequency]=key.split(":");
+    if(variety==="broccoli"){
+      // Keep the verified brochure catalogue Price IDs unchanged.
+      const product=PRODUCT_DEFINITIONS.find(p=>p.grams===Number(pack));
+      const price=catalog.prices[priceLookupKey(product,frequency)];
+      if(!price)return issue("This sprouts price is not available.",503);
+      put(form,"line_items["+index+"][price]",price);
+    }else{
+      // Server-fixed inline Prices distinguish varieties without borrowing
+      // a broccoli product ID or editing the live Stripe catalogue.
+      const prefix="line_items["+index+"][price_data]";
+      put(form,prefix+"[currency]","gbp");
+      put(form,prefix+"[unit_amount]",
+        frequency==="weekly"?SUBSCRIPTION_PRICE_PENCE[pack]:PRICE_PENCE[pack]);
+      put(form,prefix+"[product_data][name]",
+        "MicroSprouts "+VARIETY_NAMES[variety]+" Sprouts — "+
+        (pack==="200"?"Single Pack 200g":"Family Pack 500g"));
+      if(frequency==="weekly"){
+        put(form,prefix+"[recurring][interval]","week");
+        put(form,prefix+"[recurring][interval_count]",1);
+      }
+    }
     put(form,"line_items["+index+"][quantity]",quantity);
     index++;
   }
@@ -263,10 +284,12 @@ const createBasketSession=async(input,request,env)=>{
   if(discount)put(form,"discounts[0][coupon]",catalog.coupon);
   // Compact, explicitly validated item-level fulfilment information stays in
   // Stripe metadata for manual packing without an extra database.
-  const encoded=entries.map(item=>item.pack+":"+
-    (item.frequency==="weekly"?"w":"o")+":"+(item.method==="delivery"?"d":"p")).join("|");
+  const encodeEntry=item=>(item.variety==="broccoli"?"":item.variety+":")+item.pack+":"+
+    (item.frequency==="weekly"?"w":"o")+":"+(item.method==="delivery"?"d":"p");
+  const encoded=entries.map(encodeEntry).join("|");
   const first=entries[0];
   const metadata={
+    varieties:[...new Set(entries.map(x=>x.variety))].join(","),
     pack:entries.every(x=>x.pack===first.pack)?first.pack:"mixed",
     quantity:String(entries.length),
     frequency:hasWeekly?(hasOnce?"mixed":"weekly"):"once",
@@ -294,8 +317,8 @@ const createBasketSession=async(input,request,env)=>{
       frequency:"weekly",
       method:renewals.every(item=>item.method===renewalFirst.method)?renewalFirst.method:"mixed",
       promo:"",subtotal_pence:String(weekly),delivery_pence:"0",
-      total_pence:String(weekly),basket_entries:renewals.map(item=>
-        item.pack+":w:"+(item.method==="delivery"?"d":"p")).join("|"),
+      total_pence:String(weekly),basket_entries:renewals.map(encodeEntry).join("|"),
+      varieties:[...new Set(renewals.map(x=>x.variety))].join(","),
       order_summary:renewals.map(itemSummary).join("; "),
       fulfilment:fulfilmentType(renewals)
     };

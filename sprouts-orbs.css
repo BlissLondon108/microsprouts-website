@@ -132,3 +132,17 @@
  -webkit-user-drag:none;-webkit-user-select:none;user-select:none;
  -webkit-touch-callout:none;
 }
+
+/* Clean water bubble surface — no internal targeting reticle or cross lines.
+   The actual approved WebP sprout assets contain no crosshairs. */
+.sprouts-page .ms-orb-link::before,
+.sprouts-page .ms-orb-link::after{
+ content:none!important;display:none!important;
+}
+.sprouts-page .ms-orb-link{
+ background:
+  radial-gradient(ellipse 34% 16% at 32% 16%,rgba(255,255,255,.44),transparent 94%),
+  radial-gradient(ellipse 22% 13% at 78% 84%,rgba(228,252,225,.18),transparent 95%),
+  radial-gradient(circle at 49% 49%,rgba(238,255,237,.025) 43%,rgba(221,250,225,.1) 96%);
+ border:1px solid rgba(230,251,232,.72);
+}
