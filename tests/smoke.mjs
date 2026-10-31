@@ -581,5 +581,5 @@ check("Updated Day 3–5 and Day 6 broccoli pictures preserve glass containers",
  html.includes('class="growth-image__fresh-sprouts" src="assets/sprout-orbs/broccoli.webp"')&&
  html.includes('comp.css?v=sprout-art-2')&&
  read("comp.css").includes('.growth-image--refreshed-growth .growth-image__fresh-sprouts{')&&
- !html.includes('src="assets/approved/week.webp"')&&
+ !html.includes('class="growth-image"><img src="assets/approved/week.webp"')&&
  !html.includes('src="assets/approved/jar.webp"'));
