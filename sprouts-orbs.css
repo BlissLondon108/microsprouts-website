@@ -1,6 +1,5 @@
-/* MicroSprouts: stable, crosshair-free water bubbles.
-   A translucent circle, one specular surface, and the approved sprout artwork.
-   No hover-generated pseudoelements or animated radial-gradient layers. */
+/* MicroSprouts water spheres: a single reusable SVG surface for Firefox
+   and other browsers. No CSS circular borders, inset shadows, or gradients. */
 .ms-orb-scene{
  position:relative;isolation:isolate;min-width:0;width:100%;
  height:clamp(390px,37vw,490px);overflow:visible;background:transparent;
@@ -18,31 +17,17 @@
  width:calc(var(--orb-size) * var(--orb-zoom));
  height:calc(var(--orb-size) * var(--orb-zoom));
  transform:translate(-50%,-50%);
- border-radius:50%;isolation:isolate;overflow:visible;
- border:1px solid rgba(240,255,245,.72);
- background:rgba(235,255,240,.06);
- box-shadow:
-  inset 0 1px 0 rgba(255,255,255,.35),
-  inset 0 -8px 18px rgba(170,220,185,.10),
-  0 5px 19px rgba(0,24,17,.25),
-  0 0 11px rgba(181,247,224,.11);
- color:#f9ffe9;text-decoration:none;outline:none;
- transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease;
- -webkit-tap-highlight-color:transparent;
+ border:0;outline:none;background:none;box-shadow:none;
+ color:#f9ffe9;text-decoration:none;
+ transition:transform .24s ease;-webkit-tap-highlight-color:transparent;
 }
-/* Explicitly disable the original targeting/shine pseudo layers. */
-.ms-orb-link::before,
-.ms-orb-link::after{content:none!important;display:none!important}
-/* One noninteractive, fixed water reflection per sphere; it does not respond
-   to pointer coordinates and cannot draw centre-line reticles. */
+.ms-orb-link::before,.ms-orb-link::after{content:none!important;display:none!important}
 .ms-orb-surface{
- position:absolute;inset:1px;z-index:2;pointer-events:none;
- border-radius:50%;
- background:
-  radial-gradient(ellipse 36% 16% at 30% 17%,
-    rgba(255,255,255,.46),rgba(255,255,255,.10) 54%,transparent 100%),
-  radial-gradient(ellipse 18% 10% at 78% 83%,
-    rgba(240,255,245,.19),transparent 100%);
+ position:absolute;inset:0;z-index:2;pointer-events:none;
+ background:transparent url("assets/sprout-orbs/water-bubble.svg") center / 100% 100% no-repeat;
+ /* The glow follows the SVG's alpha, not a CSS border-radius box. */
+ filter:drop-shadow(0 4px 9px rgba(0,24,17,.22));
+ transition:filter .24s ease;
 }
 .ms-orb-art{
  display:block;position:absolute;inset:7%;width:86%;height:86%;z-index:1;
@@ -52,28 +37,25 @@
 }
 .ms-orb-link:hover,.ms-orb-link:focus-visible{
  transform:translate(-50%,-50%) scale(1.12);
- border-color:rgba(247,255,249,.92);
- box-shadow:
-  inset 0 1px 0 rgba(255,255,255,.48),
-  inset 0 -10px 20px rgba(170,220,185,.13),
-  0 8px 22px rgba(0,22,15,.3),
-  0 0 10px hsl(var(--glow-hue) 90% 82% / .28),
-  0 0 24px hsl(var(--glow-hue) 80% 74% / .34);
+}
+.ms-orb-link:hover .ms-orb-surface,.ms-orb-link:focus-visible .ms-orb-surface{
+ filter:
+  drop-shadow(0 2px 8px hsl(var(--glow-hue) 85% 79% / .48))
+  drop-shadow(0 0 16px hsl(var(--glow-hue) 83% 69% / .39));
 }
 .ms-orb-link:hover .ms-orb-art,.ms-orb-link:focus-visible .ms-orb-art{
  filter:
   drop-shadow(0 0 8px hsl(var(--glow-hue) 90% 78% / .52))
   drop-shadow(0 0 15px hsl(var(--glow-hue) 82% 70% / .30));
 }
-.ms-orb-link:focus-visible{outline:2px solid #e0f9c3;outline-offset:4px}
 .ms-orb-caption{
  position:absolute;bottom:-21px;left:50%;transform:translateX(-50%);z-index:3;
  padding:3px 7px;white-space:nowrap;
  font:600 11px/1.3 Arial,Helvetica,sans-serif;letter-spacing:.01em;
- color:#e6f3d5;text-shadow:0 2px 6px #001f0f;
- pointer-events:none;
+ color:#e6f3d5;text-shadow:0 2px 6px #001f0f;pointer-events:none;
 }
 .ms-orb-link:hover .ms-orb-caption,.ms-orb-link:focus-visible .ms-orb-caption{color:#fff}
+.ms-orb-link:focus-visible .ms-orb-caption{text-decoration:underline;text-underline-offset:4px}
 .ms-orb-link,.ms-orb-link *{
  cursor:default;-webkit-user-drag:none;user-select:none;-webkit-user-select:none;
  -webkit-touch-callout:none;
@@ -84,7 +66,7 @@
 @media(max-width:360px){.ms-orb-scene{--orb-zoom:.5}}
 @media(prefers-reduced-motion:reduce){
  .ms-orb-floating{will-change:auto}
- .ms-orb-link,.ms-orb-art{transition:none}
+ .ms-orb-link,.ms-orb-art,.ms-orb-surface{transition:none}
 }
 .sprouts-page .subpage-hero__inner{
  grid-template-columns:minmax(0,1fr) minmax(0,1.03fr);

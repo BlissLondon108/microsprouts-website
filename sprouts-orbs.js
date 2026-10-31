@@ -20,12 +20,6 @@
      vx:Math.cos(direction)*speed,vy:Math.sin(direction)*speed,
      hovered:false,focused:false
    };
-   link.addEventListener("pointermove",event=>{
-     const rect=link.getBoundingClientRect();
-     if(!rect.width||!rect.height)return;
-     link.style.setProperty("--orb-pointer-x",((event.clientX-rect.left)/rect.width*100).toFixed(1)+"%");
-     link.style.setProperty("--orb-pointer-y",((event.clientY-rect.top)/rect.height*100).toFixed(1)+"%");
-   },{passive:true});
    link.addEventListener("pointerenter",event=>{
      if(event.pointerType!=="touch")state.hovered=true;
    });

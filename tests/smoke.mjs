@@ -342,9 +342,9 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=7')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=8')&&sproutsDetails.includes('sprouts-orbs.js?v=4')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
- read('sprouts-orbs.js').includes('pointermove')&&
+ read('sprouts-orbs.js').includes('pointerenter')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
  .every(name=>fs.existsSync(path.join(root,'assets','sprout-orbs',name+'.webp'))));
 
@@ -364,11 +364,11 @@ check("Animated orbs use bounded collision physics instead of CSS drift",
 
 check("Water bubbles use one stable reflection layer without a target reticle",
  (sproutsDetails.match(/class="ms-orb-surface"/g)||[]).length===8&&
- read("sprouts-orbs.css").includes("radial-gradient(ellipse 36% 16%")&&
- read("sprouts-orbs.css").includes("border:1px solid rgba(240,255,245,.72)")&&
+ read("sprouts-orbs.css").includes('url("assets/sprout-orbs/water-bubble.svg")')&&
+ read("assets/sprout-orbs/water-bubble.svg").includes('<circle cx="256" cy="256" r="242"')&&
+ !read("assets/sprout-orbs/water-bubble.svg").includes("<radialGradient")&&
  !read("sprouts-orbs.css").includes("backdrop-filter")&&
- !read("sprouts-orbs.css").includes("var(--orb-pointer-x)")&&
- !read("sprouts-orbs.css").includes("radial-gradient(circle 57px"));
+ !read("sprouts-orbs.css").includes("var(--orb-pointer-x)"));
 check("Hover glows never meet the rectangular sphere viewport boundary",
  read("sprouts-orbs.css").includes("overflow:visible;background:transparent")&&
  read("sprouts-orbs.js").includes("s.r*1.12+32")&&
@@ -424,8 +424,17 @@ check("Server validates all eight varieties and creates distinct Stripe names",
 
 check("All bubble captions remain outside the sphere and collision physics is unchanged",
  read("sprouts-orbs.css").includes("overflow:visible;background:transparent")&&
- read("sprouts-orbs.css").includes("border-radius:50%;isolation:isolate;overflow:visible")&&
+ read("sprouts-orbs.css").includes("border:0;outline:none;background:none;box-shadow:none")&&
  read("sprouts-orbs.css").includes("bottom:-21px")&&
  read("sprouts-orbs.js").includes("const separate=elastic=>")&&
  !read("sprouts-orbs.css").includes("overflow:hidden")&&
  (sproutsDetails.match(/class="ms-orb-caption"/g)||[]).length===8);
+
+check("All eight spheres share one Firefox-safe static SVG with no circular CSS seams",
+  read("sprouts-orbs.css").includes('url("assets/sprout-orbs/water-bubble.svg")')&&
+  (sproutsDetails.match(/class="ms-orb-surface"/g)||[]).length===8&&
+  read("sprouts-orbs.css").includes("border:0;outline:none;background:none;box-shadow:none")&&
+  !read("sprouts-orbs.js").includes("--orb-pointer-x")&&
+  !read("sprouts-orbs.css").includes("inset 0 -")&&
+  !read("assets/sprout-orbs/water-bubble.svg").includes("<radialGradient")&&
+  read("sprouts-orbs.js").includes("const separate=elastic=>"));

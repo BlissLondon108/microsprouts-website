@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- One stable, scale-independent water-bubble drawing for all eight varieties.
+     Firefox WebRender no longer paints CSS radial gradients or inset circular shadows. -->
+<circle cx="256" cy="256" r="243" fill="#e8fff2" fill-opacity=".072"/>
+<circle cx="256" cy="256" r="242" fill="none" stroke="#f2fffc" stroke-opacity=".71" stroke-width="3.4"/>
+<circle cx="256" cy="256" r="235" fill="none" stroke="#d4fff0" stroke-opacity=".26" stroke-width="2"/>
+<path d="M79 153 C111 89 170 48 235 40" fill="none" stroke="#ffffff" stroke-opacity=".68" stroke-width="10" stroke-linecap="round"/>
+<path d="M78 165 C110 100 157 65 203 51" fill="none" stroke="#efffff" stroke-opacity=".20" stroke-width="19" stroke-linecap="round"/>
+<ellipse cx="154" cy="105" rx="61" ry="17" transform="rotate(-34 154 105)" fill="#ffffff" fill-opacity=".16"/>
+<path d="M370 435 C399 420 423 396 441 362" fill="none" stroke="#edfff6" stroke-opacity=".32" stroke-width="6" stroke-linecap="round"/>
+<ellipse cx="389" cy="403" rx="24" ry="8" transform="rotate(-39 389 403)" fill="#ffffff" fill-opacity=".14"/>
+</svg>
