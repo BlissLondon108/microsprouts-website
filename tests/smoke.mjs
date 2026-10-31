@@ -79,7 +79,7 @@ check("Chips appear before active broccoli heading and never say Edit",
  !html.includes('1 pack</span>')&&
  cartClient.includes('button.setAttribute("aria-label","Change "+label)'));
 check("Adding broccoli creates independent entries with size, frequency, method and removal",
- cartClient.includes('const makeEntry=id=>({id,pack:null,frequency:null,method:null})')&&
+ cartClient.includes('const makeEntry=(id,variety="broccoli")=>({id,variety,pack:null,frequency:null,method:null})')&&
  cartClient.includes('state.entries.push(entry)')&&
  cartClient.includes('state.activeId=entry.id')&&
  cartClient.includes('const entry=active()')&&
@@ -88,7 +88,7 @@ check("Adding broccoli creates independent entries with size, frequency, method 
  cartClient.includes('data-remove-entry')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
 check("Basket allows mixed weekly and one-time checkout with one payment",
- cartClient.includes('items:state.entries.map(item=>({pack:item.pack,frequency:item.frequency,method:item.method}))')&&
+ cartClient.includes('items:state.entries.map(item=>({variety:item.variety||"broccoli",pack:item.pack,frequency:item.frequency,method:item.method}))')&&
  cartClient.includes('fetch("/api/checkout/session"')&&
  checkoutWorker.includes('const createBasketSession=async(input,request,env)=>')&&
  checkoutWorker.includes('if(Object.hasOwn(input,"items"))return createBasketSession')&&
