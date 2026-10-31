@@ -338,7 +338,7 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=4')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=5')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
  read('sprouts-orbs.js').includes('pointermove')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
@@ -370,7 +370,7 @@ check("Hover glows never meet the rectangular sphere viewport boundary",
 
 check("All eight approved artworks appear on catalogue and in basket",
  ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>
-  sprouts.includes('class="sprout-card__art" src="assets/sprout-orbs/'+slug+'.webp"')&&
+  sprouts.includes("class=\"sprout-card__art\" role=\"img\"")&&sprouts.includes("background-image:url('assets/sprout-orbs/"+slug+".webp')")&&
   html.includes('src="assets/sprout-orbs/'+slug+'.webp"'))&&
  (html.match(/data-sprout-card="/g)||[]).length===8&&
  (html.match(/class="sprout-tile" href="sprouts.html#/g)||[]).length===8);
@@ -385,3 +385,19 @@ check("Unpriced sprouts are visibly available to enquire about, not incorrectly 
  !sprouts.includes('Ask about availability')&&
  html.includes('data-sprout-add="broccoli"')&&
  (html.match(/class="basket-sprout-card__action"/g)||[]).length===7);
+
+check("All eight catalogue cards have matching colour spotlight effects", 
+ (sprouts.match(/class="sprout-card" data-spotlight/g)||[]).length===8&&
+ sprouts.includes('href="sprouts-spotlight.css?v=1"')&&
+ sprouts.includes('src="sprouts-spotlight.js?v=1"')&&
+ ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>
+  read("sprouts-spotlight.css").includes("#"+slug+"{--spot-hue:"))&&
+ read("sprouts-spotlight.css").includes("mask-composite:exclude")&&
+ read("sprouts-spotlight.js").includes('card.addEventListener("pointermove"')&&
+ read("sprouts-spotlight.css").includes("prefers-reduced-motion:reduce"));
+check("Homepage and catalogue images never trigger native hover search arrows",
+ (html.match(/class="sprout-orb__photo" aria-hidden/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__art" role="img"/g)||[]).length===8&&
+ !sprouts.includes('<img class="sprout-card__art"')&&
+ !html.includes('<img class="sprout-orb__photo"')&&
+ read("sprouts-orbs.css").includes(".ms-orb-link::before{content:none!important}"));

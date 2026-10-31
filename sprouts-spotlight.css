@@ -1,0 +1,76 @@
+/* MicroSprouts variety cards: GlowCard-inspired pointer-following botanical spotlight.
+   Scoped to this catalogue; no React, Tailwind, or browser-fixed background. */
+.sprouts-page .sprouts-grid .sprout-card{
+ --spot-x:50%;--spot-y:50%;--spot-hue:120%;
+ position:relative;isolation:isolate;overflow:hidden;
+ border:1px solid rgba(125,160,121,.36);
+ box-shadow:0 9px 26px rgba(19,63,28,.07);
+ transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;
+}
+.sprouts-page .sprout-card#broccoli{--spot-hue:125}
+.sprouts-page .sprout-card#radish{--spot-hue:341}
+.sprouts-page .sprout-card#mung-bean{--spot-hue:74}
+.sprouts-page .sprout-card#leek{--spot-hue:157}
+.sprouts-page .sprout-card#mustard{--spot-hue:49}
+.sprouts-page .sprout-card#fenugreek{--spot-hue:31}
+.sprouts-page .sprout-card#alfalfa{--spot-hue:147}
+.sprouts-page .sprout-card#green-pea{--spot-hue:110}
+.sprouts-page .sprouts-grid .sprout-card::before{
+ content:"";position:absolute;inset:0;z-index:4;pointer-events:none;
+ border-radius:inherit;opacity:0;
+ background:radial-gradient(circle 205px at var(--spot-x) var(--spot-y),
+  hsl(var(--spot-hue) 88% 73% / .20),
+  hsl(var(--spot-hue) 80% 70% / .07) 42%,transparent 77%);
+ transition:opacity .28s ease;
+}
+.sprouts-page .sprouts-grid .sprout-card::after{
+ content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+ padding:2px;border-radius:inherit;opacity:.18;
+ background:radial-gradient(circle 205px at var(--spot-x) var(--spot-y),
+  hsl(var(--spot-hue) 96% 87% / 1),hsl(var(--spot-hue) 85% 66% / .75) 33%,transparent 78%);
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;
+ mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ mask-composite:exclude;
+ transition:opacity .3s ease;
+}
+.sprouts-page .sprouts-grid .sprout-card:hover,
+.sprouts-page .sprouts-grid .sprout-card:focus-within{
+ transform:translateY(-4px);
+ box-shadow:0 17px 39px rgba(13,54,25,.15),
+ 0 0 26px hsl(var(--spot-hue) 80% 66% / .13);
+ border-color:hsl(var(--spot-hue) 55% 61% / .59);
+}
+.sprouts-page .sprouts-grid .sprout-card:hover::before,
+.sprouts-page .sprouts-grid .sprout-card:hover::after,
+.sprouts-page .sprouts-grid .sprout-card:focus-within::before,
+.sprouts-page .sprouts-grid .sprout-card:focus-within::after{opacity:1}
+.sprouts-page .sprouts-grid .sprout-card__body{position:relative;z-index:1}
+.sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__art{
+ display:block;position:absolute;inset:0;width:100%;height:100%;
+ background-position:center;background-repeat:no-repeat;
+ background-size:contain;pointer-events:none;
+ -webkit-user-drag:none;user-select:none;
+ padding:0;
+ background-origin:content-box;background-clip:content-box;
+ box-sizing:border-box;
+ /* Keep the same roomy botanical image proportions as the approved cards. */
+ margin:clamp(10px,2.1vw,29px) clamp(12px,2.4vw,30px);
+ width:calc(100% - 2 * clamp(12px,2.4vw,30px));
+ height:calc(100% - 2 * clamp(10px,2.1vw,29px));
+ filter:drop-shadow(0 9px 12px rgba(10,31,20,.22));
+}
+@media(max-width:650px){
+ .sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__art{
+  margin:14px 28px;width:calc(100% - 56px);height:calc(100% - 28px);
+ }
+}
+@media(hover:none){
+ .sprouts-page .sprouts-grid .sprout-card:active::after,
+ .sprouts-page .sprouts-grid .sprout-card:active::before{opacity:.7}
+}
+@media(prefers-reduced-motion:reduce){
+ .sprouts-page .sprouts-grid .sprout-card{transition:none;transform:none!important}
+ .sprouts-page .sprouts-grid .sprout-card::before,
+ .sprouts-page .sprouts-grid .sprout-card::after{transition:none}
+}

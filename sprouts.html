@@ -12,9 +12,11 @@
 <link rel="preload" as="image" href="assets/sprout-orbs/broccoli.webp">
 <link rel="stylesheet" href="comp.css">
 <link rel="stylesheet" href="pages.css">
-<link rel="stylesheet" href="sprouts-orbs.css?v=4">
+<link rel="stylesheet" href="sprouts-orbs.css?v=5">
+<link rel="stylesheet" href="sprouts-spotlight.css?v=1">
 <script src="pages.js" defer></script>
 <script src="sprouts-orbs.js?v=3" defer></script>
+<script src="sprouts-spotlight.js?v=1" defer></script>
 </head>
 <body class="interior-page sprouts-page">
 <div class="interior-head" id="top">
@@ -100,9 +102,9 @@
     </div>
 
     <div class="sprouts-grid">
-      <article class="sprout-card" id="broccoli">
+      <article class="sprout-card" data-spotlight id="broccoli">
         <div class="sprout-card__visual sprout-card__visual--broccoli">
-          <img class="sprout-card__art" src="assets/sprout-orbs/broccoli.webp" width="512" height="512" loading="lazy" decoding="async" alt="Broccoli sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Broccoli sprouts" style="background-image:url('assets/sprout-orbs/broccoli.webp')"></span>
           <span class="sprout-card__visual-label" style="color:#f5f8ec">01 / Broccoli</span>
         </div>
         <div class="sprout-card__body">
@@ -116,9 +118,9 @@
         </div>
       </article>
 
-      <article class="sprout-card" id="radish">
+      <article class="sprout-card" data-spotlight id="radish">
         <div class="sprout-card__visual sprout-card__visual--radish" aria-hidden="true">
-          <img class="sprout-card__art" src="assets/sprout-orbs/radish.webp" width="512" height="512" loading="lazy" decoding="async" alt="Radish sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Radish sprouts" style="background-image:url('assets/sprout-orbs/radish.webp')"></span>
           <span class="sprout-card__visual-label">02 / Radish</span>
         </div>
         <div class="sprout-card__body">
@@ -132,9 +134,9 @@
         </div>
       </article>
 
-      <article class="sprout-card" id="mung-bean">
+      <article class="sprout-card" data-spotlight id="mung-bean">
         <div class="sprout-card__visual sprout-card__visual--mung" aria-hidden="true">
-          <img class="sprout-card__art" src="assets/sprout-orbs/mung-bean.webp" width="512" height="512" loading="lazy" decoding="async" alt="Mung bean sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Mung bean sprouts" style="background-image:url('assets/sprout-orbs/mung-bean.webp')"></span>
           <span class="sprout-card__visual-label">03 / Mung bean</span>
         </div>
         <div class="sprout-card__body">
@@ -148,9 +150,9 @@
         </div>
       </article>
 
-      <article class="sprout-card" id="leek">
+      <article class="sprout-card" data-spotlight id="leek">
         <div class="sprout-card__visual sprout-card__visual--leek" aria-hidden="true">
-          <img class="sprout-card__art" src="assets/sprout-orbs/leek.webp" width="512" height="512" loading="lazy" decoding="async" alt="Leek sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Leek sprouts" style="background-image:url('assets/sprout-orbs/leek.webp')"></span>
           <span class="sprout-card__visual-label">04 / Leek</span>
         </div>
         <div class="sprout-card__body">
@@ -164,9 +166,9 @@
         </div>
       </article>
 
-      <article class="sprout-card" id="mustard">
+      <article class="sprout-card" data-spotlight id="mustard">
         <div class="sprout-card__visual sprout-card__visual--mustard" aria-hidden="true">
-          <img class="sprout-card__art" src="assets/sprout-orbs/mustard.webp" width="512" height="512" loading="lazy" decoding="async" alt="Mustard sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Mustard sprouts" style="background-image:url('assets/sprout-orbs/mustard.webp')"></span>
           <span class="sprout-card__visual-label">05 / Mustard</span>
         </div>
         <div class="sprout-card__body">
@@ -180,9 +182,9 @@
         </div>
       </article>
 
-      <article class="sprout-card" id="fenugreek">
+      <article class="sprout-card" data-spotlight id="fenugreek">
         <div class="sprout-card__visual sprout-card__visual--fenugreek" aria-hidden="true">
-          <img class="sprout-card__art" src="assets/sprout-orbs/fenugreek.webp" width="512" height="512" loading="lazy" decoding="async" alt="Fenugreek sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Fenugreek sprouts" style="background-image:url('assets/sprout-orbs/fenugreek.webp')"></span>
           <span class="sprout-card__visual-label">06 / Fenugreek</span>
         </div>
         <div class="sprout-card__body">
@@ -196,9 +198,9 @@
         </div>
       </article>
 
-      <article class="sprout-card" id="alfalfa">
+      <article class="sprout-card" data-spotlight id="alfalfa">
         <div class="sprout-card__visual sprout-card__visual--alfalfa" aria-hidden="true">
-          <img class="sprout-card__art" src="assets/sprout-orbs/alfalfa.webp" width="512" height="512" loading="lazy" decoding="async" alt="Alfalfa sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Alfalfa sprouts" style="background-image:url('assets/sprout-orbs/alfalfa.webp')"></span>
           <span class="sprout-card__visual-label">07 / Alfalfa</span>
         </div>
         <div class="sprout-card__body">
@@ -212,9 +214,9 @@
         </div>
       </article>
 
-      <article class="sprout-card" id="green-pea">
+      <article class="sprout-card" data-spotlight id="green-pea">
         <div class="sprout-card__visual sprout-card__visual--green-pea" aria-hidden="true">
-          <img class="sprout-card__art" src="assets/sprout-orbs/green-pea.webp" width="512" height="512" loading="lazy" decoding="async" alt="Green pea sprouts">
+          <span class="sprout-card__art" role="img" aria-label="Green pea sprouts" style="background-image:url('assets/sprout-orbs/green-pea.webp')"></span>
           <span class="sprout-card__visual-label">08 / Green pea</span>
         </div>
         <div class="sprout-card__body">
