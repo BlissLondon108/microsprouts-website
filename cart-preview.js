@@ -231,7 +231,7 @@
    const entry=makeEntry(state.nextId++,validVariety(options.variety)?options.variety:"broccoli");
    if(["200","500"].includes(options.pack))entry.pack=options.pack;
    if(["once","weekly"].includes(options.frequency))entry.frequency=options.frequency;
-   state.entries.push(entry);state.activeId=entry.id;state.stage="pack";
+   state.entries.push(entry);state.activeId=entry.id;state.stage=entry.pack?"order":"pack";
    save();
    return entry;
  }
@@ -253,6 +253,19 @@
    returnFocus?.focus?.();
  }
  trigger.addEventListener("click",()=>openCart());
+ document.querySelectorAll("[data-cart-add-pack]").forEach(button=>{
+   button.addEventListener("click",()=>{
+     const variety=button.dataset.variety,pack=button.dataset.pack;
+     if(!validVariety(variety)||!["200","500"].includes(pack))return;
+     if(state.entries.length>=10){
+       openCart();
+       showError("Your basket can contain up to 10 sprout packs.");
+       return;
+     }
+     openCart({add:true,variety,pack});
+     setStage("order");
+   });
+ });
  document.querySelectorAll("[data-cart-open]").forEach(button=>button.addEventListener("click",event=>{
    event.preventDefault();
    openCart({add:true,
