@@ -34,7 +34,7 @@ check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('const storeKey="microsprouts-basket-entries-v3"')&&
  html.includes('id="basket-empty"')&&html.includes('Your basket is empty.')&&
  html.includes('id="basket-start"')&&
- cartClient.includes('if(options.add)addEntry(options)')&&
+ cartClient.includes('if(options.add){closeSproutPicker();addEntry(options);}')&&
  cartClient.includes('el("basket-start").addEventListener("click"')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
 check("Add Sprouts offers all eight approved priced varieties",
