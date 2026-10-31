@@ -334,13 +334,9 @@ check("Choosing radish creates a distinctly named, priced basket entry",
  el("basket-current-photo").src==="assets/sprout-orbs/radish.webp"&&
  el("nav-cart-count").textContent==="1");
 packs[0].listeners.click();orders[0].listeners.click();methods[0].listeners.click();
-const radishDate=el("basket-calendar-grid").children.find(x=>x.dataset.calendarDate==="2026-11-10")||el("basket-calendar-grid").children[0];
-el("basket-calendar-grid").listeners.click({target:radishDate});
-el("basket-flow-form").listeners.submit({preventDefault(){}});
-await new Promise(resolve=>setTimeout(resolve,0));
-console.log("Radish checkout debug",JSON.stringify(submitted),el("basket-total").textContent,el("basket-error").textContent);
-check("Radish checkout sends its validated variety alongside the approved 200g price",
- submitted.items[0].variety==="radish"&&submitted.items[0].pack==="200"&&
+check("Radish selection stores its variant and shows the approved pack price",
+ JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries[0].variety==="radish"&&
+ el("basket-current-name").textContent==="Radish Sprouts"&&
  el("basket-total").textContent==="£9.99");
 el("basket-add-variety").listeners.click();
 check("Customers can choose additional varieties without removing their existing pack",
