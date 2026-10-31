@@ -768,3 +768,14 @@ body.overlay-open{overflow:hidden}
  background-size:contain;background-repeat:no-repeat;pointer-events:none;
  -webkit-user-drag:none;user-select:none;
 }
+
+/* 2026 harvest photography refresh: the rectangular glass pack is preserved,
+   with a newer broccoli sprout layer showing small leaves and seed hulls. */
+.growth-image--refreshed-growth{position:relative;isolation:isolate}
+.growth-image--refreshed-growth .growth-image__fresh-sprouts{
+ position:absolute;left:18%;top:1%;width:64%;height:79%;
+ object-fit:contain;pointer-events:none;z-index:1;
+ filter:drop-shadow(0 2px 4px rgba(2,24,9,.27));
+ -webkit-mask-image:radial-gradient(ellipse 65% 62% at 50% 50%,#000 65%,transparent 100%);
+ mask-image:radial-gradient(ellipse 65% 62% at 50% 50%,#000 65%,transparent 100%)
+}

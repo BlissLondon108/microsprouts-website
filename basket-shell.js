@@ -25,7 +25,7 @@
           <div id="basket-picker-home" class="basket-flow__picker-home">
           <section class="basket-sprout-picker" id="basket-sprout-picker" aria-label="Choose your sprouts" hidden>
               <div class="basket-sprout-picker__heading">
-                <span>SELECT YOUR FAVORITE</span>
+                <span>Add Your Favorite</span>
               </div>
               <div id="basket-sprout-track" class="basket-sprout-track" role="list" aria-roledescription="carousel" aria-label="Eight draggable sprout varieties">
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--broccoli" data-sprout-card="broccoli" aria-label="Broccoli sprouts">
@@ -191,7 +191,6 @@
       <section class="basket-bulk-card" role="dialog" aria-modal="true" aria-labelledby="basket-bulk-title" aria-describedby="basket-bulk-description" tabindex="-1">
         <button type="button" class="basket-bulk-card__close" id="basket-bulk-close" data-bulk-close aria-label="Close bulk order enquiry">×</button>
         <span class="basket-bulk-card__eyebrow">A LITTLE SOMETHING EXTRA</span>
-        <div class="basket-bulk-card__icon" aria-hidden="true">✦</div>
         <h2 class="basket-bulk-card__title" id="basket-bulk-title">Planning a larger order?</h2>
         <p class="basket-bulk-card__description" id="basket-bulk-description">We’d love to grow it for you. For orders of more than 10 packs, get in touch and we’ll work out a <strong>personal bulk discount</strong>, check availability and arrange the best collection or delivery option for you.</p>
         <a class="basket-bulk-card__whatsapp" id="basket-bulk-whatsapp" href="https://wa.me/447386853514" target="_blank" rel="noopener noreferrer">Let's chat on WhatsApp <span aria-hidden="true">↗</span></a>

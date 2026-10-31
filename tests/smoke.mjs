@@ -70,8 +70,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=18"')&&
- html.includes('href="basket-flow.css?v=13"'));
+ html.includes('src="cart-preview.js?v=19"')&&
+ html.includes('href="basket-flow.css?v=14"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -225,11 +225,12 @@ check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).leng
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
 const localAssetPaths = [...new Set([...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m=>m[1]))];
 check("Local images exist", localAssetPaths.every(src => fs.existsSync(path.join(root, src))));
-check("Approved homepage photographs are direct, with no old-photo replacement pass",
+check("Homepage photographs retain containers while refreshing broccoli sprouts",
   html.includes('src="assets/approved/seeds.webp"')&&
   html.includes('src="assets/approved/germination.webp"')&&
-  html.includes('src="assets/approved/jar.webp"')&&
-  html.includes('src="assets/approved/week.webp"')&&
+  html.includes('src="assets/approved/jar-real-broccoli.webp"')&&
+  html.includes('src="assets/approved/harvest.webp"')&&
+  html.includes('src="assets/sprout-orbs/broccoli.webp"')&&
   html.includes('src="assets/approved/woman.webp"')&&
   html.includes('src="assets/approved/macro.webp"')&&
   html.includes('src="assets/approved/toast.webp"')&&
@@ -467,8 +468,8 @@ const homepageShell=homepageStart>=0&&homepageEnd>homepageStart?
  html.slice(homepageStart,homepageEnd).trim():"";
 check("All three main pages have a nav basket with the same full shopping drawer",
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
- [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=4"')&&
- doc.includes('src="cart-preview.js?v=18"')&&doc.includes('href="basket-flow.css?v=13"')&&
+ [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=5"')&&
+ doc.includes('src="cart-preview.js?v=19"')&&doc.includes('href="basket-flow.css?v=14"')&&
  doc.includes('href="basket-crosspage.css?v=4"'))&&
  savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
@@ -529,7 +530,7 @@ check("Basket header uses brand wordmark typography without duplicate MicroSprou
  flowCss.includes('font-family:Georgia,"Times New Roman",serif;')&&
  flowCss.includes('font-size:34px;font-weight:bold;letter-spacing:-.032em;'));
 check("Carousel says Select Your Favorite and fades both horizontal edges",
- html.includes('>SELECT YOUR FAVORITE</span>')&&
+ html.includes('>Add Your Favorite</span>')&&
  !html.includes('EXPLORE THE COLLECTION')&&
  !html.includes('Drag or swipe')&&
  !read("basket-shell.js").includes('Drag or swipe')&&
@@ -538,12 +539,12 @@ check("Carousel says Select Your Favorite and fades both horizontal edges",
  flowCss.includes('mask-image:linear-gradient(to right,')&&
  flowCss.includes('#000 calc(100% - 24px),transparent 100%')&&
  (html.match(/class="basket-sprout-card__hit"/g)||[]).length===8&&
- [html,sprouts,science].every(s=>s.includes('basket-flow.css?v=13')));
+ [html,sprouts,science].every(s=>s.includes('basket-flow.css?v=14')));
 
 check("An eleventh pack offers an elegant WhatsApp bulk-enquiry popup on every page",
  ["index.html","sprouts.html","science.html"].every(file=>
-   read(file).includes('basket-flow.css?v=13')&&read(file).includes('cart-preview.js?v=18'))&&
- [sprouts,science].every(file=>file.includes('basket-shell.js?v=4'))&&
+   read(file).includes('basket-flow.css?v=14')&&read(file).includes('cart-preview.js?v=19'))&&
+ [sprouts,science].every(file=>file.includes('basket-shell.js?v=5'))&&
  html.includes('id="basket-bulk-overlay" hidden')&&
  html.includes('id="basket-bulk-title">Planning a larger order?')&&
  html.includes('personal bulk discount</strong>')&&
@@ -560,3 +561,25 @@ check("An eleventh pack offers an elegant WhatsApp bulk-enquiry popup on every p
  cartClient.includes('showBulkOrder(button.dataset.sproutAdd)')&&
  !cartClient.includes('Your basket can contain up to 10 sprout packs.')&&
  read("basket-shell.js").includes('id="basket-bulk-overlay"'));
+
+check("Carousel hides at ten packs, restores after removal, and bulk pop-up has no star",
+ html.includes('>Add Your Favorite</span>')&&
+ !html.includes('SELECT YOUR FAVORITE')&&
+ !html.includes('class="basket-bulk-card__icon"')&&
+ !read("basket-shell.js").includes('class="basket-bulk-card__icon"')&&
+ !flowCss.includes('.basket-bulk-card__icon{')&&
+ cartClient.includes('const docked=()=>sproutPicker.parentElement===pickerDock;')&&
+ cartClient.includes('const atCapacity=state.entries.length>=maxOnlinePacks;')&&
+ cartClient.includes('pickerDock.hidden=atCapacity;')&&
+ cartClient.includes('sproutPicker.hidden=atCapacity;')&&
+ flowCss.includes('.basket-flow__carousel-dock.is-at-capacity{display:none!important}'));
+
+check("Updated Day 3–5 and Day 6 broccoli pictures preserve glass containers",
+ html.includes('src="assets/approved/jar-real-broccoli.webp"')&&
+ html.includes('src="assets/approved/harvest.webp"')&&
+ html.includes('class="growth-image growth-image--refreshed-growth"')&&
+ html.includes('class="growth-image__fresh-sprouts" src="assets/sprout-orbs/broccoli.webp"')&&
+ html.includes('comp.css?v=sprout-art-2')&&
+ read("comp.css").includes('.growth-image--refreshed-growth .growth-image__fresh-sprouts{')&&
+ !html.includes('src="assets/approved/week.webp"')&&
+ !html.includes('src="assets/approved/jar.webp"'));

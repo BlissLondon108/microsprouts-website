@@ -28,7 +28,7 @@
  const pickerHome=el("basket-picker-home"),pickerDock=el("basket-picker-dock");
  const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")];
  let sproutIndex=0,drag=null,suppressClick=false;
- const docked=()=>!pickerDock.hidden;
+ const docked=()=>sproutPicker.parentElement===pickerDock;
  function setSproutIndex(next,scroll=true){
    sproutIndex=Math.max(0,Math.min(sproutCards.length-1,next));
    if(scroll&&typeof sproutTrack.scrollTo==="function"){
@@ -179,6 +179,15 @@
  function render(){
    const entry=active();
    const isEmpty=!entry;
+   // Full basket: hide the entire carousel, but retain its docked DOM position.
+   // Removing any pack immediately restores the gallery without losing its scroll.
+   if(docked()){
+     const atCapacity=state.entries.length>=maxOnlinePacks;
+     pickerDock.hidden=atCapacity;
+     sproutPicker.hidden=atCapacity;
+     if(atCapacity)pickerDock.classList.add("is-at-capacity");
+     else pickerDock.classList.remove("is-at-capacity");
+   }
    el("basket-empty").hidden=!isEmpty;
    el("basket-other-items").hidden=isEmpty;
    el("basket-shared-details").hidden=isEmpty;

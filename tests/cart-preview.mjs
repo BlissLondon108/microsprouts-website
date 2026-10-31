@@ -391,9 +391,11 @@ check("Adding a 200g pack updates the mixed-variety total",
  !stages[1].hidden);
 // Repeated clicks keep normal checkout for ten, then invite a personal bulk enquiry.
 for(let count=3;count<10;count++)sproutTrack.listeners.click({target:broccoliAdd,detail:1});
-check("Ten packs remain selectable in the ordinary basket",
+check("Ten packs remain selectable and hide the Add Your Favorite carousel",
  el("nav-cart-count").textContent==="10"&&
  el("basket-bulk-overlay").hidden&&
+ el("basket-picker-dock").hidden&&
+ el("basket-sprout-picker").hidden&&
  !el("basket-add-another").disabled);
 sproutTrack.listeners.click({target:radishAdd,detail:1});
 const enquiry=decodeURIComponent(el("basket-bulk-whatsapp").href.split("?text=")[1]||"");
@@ -418,8 +420,10 @@ el("basket-bulk-close").listeners.click();
 check("Bulk close button returns to the unchanged basket",
  el("basket-bulk-overlay").hidden&&!el("cart-overlay").hidden);
 el("basket-remove-entry").listeners.click();
-check("Removing a pack allows normal checkout additions again",
- el("nav-cart-count").textContent==="9");
+check("Removing any pack immediately restores the docked carousel",
+ el("nav-cart-count").textContent==="9"&&
+ !el("basket-picker-dock").hidden&&
+ !el("basket-sprout-picker").hidden);
 sproutTrack.listeners.click({target:radishAdd,detail:1});
 check("A tenth pack can be added normally after reducing the basket",
  el("nav-cart-count").textContent==="10"&&el("basket-bulk-overlay").hidden);

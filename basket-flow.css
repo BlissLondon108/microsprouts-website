@@ -736,11 +736,6 @@
  display:block;margin-bottom:15px;color:#5d8761;
  font:800 10px/1.5 Arial,Helvetica,sans-serif;letter-spacing:.14em
 }
-.basket-bulk-card__icon{
- display:grid;place-items:center;margin:0 auto 14px;width:49px;height:49px;
- background:#e8f4da;border:1px solid #c8e3b6;border-radius:50%;
- color:#518750;font-size:27px
-}
 .basket-bulk-card__title{
  font:400 clamp(32px,5vw,41px)/1.08 Georgia,"Times New Roman",serif;
  letter-spacing:-.035em;color:#143d23;margin:0 0 16px
@@ -766,3 +761,8 @@
  .basket-bulk-card__whatsapp{transition:none}
  .basket-bulk-card__whatsapp:hover{transform:none}
 }
+
+/* At ten packs the carousel and its caption disappear completely. The
+   dock is restored automatically as soon as any pack is removed. */
+.basket-flow__carousel-dock.is-at-capacity{display:none!important}
+.basket-flow:has(.basket-flow__carousel-dock.is-at-capacity) #basket-add-variety{display:none!important}
