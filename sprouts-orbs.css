@@ -1,91 +1,66 @@
-/* MicroSprouts: eight floating, botanical glow spheres. */
+/* MicroSprouts botanical spheres — clean artwork, no duplicate glass backing. */
 .ms-orb-scene{
- position:relative;isolation:isolate;min-width:0;width:100%;height:clamp(390px,37vw,490px);
- background:transparent;overflow:visible;--orb-zoom:1;
-}
-.ms-orb-scene::before{
- content:"";pointer-events:none;position:absolute;inset:8% 1% 2%;z-index:-1;
- background:radial-gradient(ellipse at 48% 50%,hsl(119 31% 50% / .13),transparent 68%);
- filter:blur(24px)
+ position:relative;isolation:isolate;min-width:0;width:100%;
+ height:clamp(390px,37vw,490px);overflow:hidden;background:transparent;
+ --orb-zoom:1;
 }
 .ms-orb-floating{
  position:absolute;left:var(--orb-x);top:var(--orb-y);width:0;height:0;
- animation:ms-orb-drift var(--float-time,13s) ease-in-out infinite alternate;
- animation-delay:var(--float-delay,0s);z-index:1
+ z-index:1;will-change:transform;
 }
-.ms-orb-floating:hover,.ms-orb-floating:focus-within{
- animation-play-state:paused;z-index:18
-}
-@keyframes ms-orb-drift{
- 0%{transform:translate3d(-5px,9px,0)}
- 30%{transform:translate3d(12px,-10px,0)}
- 70%{transform:translate3d(-13px,-15px,0)}
- 100%{transform:translate3d(8px,13px,0)}
-}
+.ms-orb-scene[data-orb-ready="true"] .ms-orb-floating{left:0;top:0}
+.ms-orb-floating:hover,.ms-orb-floating:focus-within{z-index:10}
 .ms-orb-link{
- --glow-hue:125;--orb-pointer-x:32%;--orb-pointer-y:28%;
+ --glow-hue:125;--orb-pointer-x:50%;--orb-pointer-y:50%;
  box-sizing:border-box;display:block;position:absolute;top:0;left:0;
  width:calc(var(--orb-size) * var(--orb-zoom));
  height:calc(var(--orb-size) * var(--orb-zoom));
- transform:translate(-50%,-50%) scale(1);
- background:radial-gradient(circle at 30% 23%,hsl(0 0% 100% / .18),transparent 38%),
- radial-gradient(circle at 56% 55%,var(--orb-tone),#19482f 75%,#042116 102%);
- border-radius:50%;border:1px solid hsl(89 76% 92% / .53);
- box-shadow:inset 10px 12px 20px #ffffff18,inset -10px -18px 23px #05190b7c,
- 0 12px 25px #001b0e90,0 0 19px hsl(var(--glow-hue) 80% 73% / .17);
- backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
- text-decoration:none;color:#f9ffe9;outline:none;transition:transform .28s ease,
- box-shadow .28s ease,filter .28s ease;
- -webkit-tap-highlight-color:transparent;
+ transform:translate(-50%,-50%);scale:1;
+ border:0;background:transparent;box-shadow:none;border-radius:50%;
+ color:#f9ffe9;text-decoration:none;outline:none;
+ transition:scale .24s ease;-webkit-tap-highlight-color:transparent;
 }
 .ms-orb-link::before{
- content:"";z-index:5;pointer-events:none;position:absolute;inset:-3px;border-radius:50%;opacity:0;
- background:radial-gradient(circle 75px at var(--orb-pointer-x) var(--orb-pointer-y),
- hsl(var(--glow-hue) 90% 84% / .64),transparent 72%);
- border:1px solid hsl(var(--glow-hue) 88% 78% / .72);
- filter:brightness(1.35);mix-blend-mode:screen;
- transition:opacity .24s ease
+ content:"";pointer-events:none;position:absolute;inset:0;z-index:0;
+ border-radius:50%;opacity:0;
+ background:radial-gradient(circle 44px at var(--orb-pointer-x) var(--orb-pointer-y),
+   hsl(var(--glow-hue) 95% 82% / .48),transparent 85%);
+ filter:blur(8px);transition:opacity .2s ease;
 }
-.ms-orb-link::after{
- content:"";pointer-events:none;position:absolute;inset:5px;border-radius:50%;z-index:6;
- border:1px solid #f7ffe52c;
- background:radial-gradient(ellipse at 33% 15%,#ffffff36,transparent 32%);
- box-shadow:inset 0 0 14px #caffce1d
-}
-.ms-orb-link:hover,.ms-orb-link:focus-visible{
- transform:translate(-50%,-50%) scale(1.15);
- filter:saturate(1.14) brightness(1.11);
- box-shadow:inset 9px 11px 19px #ffffff2a,inset -12px -16px 24px #05190b66,
- 0 17px 34px #00170c9e,0 0 0 5px hsl(var(--glow-hue) 90% 78% / .15),
- 0 0 43px 15px hsl(var(--glow-hue) 80% 68% / .35)
-}
-.ms-orb-link:hover::before,.ms-orb-link:focus-visible::before{opacity:1}
-.ms-orb-link:focus-visible{outline:2px solid #e0f9c3;outline-offset:8px}
+.ms-orb-link::after{content:none}
 .ms-orb-art{
- position:absolute;inset:7%;width:86%;height:86%;object-fit:contain;
- filter:drop-shadow(0 3px 5px #011b0c76);z-index:3;pointer-events:none
+ position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;
+ pointer-events:none;filter:drop-shadow(0 4px 5px #00190a58);
+ transition:filter .24s ease;
 }
+.ms-orb-link:hover,.ms-orb-link:focus-visible{scale:1.13}
+.ms-orb-link:hover::before,.ms-orb-link:focus-visible::before{opacity:1}
+.ms-orb-link:hover .ms-orb-art,.ms-orb-link:focus-visible .ms-orb-art{
+ filter:drop-shadow(0 0 9px hsl(var(--glow-hue) 90% 77% / .72))
+ drop-shadow(0 0 22px hsl(var(--glow-hue) 85% 69% / .50));
+}
+.ms-orb-link:focus-visible{outline:2px solid #e0f9c3;outline-offset:4px}
 .ms-orb-caption{
- position:absolute;bottom:-23px;left:50%;transform:translateX(-50%);
+ position:absolute;bottom:-21px;left:50%;transform:translateX(-50%);
  padding:3px 7px;white-space:nowrap;font:600 11px/1.3 Arial,Helvetica,sans-serif;
  letter-spacing:.01em;color:#e6f3d5;text-shadow:0 2px 6px #001f0f;
- transition:color .2s ease;pointer-events:none
+ pointer-events:none;
 }
 .ms-orb-link:hover .ms-orb-caption,.ms-orb-link:focus-visible .ms-orb-caption{color:#fff}
-.ms-orb-eyebrow{
- position:absolute;left:3%;bottom:-12px;font:700 10px/1.4 Arial,Helvetica,sans-serif;
- letter-spacing:.16em;text-transform:uppercase;color:#bddbac;
-}
-.ms-orb-eyebrow strong{letter-spacing:normal;font-weight:500;margin-left:8px;color:#f3ffe9;text-transform:none}
 @media(max-width:1050px){.ms-orb-scene{--orb-zoom:.89}}
 @media(max-width:770px){.ms-orb-scene{height:370px;--orb-zoom:.87;width:min(100%,580px);margin:0 auto}}
-@media(max-width:480px){.ms-orb-scene{height:300px;--orb-zoom:.67}.ms-orb-caption{font-size:10px;bottom:-19px}.ms-orb-eyebrow{bottom:-21px;font-size:9px}}
+@media(max-width:480px){.ms-orb-scene{height:300px;--orb-zoom:.59}.ms-orb-caption{font-size:10px;bottom:-18px}}
+@media(max-width:360px){.ms-orb-scene{--orb-zoom:.52}}
 @media(prefers-reduced-motion:reduce){
- .ms-orb-floating{animation:none}
- .ms-orb-link{transition:none}
+ .ms-orb-floating{will-change:auto}
+ .ms-orb-link,.ms-orb-art,.ms-orb-link::before{transition:none}
 }
-
-/* Match the approved preview proportions without affecting the Science page. */
-.sprouts-page .subpage-hero__inner{grid-template-columns:minmax(0,1fr) minmax(0,1.03fr);gap:clamp(25px,4vw,55px)}
+/* Keep the approved More Sprouts composition isolated from other pages. */
+.sprouts-page .subpage-hero__inner{
+ grid-template-columns:minmax(0,1fr) minmax(0,1.03fr);
+ gap:clamp(25px,4vw,55px)
+}
 .sprout-card__visual--green-pea{background:radial-gradient(ellipse at 72% 25%,#e1f2be,#94c686 67%,#56875b)}
-@media(max-width:770px){.sprouts-page .subpage-hero__inner{grid-template-columns:1fr;gap:12px}}
+@media(max-width:770px){
+ .sprouts-page .subpage-hero__inner{grid-template-columns:1fr;gap:12px}
+}

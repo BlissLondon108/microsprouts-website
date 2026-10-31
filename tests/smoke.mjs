@@ -338,8 +338,21 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=1')&&sproutsDetails.includes('sprouts-orbs.js?v=1')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=2')&&sproutsDetails.includes('sprouts-orbs.js?v=2')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
  read('sprouts-orbs.js').includes('pointermove')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
  .every(name=>fs.existsSync(path.join(root,'assets','sprout-orbs',name+'.webp'))));
+
+check("Orb artwork has no opaque secondary glass disk, and unnecessary counter is removed",
+ !sproutsDetails.includes('ms-orb-eyebrow')&&
+ !sproutsDetails.includes('Explore the collection')&&
+ !read('sprouts-orbs.css').includes('backdrop-filter')&&
+ read('sprouts-orbs.css').includes('background:transparent')&&
+ read('sprouts-orbs.css').includes('.ms-orb-link::after{content:none}'));
+check("Animated orbs use bounded collision physics instead of CSS drift",
+ read('sprouts-orbs.js').includes('requestAnimationFrame')&&
+ read('sprouts-orbs.js').includes('const separate=elastic=>')&&
+ read('sprouts-orbs.js').includes('const within=s=>')&&
+ read('sprouts-orbs.js').includes('prefers-reduced-motion: reduce')&&
+ !read('sprouts-orbs.css').includes('@keyframes ms-orb-drift'));
