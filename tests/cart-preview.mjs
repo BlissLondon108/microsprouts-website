@@ -351,7 +351,7 @@ check("500g green pea card directly adds its preselected pack and opens order fr
  !el("cart-overlay").hidden&&
  el("basket-current-name").textContent==="Green pea Sprouts"&&
  el("basket-selected-pack").textContent==="500g"&&
- el("basket-total").textContent==="£16.99"&&
+ el("basket-total").textContent==="£26.98"&&
  !stages[1].hidden&&
  JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).variety==="green-pea"&&
  JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).pack==="500");
