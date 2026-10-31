@@ -167,3 +167,21 @@
  background:radial-gradient(ellipse at 72% 22%,#d9eedb,#97c2a5 68%,#527b6b)
 }
 .sprout-card__visual--fenugreek .sprout-card__visual-label{color:#fff}
+
+/* Approved botanical WebP cutouts replace the placeholder letters and old broccoli jar. */
+.sprouts-page .sprout-card__visual{isolation:isolate;display:grid;place-items:center}
+.sprouts-page .sprout-card__visual .sprout-card__art{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:contain;object-position:center;
+  padding:clamp(10px,2.1vw,29px) clamp(12px,2.4vw,30px);
+  filter:drop-shadow(0 9px 12px rgba(10,31,20,.22));
+  z-index:1
+}
+.sprouts-page .sprout-card__visual-label{
+  z-index:2;bottom:15px;left:15px;color:#153a28!important;
+  padding:7px 10px;background:rgba(252,255,246,.86);
+  border:1px solid rgba(255,255,255,.53);border-radius:99px;
+  backdrop-filter:blur(3px)
+}
+.sprouts-page .sprout-card__visual--broccoli{background:radial-gradient(ellipse at 65% 18%,#d5edbc,#80b795 65%,#36765d)}
+@media(max-width:650px){.sprouts-page .sprout-card__visual .sprout-card__art{padding:14px 28px}}

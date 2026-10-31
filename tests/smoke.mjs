@@ -42,7 +42,7 @@ check("Add Sprouts opens an accessible eight-variety carousel, without selling u
  html.includes('id="basket-sprout-picker"')&&
  (html.match(/data-sprout-card="/g)||[]).length===8&&
  html.includes('data-sprout-add="broccoli"')&&
- (html.match(/class="basket-sprout-card__action" href="https:\/\/wa\.me\//g)||[]).length===7&&
+ (html.match(/class="basket-sprout-card__action"/g)||[]).length===7);
  cartClient.includes('const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")]')&&
  cartClient.includes('sproutTrack.addEventListener("scroll"')&&
  cartClient.includes('sproutTrack.addEventListener("click"')&&
@@ -71,7 +71,7 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
  html.includes('src="cart-preview.js?v=13"')&&
- html.includes('href="basket-flow.css?v=9"'));
+ html.includes('href="basket-flow.css?v=10"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -213,7 +213,7 @@ check("Three order choices remain above manual sprout gallery",
  (html.match(/<article class="order-choice-card/g)||[]).length===3&&
  ["One-time order","Weekly subscription","Custom subscription"].every(x=>html.includes(x))&&
  html.includes("https://wa.me/447386853514?text=Hello%20MicroSprouts%21")&&
- ["broccoli","radish","mung-bean","leek"].every(name=>
+ ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(name=>
   html.includes('class="sprout-tile" href="sprouts.html#'+name+'"'))&&
  html.includes('src="carousel-interaction.js?v=2"')&&
  carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})'));
@@ -338,7 +338,7 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=3')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=4')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
  read('sprouts-orbs.js').includes('pointermove')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
@@ -367,3 +367,21 @@ check("Hover glows never meet the rectangular sphere viewport boundary",
  read("sprouts-orbs.js").includes("s.r*1.12+32")&&
  read("sprouts-orbs.js").includes("s.r*1.12+36")&&
  read("sprouts-orbs.js").includes("const separate=elastic=>"));
+
+check("All eight approved artworks appear on catalogue and in basket",
+ ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>
+  sprouts.includes('class="sprout-card__art" src="assets/sprout-orbs/'+slug+'.webp"')&&
+  html.includes('src="assets/sprout-orbs/'+slug+'.webp"'))&&
+ (html.match(/data-sprout-card="/g)||[]).length===8&&
+ (html.match(/class="sprout-tile" href="sprouts.html#/g)||[]).length===8);
+check("Animated hero uses non-image background art without hover target arrows",
+ !sprouts.includes('<img class="ms-orb-art"')&&
+ (sprouts.match(/<span class="ms-orb-art"/g)||[]).length===8&&
+ read("sprouts-orbs.css").includes("cursor:default;-webkit-user-drag:none")&&
+ !html.includes('class="sprout-orb__add"'));
+check("Unpriced sprouts are visibly available to enquire about, not incorrectly priced",
+ (sprouts.match(/Available by enquiry/g)||[]).length===7&&
+ (html.match(/Available by enquiry/g)||[]).length===7&&
+ !sprouts.includes('Ask about availability')&&
+ html.includes('data-sprout-add="broccoli"')&&
+ (html.match(/class="basket-sprout-card__action" href="https:\\/\\/wa\\.me\\//g)||[]).length===7);
