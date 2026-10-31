@@ -21,13 +21,12 @@
  // The picker is for discovering the eight varieties. Only broccoli has
  // the same owner-approved Stripe amounts across all varieties.
  const sproutPicker=el("basket-sprout-picker"),sproutTrack=el("basket-sprout-track");
+ const pickerHome=el("basket-picker-home"),pickerDock=el("basket-picker-dock");
  const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")];
- let sproutIndex=0;
+ let sproutIndex=0,drag=null,suppressClick=false;
+ const docked=()=>!pickerDock.hidden;
  function setSproutIndex(next,scroll=true){
    sproutIndex=Math.max(0,Math.min(sproutCards.length-1,next));
-   el("basket-sprout-prev").disabled=sproutIndex===0;
-   el("basket-sprout-next").disabled=sproutIndex>=sproutCards.length-1;
-   setText("basket-sprout-progress",(sproutIndex+1)+" of "+sproutCards.length);
    if(scroll&&typeof sproutTrack.scrollTo==="function"){
      const first=sproutCards[0],selected=sproutCards[sproutIndex];
      sproutTrack.scrollTo({left:selected.offsetLeft-first.offsetLeft,
@@ -35,7 +34,20 @@
    }
  }
  function closeSproutPicker(){
+   if(docked())return; // Once docked it stays visible above the basket total.
    sproutPicker.hidden=true;
+   el("basket-start").setAttribute("aria-expanded","false");
+ }
+ function dockSproutPicker(){
+   pickerDock.hidden=false;
+   pickerDock.append(sproutPicker);
+   sproutPicker.hidden=false;
+   el("basket-start").setAttribute("aria-expanded","true");
+ }
+ function resetSproutPicker(){
+   sproutPicker.hidden=true;
+   pickerHome.append(sproutPicker);
+   pickerDock.hidden=true;
    el("basket-start").setAttribute("aria-expanded","false");
  }
  let enabled=false,working=false,returnFocus=null;
@@ -239,7 +251,7 @@
    returnFocus=document.activeElement;
    // The nav cart simply opens the basket. Explicit shopping CTAs create
    // one separate entry, but opening an empty basket never creates broccoli.
-   if(options.add){closeSproutPicker();addEntry(options);}
+   if(options.add){if(!docked())closeSproutPicker();addEntry(options);}
    if(active()&&!complete(active())&&state.stage==="details")
      state.stage=active().frequency?"delivery":active().pack?"order":"pack";
    overlay.hidden=false;document.body.classList.add("overlay-open");
@@ -320,8 +332,35 @@
    el("basket-start").setAttribute("aria-expanded",String(opening));
    if(opening)setSproutIndex(0);
  });
- el("basket-sprout-prev").addEventListener("click",()=>setSproutIndex(sproutIndex-1));
- el("basket-sprout-next").addEventListener("click",()=>setSproutIndex(sproutIndex+1));
+ // Mouse/pen drag behaves like a horizontal carousel, without arrow buttons.
+ // A completed drag suppresses the synthetic click so scrolling never adds a pack.
+ sproutTrack.addEventListener("pointerdown",event=>{
+   if(event.pointerType==="touch"||event.button!==0)return;
+   suppressClick=false;
+   drag={id:event.pointerId,x:event.clientX,scroll:sproutTrack.scrollLeft,moved:false};
+ });
+ sproutTrack.addEventListener("pointermove",event=>{
+   if(!drag||event.pointerId!==drag.id)return;
+   const dx=event.clientX-drag.x;
+   if(Math.abs(dx)>6){
+     drag.moved=true;
+     sproutTrack.classList.add("is-dragging");
+     sproutTrack.setPointerCapture?.(event.pointerId);
+   }
+   if(drag.moved){event.preventDefault();sproutTrack.scrollLeft=drag.scroll-dx;}
+ });
+ const finishDrag=event=>{
+   if(!drag||event.pointerId!==drag.id)return;
+   if(drag.moved){
+     suppressClick=true;
+     // Cleared on the next fresh pointerdown; keyboard clicks remain supported.
+     sproutTrack.classList.remove("is-dragging");
+   }
+   try{if(sproutTrack.hasPointerCapture?.(drag.id))sproutTrack.releasePointerCapture(drag.id)}catch{}
+   drag=null;
+ };
+ sproutTrack.addEventListener("pointerup",finishDrag);
+ sproutTrack.addEventListener("pointercancel",finishDrag);
  sproutTrack.addEventListener("keydown",event=>{
    if(event.key!=="ArrowRight"&&event.key!=="ArrowLeft")return;
    event.preventDefault();
@@ -335,10 +374,18 @@
    if(nearest!==sproutIndex)setSproutIndex(nearest,false);
  });
  sproutTrack.addEventListener("click",event=>{
+   if(suppressClick&&event.detail!==0){suppressClick=false;event.preventDefault();return;}
+   suppressClick=false;
    const button=event.target.closest("[data-sprout-add]");
    if(!button||!validVariety(button.dataset.sproutAdd))return;
-   closeSproutPicker();
-   if(addEntry({variety:button.dataset.sproutAdd}))setStage("pack");
+   if(state.entries.length>=10){
+     showError("Your basket can contain up to 10 sprout packs.");
+     return;
+   }
+   if(addEntry({variety:button.dataset.sproutAdd})){
+     dockSproutPicker();
+     setStage("pack");
+   }
  });
  el("basket-add-another").addEventListener("click",()=>{
    if(state.entries.length>=10||!complete(active()))return;
@@ -346,6 +393,7 @@
  });
  el("basket-add-variety")?.addEventListener("click",()=>{
    if(state.entries.length>=10||!complete(active()))return;
+   if(docked())return;
    const opening=sproutPicker.hidden;
    sproutPicker.hidden=!opening;
    if(opening)setSproutIndex(0);
@@ -354,7 +402,7 @@
    state.entries=state.entries.filter(entry=>entry.id!==id);
    if(!state.entries.length){
      state.activeId=null;state.nextId=1;state.stage="pack";
-     closeSproutPicker();
+     resetSproutPicker();
      save();showError("");render();el("basket-start").focus();return;
    }
    if(state.activeId===id)state.activeId=state.entries.at(-1).id;

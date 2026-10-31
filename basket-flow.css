@@ -576,3 +576,108 @@
  position:relative;z-index:1
 }
 .basket-sprout-card__number{z-index:2}
+
+/* Shared header rhythm: match the dark green site navigation on every page. */
+.basket-flow .cart-overlay__top{
+ min-height:63px;padding:10px 19px;gap:14px;
+ background:#042b12;color:#f7f8ef;border-bottom:1px solid #174c2c;
+}
+.basket-flow .cart-overlay__top>div{display:flex;align-items:center;gap:13px;min-width:0}
+.basket-flow .cart-overlay__brand{
+ margin:0;font-size:10px;line-height:1.2;letter-spacing:.12em;
+ color:#d6e9a7;white-space:nowrap
+}
+.basket-flow .basket-drawer-title{
+ margin:0;font-size:22px;line-height:1.1;color:#f8fbf4;
+ white-space:nowrap
+}
+.basket-flow .cart-overlay__close{
+ background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);
+ color:#f8fbf4;width:35px;height:35px;min-width:35px;
+}
+.basket-flow .cart-overlay__close:hover{background:rgba(255,255,255,.2)}
+.basket-flow .cart-overlay__close:focus-visible{outline-color:#d6e9a7}
+
+/* In the empty basket the gallery appears below Add Sprouts. Once an item
+   is chosen it is moved into a dedicated, always-visible dock directly above
+   Due today — it stays available while the rest of the order is configured. */
+.basket-flow__picker-home{min-width:0}
+.basket-flow__carousel-dock{
+ flex:0 0 auto;min-width:0;max-height:min(33vh,240px);
+ overflow:hidden;padding:10px 17px 8px;
+ background:#f1f7eb;border-top:1px solid #dae8d4
+}
+.basket-flow__carousel-dock .basket-sprout-picker{margin:0}
+.basket-flow__carousel-dock .basket-sprout-picker__heading{margin-bottom:6px}
+.basket-flow__carousel-dock .basket-sprout-track{
+ grid-auto-columns:minmax(132px,46%);gap:10px;padding-bottom:5px
+}
+.basket-flow__carousel-dock .basket-sprout-card__visual{height:107px}
+.basket-flow__carousel-dock .basket-sprout-card__content{min-height:50px;padding:8px 10px}
+.basket-flow__carousel-dock .basket-sprout-card__name{font-size:16px}
+.basket-flow__carousel-dock .basket-sprout-card__description{font-size:10px;margin-top:3px}
+.basket-flow:has(.basket-flow__carousel-dock:not([hidden])) #basket-add-variety{
+ display:none
+}
+
+/* Fully clickable photographic cards, with a small descriptive caption.
+   No redundant status, numbering, or secondary action buttons. */
+.basket-sprout-picker__heading{margin-bottom:10px}
+.basket-sprout-picker__hint{
+ font-size:10px;letter-spacing:.02em;font-weight:650;color:#77907c
+}
+.basket-sprout-track{
+ scroll-snap-type:x proximity;touch-action:pan-x;
+ cursor:grab;user-select:none;-webkit-user-select:none
+}
+.basket-sprout-track.is-dragging{cursor:grabbing;scroll-snap-type:none}
+.basket-sprout-track.is-dragging *{cursor:grabbing}
+.basket-sprout-card{
+ min-height:0;box-shadow:0 5px 14px rgba(24,63,36,.075);
+ transition:border-color .15s ease,box-shadow .15s ease
+}
+.basket-sprout-card:hover,.basket-sprout-card:focus-within{
+ border-color:#7daa78;box-shadow:0 6px 16px rgba(24,83,40,.16)
+}
+.basket-sprout-card__hit{
+ display:flex;flex-direction:column;align-items:stretch;
+ appearance:none;text-align:left;width:100%;height:100%;padding:0;
+ background:transparent;border:0;color:inherit;cursor:grab;
+ font:inherit;min-width:0
+}
+.basket-sprout-card__hit:focus-visible{
+ outline:3px solid #2c7040;outline-offset:-4px
+}
+.basket-sprout-card__visual{height:155px;width:100%;flex:none}
+.basket-sprout-card__visual::after{display:none}
+.basket-sprout-card__visual img{
+ width:100%;height:100%;padding:6px 10px;object-fit:contain;
+ object-position:center;pointer-events:none;-webkit-user-drag:none
+}
+.basket-sprout-card__content{
+ display:flex;flex-direction:column;align-items:flex-start;
+ background:#fcfff9;padding:11px 12px 13px;
+ flex:1;min-height:66px
+}
+.basket-sprout-card__name{
+ font:normal 19px/1.15 Georgia,"Times New Roman",serif;
+ letter-spacing:-.02em;color:#1c422c
+}
+.basket-sprout-card__description{
+ display:block;margin-top:5px;color:#647d66;
+ font-size:11px;line-height:1.4
+}
+@media(max-width:520px){
+ .basket-flow .cart-overlay__top{min-height:58px;padding:9px 13px}
+ .basket-flow .cart-overlay__top>div{gap:9px}
+ .basket-flow .basket-drawer-title{font-size:20px}
+ .basket-flow .cart-overlay__brand{font-size:9px}
+ .basket-flow__carousel-dock{padding:8px 12px 6px;max-height:min(34vh,210px)}
+ .basket-flow__carousel-dock .basket-sprout-track{grid-auto-columns:minmax(122px,54%)}
+ .basket-flow__carousel-dock .basket-sprout-card__visual{height:83px}
+ .basket-flow__carousel-dock .basket-sprout-card__content{padding:6px 9px;min-height:45px}
+ .basket-sprout-card__visual{height:135px}
+}
+@media(prefers-reduced-motion:reduce){
+ .basket-sprout-card{transition:none}
+}

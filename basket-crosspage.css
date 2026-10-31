@@ -2,7 +2,7 @@
    Move only the basket towards the right edge. */
 @media(min-width:771px){
  .comp-nav .nav-cart{
-  right:4px;top:50%;transform:translateY(-50%);
+  right:20px;top:50%;transform:translateY(-50%);
   width:36px;height:36px
  }
 }
@@ -10,7 +10,7 @@
    sit near the browser edge. The basket is absolutely positioned so no
    navigation link or wordmark moves when its horizontal position changes. */
 @media(min-width:1460px){
- .comp-nav .nav-cart{right:calc(732px - 50vw)}
+ .comp-nav .nav-cart{right:calc(751px - 50vw)}
 }
 /* The homepage hero and header both cap at 1440px. Above 1535px,
    the left edge of its Benefits link is aligned to the product-panel h1's

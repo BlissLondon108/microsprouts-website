@@ -55,7 +55,7 @@ class Fake {
 const ids=[
  "cart-overlay","open-cart","basket-flow-form","basket","basket-pay",
  "basket-total","basket-total-type","basket-total-note","basket-add-another",
- "basket-remove-entry","nav-cart-count","basket-date","basket-error","basket-empty","basket-start","basket-sprout-picker","basket-sprout-track","basket-sprout-prev","basket-sprout-next","basket-sprout-progress","basket-current-shipping",
+ "basket-remove-entry","nav-cart-count","basket-date","basket-error","basket-empty","basket-start","basket-sprout-picker","basket-sprout-track","basket-picker-home","basket-picker-dock","basket-current-shipping",
  "basket-pack-200-price","basket-pack-500-price","basket-delivery-price",
  "basket-items-control","basket-stage","basket-current-item","basket-current-price","basket-shared-details",
  "basket-calendar-grid","basket-calendar-month","basket-calendar-prev","basket-calendar-next",
@@ -80,6 +80,8 @@ sproutTrack.scrollLeft=0;
 sproutTrack.querySelectorAll=selector=>selector==="[data-sprout-card]"?sproutCards:[];
 sproutTrack.scrollTo=({left})=>{sproutTrack.scrollLeft=left;};
 el("basket-sprout-picker").hidden=true;
+el("basket-picker-home").append(el("basket-sprout-picker"));
+el("basket-picker-dock").hidden=true;
 el("cart-overlay").hidden=true;
 el("checkout-button").dataset.pack="500";
 el("checkout-button").dataset.frequency="once";
@@ -168,31 +170,41 @@ check("Opening nav basket doesn't add broccoli or start checkout",
  el("nav-cart-count").textContent==="0");
 el("close-cart").listeners.click();
 el("basket-start").listeners.click();
-check("Add Sprouts opens the eight-variety picker without adding a product",
+check("Add Sprouts opens a touch-scrollable carousel with no arrow controls",
  !el("basket-sprout-picker").hidden&&
  el("basket-start").attributes["aria-expanded"]==="true"&&
  el("nav-cart-count").textContent==="0"&&
  el("basket-other-items").hidden&&
- el("basket-sprout-progress").textContent==="1 of 8"&&
- el("basket-sprout-prev").disabled&&
- !el("basket-sprout-next").disabled);
-el("basket-sprout-next").listeners.click();
-check("Carousel next arrow advances to radish, updating progress and scroll",
- el("basket-sprout-progress").textContent==="2 of 8"&&
+ el("basket-picker-dock").hidden&&
+ el("basket-picker-home").children.includes(el("basket-sprout-picker")));
+sproutTrack.listeners.keydown({key:"ArrowRight",preventDefault(){}});
+check("Keyboard arrows scroll the carousel without showing arrow buttons",
  sproutTrack.scrollLeft===220);
-sproutTrack.scrollLeft=1540;
-sproutTrack.listeners.scroll();
-check("Touch scrolling updates picker progress and arrow bounds",
- el("basket-sprout-progress").textContent==="8 of 8"&&
- el("basket-sprout-next").disabled);
-el("basket-sprout-prev").listeners.click();
-check("Previous arrow returns to alfalfa",
- el("basket-sprout-progress").textContent==="7 of 8"&&
- sproutTrack.scrollLeft===1320);
+sproutTrack.listeners.pointerdown({pointerType:"mouse",button:0,pointerId:1,clientX:120});
+sproutTrack.listeners.pointermove({pointerType:"mouse",pointerId:1,clientX:55,preventDefault(){}});
+sproutTrack.listeners.pointerup({pointerType:"mouse",pointerId:1});
+sproutTrack.listeners.click({target:broccoliAdd,detail:1,preventDefault(){}});
+check("Dragging with the mouse scrolls without adding a pack",
+ sproutTrack.scrollLeft===285&&el("nav-cart-count").textContent==="0");
+sproutTrack.listeners.click({target:radishAdd,detail:1});
+check("A normal click on the whole card adds radish despite a prior drag",
+ el("nav-cart-count").textContent==="1"&&
+ el("basket-current-name").textContent==="Radish Sprouts"&&
+ !el("basket-picker-dock").hidden&&
+ !el("basket-sprout-picker").hidden);
+el("basket-remove-entry").listeners.click();
+check("Removing the last item restores carousel to its empty basket position",
+ el("basket-picker-dock").hidden&&
+ el("basket-picker-home").children.includes(el("basket-sprout-picker"))&&
+ el("basket-sprout-picker").hidden);
+el("basket-start").listeners.click();
+
 sproutTrack.listeners.click({target:broccoliAdd});
 check("Selecting broccoli reveals the pack editor and updates badge",
  el("basket-empty").hidden&&!el("basket-other-items").hidden&&
- el("basket-sprout-picker").hidden&&
+ !el("basket-sprout-picker").hidden&&
+ !el("basket-picker-dock").hidden&&
+ el("basket-picker-dock").children.includes(el("basket-sprout-picker"))&&
  !el("basket-remove-entry").hidden&&
  el("basket-other-items").children[0]===el("basket-current-item")&&
  document.getElementById("basket-current-item")===el("basket-current-item")&&
@@ -320,7 +332,8 @@ el("basket-start").listeners.click();
 check("Picker reopens after emptying without auto-adding broccoli",
  el("nav-cart-count").textContent==="0"&&
  !el("basket-sprout-picker").hidden&&
- el("basket-sprout-progress").textContent==="1 of 8");
+ el("basket-picker-home").children.includes(el("basket-sprout-picker"))&&
+ el("basket-picker-dock").hidden);
 sproutTrack.listeners.click({target:broccoliAdd});
 check("Choosing broccoli again works without refresh",
  el("nav-cart-count").textContent==="1"&&

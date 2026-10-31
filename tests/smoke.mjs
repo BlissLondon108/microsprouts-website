@@ -27,14 +27,14 @@ const required=["checkout-button","open-cart","nav-cart-count","cart-overlay","c
  "basket-flow-form","basket-pack-label","basket-order-label","basket-delivery-label",
  "basket-current-price","basket-total","basket-pay","basket-date","basket-calendar-grid",
  "basket-calendar-month","basket-calendar-prev","basket-calendar-next","basket-date-label",
- "basket-other-items","basket-empty","basket-start","basket-sprout-picker","basket-sprout-track","basket-sprout-prev","basket-sprout-next","basket-sprout-progress","basket-current-shipping","basket-add-another","basket-shared-details",
+ "basket-other-items","basket-empty","basket-start","basket-sprout-picker","basket-sprout-track","basket-picker-home","basket-picker-dock","basket-current-shipping","basket-add-another","basket-shared-details",
  "basket-remove-entry","sprout-scroll","order-options","explore-sprouts"];
 check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('const state={entries:[],activeId:null,stage:"pack",nextId:1}')&&
  cartClient.includes('const storeKey="microsprouts-basket-entries-v3"')&&
  html.includes('id="basket-empty"')&&html.includes('Your basket is empty.')&&
  html.includes('id="basket-start"')&&
- cartClient.includes('if(options.add){closeSproutPicker();addEntry(options);}')&&
+ cartClient.includes('if(options.add){if(!docked())closeSproutPicker();addEntry(options);}')&&
  cartClient.includes('el("basket-start").addEventListener("click"')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
 check("Add Sprouts offers all eight approved priced varieties",
@@ -48,7 +48,7 @@ check("Add Sprouts offers all eight approved priced varieties",
  cartClient.includes('sproutTrack.addEventListener("click"')&&
  cartClient.includes('validVariety(button.dataset.sproutAdd)')&&
  flowCss.includes('.basket-flow [hidden]{display:none!important}')&&
- flowCss.includes('scroll-snap-type:x mandatory'));
+ flowCss.includes('scroll-snap-type:x proximity'));
 check("Pack banners show product price and fee without double-counting shipping",
  html.includes('id="basket-current-shipping"')&&
  cartClient.includes('const shippingLine=entry=>')&&
@@ -70,8 +70,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=16"')&&
- html.includes('href="basket-flow.css?v=10"'));
+ html.includes('src="cart-preview.js?v=17"')&&
+ html.includes('href="basket-flow.css?v=11"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -466,9 +466,9 @@ const homepageShell=homepageStart>=0&&homepageEnd>homepageStart?
  html.slice(homepageStart,homepageEnd).trim():"";
 check("All three main pages have a nav basket with the same full shopping drawer",
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
- [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=1"')&&
- doc.includes('src="cart-preview.js?v=16"')&&doc.includes('href="basket-flow.css?v=10"')&&
- doc.includes('href="basket-crosspage.css?v=3"'))&&
+ [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=2"')&&
+ doc.includes('src="cart-preview.js?v=17"')&&doc.includes('href="basket-flow.css?v=11"')&&
+ doc.includes('href="basket-crosspage.css?v=4"'))&&
  savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
  basketShell.indexOf('insertAdjacentHTML("beforeend",markup)')!==-1);
@@ -478,7 +478,7 @@ check("Pages share pack and basket persistence safely",
  cartClient.includes('sessionStorage.getItem(storeKey')&&
  cartClient.includes('openCart({add:true,variety});')&&
  basketSharedCSS.includes('.comp-nav .nav-cart')&&
- basketSharedCSS.includes('right:4px')&&
+ basketSharedCSS.includes('right:20px')&&
  !basketSharedCSS.includes('.comp-nav nav{margin-right')&&
  !basketSharedCSS.includes('.comp-nav-links')&&
  read("basket-shell.js").includes('id="basket-current-photo"'));
@@ -488,15 +488,35 @@ check("Collection has a centered single action and preserves responsive navigati
  basketSharedCSS.includes('width:min(100%,222px)')&&
  !basketSharedCSS.includes('margin-right:69px')&&
  !basketSharedCSS.includes('.menu-btn')&&
- [html,sprouts,science].every(doc=>doc.includes('basket-crosspage.css?v=3')));
+ [html,sprouts,science].every(doc=>doc.includes('basket-crosspage.css?v=4')));
 
 check("Homepage Benefits aligns with Broccoli heading on wide desktops while cart moves independently",
  basketSharedCSS.includes("left:calc(61.867704% + 6.9px)")&&
  basketSharedCSS.includes("@media(min-width:1536px)")&&
  basketSharedCSS.includes(".site-hero .comp-nav nav")&&
- basketSharedCSS.includes("right:calc(732px - 50vw)")&&
+ basketSharedCSS.includes("right:calc(751px - 50vw)")&&
  basketSharedCSS.includes("@media(min-width:1460px)")&&
  !basketSharedCSS.includes(".comp-nav-links{")&&
  !basketSharedCSS.includes(".comp-nav{padding")&&
  !basketSharedCSS.includes("letter-spacing:")&&
- [html,sprouts,science].every(markup=>markup.includes('href="basket-crosspage.css?v=3"')));
+ [html,sprouts,science].every(markup=>markup.includes('href="basket-crosspage.css?v=4"')));
+
+check("Basket drawer header matches dark navigation and carousel docks above Due today",
+ flowCss.includes('.basket-flow .cart-overlay__top{')&&
+ flowCss.includes('background:#042b12;color:#f7f8ef')&&
+ flowCss.includes('min-height:63px')&&
+ html.includes('id="basket-picker-home"')&&html.includes('id="basket-picker-dock"')&&
+ html.indexOf('id="basket-picker-dock"')<html.indexOf('class="basket-flow__footer"')&&
+ html.includes('aria-roledescription="carousel"')&&
+ !html.includes('basket-sprout-prev')&&!html.includes('basket-sprout-next')&&
+ !html.includes('basket-sprout-progress')&&
+ !html.includes('Discover all eight varieties')&&
+ (html.match(/class="basket-sprout-card__hit"/g)||[]).length===8&&
+ (html.match(/class="basket-sprout-card__description"/g)||[]).length===8&&
+ !html.includes('basket-sprout-card__availability')&&
+ !html.includes('basket-sprout-card__number')&&
+ !html.includes('basket-sprout-card__action')&&
+ cartClient.includes('pickerDock.append(sproutPicker)')&&
+ cartClient.includes('sproutTrack.addEventListener("pointerdown"')&&
+ cartClient.includes('sproutTrack.addEventListener("pointermove"')&&
+ cartClient.includes('suppressClick=true'));

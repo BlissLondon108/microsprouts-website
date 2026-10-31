@@ -23,91 +23,88 @@
             <button type="button" id="basket-start" class="basket-flow__start" aria-expanded="false" aria-controls="basket-sprout-picker">Add Sprouts <span aria-hidden="true">+</span></button>
             
           </div>
+          <div id="basket-picker-home" class="basket-flow__picker-home">
           <section class="basket-sprout-picker" id="basket-sprout-picker" aria-label="Choose your sprouts" hidden>
               <div class="basket-sprout-picker__heading">
                 <span>EXPLORE THE COLLECTION</span>
-                <div class="basket-sprout-picker__navigation">
-                  <button type="button" id="basket-sprout-prev" aria-label="Previous sprout" disabled>‹</button>
-                  <output id="basket-sprout-progress" aria-live="polite" aria-atomic="true">1 of 8</output>
-                  <button type="button" id="basket-sprout-next" aria-label="Next sprout">›</button>
-                </div>
+                <span class="basket-sprout-picker__hint">Drag or swipe</span>
               </div>
-              <div id="basket-sprout-track" class="basket-sprout-track" role="list" aria-label="Eight sprout varieties">
+              <div id="basket-sprout-track" class="basket-sprout-track" role="list" aria-roledescription="carousel" aria-label="Eight draggable sprout varieties">
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--broccoli" data-sprout-card="broccoli" aria-label="Broccoli sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/broccoli.webp" width="260" height="136" alt="Broccoli sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">01 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Broccoli <span>sprouts</span></div>
-                    <p>Fresh · gently peppery</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="broccoli">Choose broccoli <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="broccoli" aria-label="Add Broccoli sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/broccoli.webp" width="260" height="136" alt="Broccoli sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Broccoli sprouts</span>
+                      <span class="basket-sprout-card__description">Fresh · gently peppery</span>
+                    </span>
+                  </button>
                 </article>
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--radish" data-sprout-card="radish" aria-label="Radish sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/radish.webp" width="260" height="136" alt="Radish sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">02 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Radish <span>sprouts</span></div>
-                    <p>Bold · peppery</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="radish">Choose radish <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="radish" aria-label="Add Radish sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/radish.webp" width="260" height="136" alt="Radish sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Radish sprouts</span>
+                      <span class="basket-sprout-card__description">Bold · peppery</span>
+                    </span>
+                  </button>
                 </article>
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--mung-bean" data-sprout-card="mung-bean" aria-label="Mung bean sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/mung-bean.webp" width="260" height="136" alt="Mung bean sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">03 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Mung bean <span>sprouts</span></div>
-                    <p>Crunchy · mild</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="mung-bean">Choose mung bean <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="mung-bean" aria-label="Add Mung bean sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/mung-bean.webp" width="260" height="136" alt="Mung bean sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Mung bean sprouts</span>
+                      <span class="basket-sprout-card__description">Crunchy · mild</span>
+                    </span>
+                  </button>
                 </article>
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--leek" data-sprout-card="leek" aria-label="Leek sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/leek.webp" width="260" height="136" alt="Leek sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">04 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Leek <span>sprouts</span></div>
-                    <p>Delicate · savoury</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="leek">Choose leek <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="leek" aria-label="Add Leek sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/leek.webp" width="260" height="136" alt="Leek sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Leek sprouts</span>
+                      <span class="basket-sprout-card__description">Delicate · savoury</span>
+                    </span>
+                  </button>
                 </article>
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--mustard" data-sprout-card="mustard" aria-label="Mustard sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/mustard.webp" width="260" height="136" alt="Mustard sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">05 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Mustard <span>sprouts</span></div>
-                    <p>Bright · spicy</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="mustard">Choose mustard <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="mustard" aria-label="Add Mustard sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/mustard.webp" width="260" height="136" alt="Mustard sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Mustard sprouts</span>
+                      <span class="basket-sprout-card__description">Bright · spicy</span>
+                    </span>
+                  </button>
                 </article>
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--fenugreek" data-sprout-card="fenugreek" aria-label="Fenugreek sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/fenugreek.webp" width="260" height="136" alt="Fenugreek sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">06 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Fenugreek <span>sprouts</span></div>
-                    <p>Earthy · aromatic</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="fenugreek">Choose fenugreek <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="fenugreek" aria-label="Add Fenugreek sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/fenugreek.webp" width="260" height="136" alt="Fenugreek sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Fenugreek sprouts</span>
+                      <span class="basket-sprout-card__description">Earthy · aromatic</span>
+                    </span>
+                  </button>
                 </article>
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--alfalfa" data-sprout-card="alfalfa" aria-label="Alfalfa sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/alfalfa.webp" width="260" height="136" alt="Alfalfa sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">07 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Alfalfa <span>sprouts</span></div>
-                    <p>Tender · mild</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="alfalfa">Choose alfalfa <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="alfalfa" aria-label="Add Alfalfa sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/alfalfa.webp" width="260" height="136" alt="Alfalfa sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Alfalfa sprouts</span>
+                      <span class="basket-sprout-card__description">Tender · mild</span>
+                    </span>
+                  </button>
                 </article>
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--green-pea" data-sprout-card="green-pea" aria-label="Green pea sprouts">
-                  <div class="basket-sprout-card__visual"><img src="assets/sprout-orbs/green-pea.webp" width="260" height="136" alt="Green pea sprouts" loading="lazy" decoding="async"><span class="basket-sprout-card__number">08 / 08</span></div>
-                  <div class="basket-sprout-card__content">
-                    <div class="basket-sprout-card__name">Green pea <span>sprouts</span></div>
-                    <p>Fresh · gently sweet</p>
-                    <span class="basket-sprout-card__availability">Ready to order</span>
-                    <button type="button" class="basket-sprout-card__action basket-sprout-card__action--primary" data-sprout-add="green-pea">Choose green pea <span aria-hidden="true">→</span></button>
-                  </div>
+                  <button type="button" class="basket-sprout-card__hit" data-sprout-add="green-pea" aria-label="Add Green pea sprouts to basket">
+                    <span class="basket-sprout-card__visual"><img src="assets/sprout-orbs/green-pea.webp" width="260" height="136" alt="Green pea sprouts" loading="lazy" draggable="false" decoding="async"></span>
+                    <span class="basket-sprout-card__content">
+                      <span class="basket-sprout-card__name">Green pea sprouts</span>
+                      <span class="basket-sprout-card__description">Fresh · gently sweet</span>
+                    </span>
+                  </button>
                 </article>
               </div>
-              <a class="basket-sprout-picker__all" href="sprouts.html#varieties">Discover all eight varieties <span aria-hidden="true">↗</span></a>
             </section>
+          </div>
           <div class="basket-flow__previous" id="basket-other-items" aria-label="Your sprout packs in order of addition">
           <section class="basket-flow__current" id="basket-current-item" aria-label="Sprout pack being configured">
           <button type="button" class="basket-flow__mini-remove basket-flow__current-remove" id="basket-remove-entry" aria-label="Remove this sprout pack" hidden>×</button>
@@ -180,6 +177,7 @@
               </div>
             </section>
           </div>
+        <div id="basket-picker-dock" class="basket-flow__carousel-dock" hidden></div>
         <div class="basket-flow__footer">
           <div class="basket-flow__total">
             <div><span id="basket-total-type">Your sprouts</span><small id="basket-total-note">Choose a pack to begin</small></div>
