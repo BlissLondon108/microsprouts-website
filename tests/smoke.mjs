@@ -34,7 +34,7 @@ check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('const storeKey="microsprouts-basket-entries-v3"')&&
  html.includes('id="basket-empty"')&&html.includes('Your basket is empty.')&&
  html.includes('id="basket-start"')&&
- cartClient.includes('if(options.add){if(!docked())closeSproutPicker();addEntry(options);}')&&
+ cartClient.includes('if(options.add&&!bulkAttempt){if(!docked())closeSproutPicker();addEntry(options);}')&&
  cartClient.includes('el("basket-start").addEventListener("click"')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
 check("Add Sprouts offers all eight approved priced varieties",
@@ -70,8 +70,8 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=17"')&&
- html.includes('href="basket-flow.css?v=12"'));
+ html.includes('src="cart-preview.js?v=18"')&&
+ html.includes('href="basket-flow.css?v=13"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -467,8 +467,8 @@ const homepageShell=homepageStart>=0&&homepageEnd>homepageStart?
  html.slice(homepageStart,homepageEnd).trim():"";
 check("All three main pages have a nav basket with the same full shopping drawer",
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
- [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=3"')&&
- doc.includes('src="cart-preview.js?v=17"')&&doc.includes('href="basket-flow.css?v=12"')&&
+ [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=4"')&&
+ doc.includes('src="cart-preview.js?v=18"')&&doc.includes('href="basket-flow.css?v=13"')&&
  doc.includes('href="basket-crosspage.css?v=4"'))&&
  savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
@@ -538,4 +538,25 @@ check("Carousel says Select Your Favorite and fades both horizontal edges",
  flowCss.includes('mask-image:linear-gradient(to right,')&&
  flowCss.includes('#000 calc(100% - 24px),transparent 100%')&&
  (html.match(/class="basket-sprout-card__hit"/g)||[]).length===8&&
- [html,sprouts,science].every(s=>s.includes('basket-flow.css?v=12')));
+ [html,sprouts,science].every(s=>s.includes('basket-flow.css?v=13')));
+
+check("An eleventh pack offers an elegant WhatsApp bulk-enquiry popup on every page",
+ ["index.html","sprouts.html","science.html"].every(file=>
+   read(file).includes('basket-flow.css?v=13')&&read(file).includes('cart-preview.js?v=18'))&&
+ [sprouts,science].every(file=>file.includes('basket-shell.js?v=4'))&&
+ html.includes('id="basket-bulk-overlay" hidden')&&
+ html.includes('id="basket-bulk-title">Planning a larger order?')&&
+ html.includes('personal bulk discount</strong>')&&
+ html.includes('best collection or delivery option for you')&&
+ html.includes('id="basket-bulk-whatsapp" href="https://wa.me/447386853514"')&&
+ html.includes('target="_blank" rel="noopener noreferrer"')&&
+ html.includes('id="basket-bulk-close"')&&
+ html.includes('data-bulk-close')&&
+ flowCss.includes('.basket-bulk-overlay{')&&
+ flowCss.includes('.basket-bulk-card__whatsapp{')&&
+ cartClient.includes('function showBulkOrder(extraVariety)')&&
+ cartClient.includes('encodeURIComponent(message)')&&
+ cartClient.includes('if(state.entries.length>=maxOnlinePacks){')&&
+ cartClient.includes('showBulkOrder(button.dataset.sproutAdd)')&&
+ !cartClient.includes('Your basket can contain up to 10 sprout packs.')&&
+ read("basket-shell.js").includes('id="basket-bulk-overlay"'));

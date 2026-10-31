@@ -8,6 +8,10 @@
  const overlay=el("cart-overlay"),trigger=el("open-cart"),form=el("basket-flow-form");
  if(!overlay||!trigger||!form)return;
  const panel=el("basket"),pay=el("basket-pay");
+ const bulkDialog=el("basket-bulk-overlay");
+ const bulkLink=el("basket-bulk-whatsapp"),bulkClose=el("basket-bulk-close");
+ const maxOnlinePacks=10;
+ let bulkReturnFocus=null;
  const stages=["pack","order","delivery","details"];
  const prices={once:{"200":999,"500":1699},weekly:{"200":899,"500":1549}};
  const varietyNames={"broccoli":"Broccoli","radish":"Radish","mung-bean":"Mung bean","leek":"Leek","mustard":"Mustard","fenugreek":"Fenugreek","alfalfa":"Alfalfa","green-pea":"Green pea"};
@@ -87,6 +91,24 @@
    }
  }catch{}
  const showError=message=>{const node=el("basket-error");node.textContent=message;node.hidden=!message};
+ function showBulkOrder(extraVariety){
+   bulkReturnFocus=document.activeElement;
+   const requested=validVariety(extraVariety)?" I’m also interested in "+varietyNames[extraVariety]+" sprouts.":"";
+   const chosen=state.entries.map(entry=>varietyLabel(entry)+(entry.pack?" "+entry.pack+"g":"")).join(", ");
+   const message="Hello MicroSprouts! I’m planning a larger order of more than 10 sprout packs. "+
+     "I have "+state.entries.length+" packs in my basket"+
+     (chosen?" ("+chosen+")":"")+"."+requested+
+     " Could we discuss a personal bulk discount, availability, and the best delivery or collection arrangement? Thank you!";
+   bulkLink.href="https://wa.me/447386853514?text="+encodeURIComponent(message);
+   showError("");
+   bulkDialog.hidden=false;
+   bulkClose.focus();
+ }
+ function closeBulkOrder(restoreFocus=true){
+   if(bulkDialog.hidden)return;
+   bulkDialog.hidden=true;
+   if(restoreFocus)bulkReturnFocus?.focus?.();
+ }
  const focusable=()=>[...panel.querySelectorAll(
    'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),summary'
  )].filter(node=>!node.closest("[hidden]")&&node.getClientRects().length);
@@ -194,7 +216,7 @@
    }
    renderOther();
    el("basket-items-control").hidden=!complete(entry);
-   el("basket-add-another").disabled=state.entries.length>=10;
+   el("basket-add-another").disabled=false; // At ten packs this opens the personal bulk-order invitation.
    el("basket-remove-entry").hidden=false;
    // A newly added (not-yet-configured) pack is still an item in the basket.
    // The nav badge updates immediately, before its size is chosen.
@@ -239,7 +261,7 @@
    }
  }
  function addEntry(options={}){
-   if(state.entries.length>=10)return null;
+   if(state.entries.length>=maxOnlinePacks){showBulkOrder(options.variety);return null;}
    const entry=makeEntry(state.nextId++,validVariety(options.variety)?options.variety:"broccoli");
    if(["200","500"].includes(options.pack))entry.pack=options.pack;
    if(["once","weekly"].includes(options.frequency))entry.frequency=options.frequency;
@@ -251,15 +273,19 @@
    returnFocus=document.activeElement;
    // The nav cart simply opens the basket. Explicit shopping CTAs create
    // one separate entry, but opening an empty basket never creates broccoli.
-   if(options.add){if(!docked())closeSproutPicker();addEntry(options);}
+   const bulkAttempt=!!options.add&&state.entries.length>=maxOnlinePacks;
+   if(options.add&&!bulkAttempt){if(!docked())closeSproutPicker();addEntry(options);}
    if(active()&&!complete(active())&&state.stage==="details")
      state.stage=active().frequency?"delivery":active().pack?"order":"pack";
    overlay.hidden=false;document.body.classList.add("overlay-open");
    trigger.setAttribute("aria-expanded","true");
-   render();el("close-cart").focus();
+   render();
+   if(bulkAttempt)showBulkOrder(options.variety);
+   else el("close-cart").focus();
  }
  function closeCart(){
    if(overlay.hidden)return;
+   closeBulkOrder(false);
    overlay.hidden=true;document.body.classList.remove("overlay-open");
    trigger.setAttribute("aria-expanded","false");
    returnFocus?.focus?.();
@@ -269,9 +295,9 @@
    button.addEventListener("click",()=>{
      const variety=button.dataset.variety;
      if(!validVariety(variety))return;
-     if(state.entries.length>=10){
+     if(state.entries.length>=maxOnlinePacks){
        openCart();
-       showError("Your basket can contain up to 10 sprout packs.");
+       showBulkOrder(variety);
        return;
      }
      // The catalogue only selects the variety; the basket asks 200g or 500g.
@@ -286,6 +312,8 @@
      frequency:button.dataset.frequency,variety:button.dataset.variety});
  }));
  document.querySelectorAll("[data-cart-close]").forEach(button=>button.addEventListener("click",closeCart));
+ document.querySelectorAll("[data-bulk-close]").forEach(button=>
+   button.addEventListener("click",()=>closeBulkOrder()));
  form.querySelectorAll("[data-flow-pack]").forEach(button=>button.addEventListener("click",()=>{
    active().pack=button.dataset.flowPack;save();setStage("order");
  }));
@@ -378,8 +406,8 @@
    suppressClick=false;
    const button=event.target.closest("[data-sprout-add]");
    if(!button||!validVariety(button.dataset.sproutAdd))return;
-   if(state.entries.length>=10){
-     showError("Your basket can contain up to 10 sprout packs.");
+   if(state.entries.length>=maxOnlinePacks){
+     showBulkOrder(button.dataset.sproutAdd);
      return;
    }
    if(addEntry({variety:button.dataset.sproutAdd})){
@@ -388,11 +416,12 @@
    }
  });
  el("basket-add-another").addEventListener("click",()=>{
-   if(state.entries.length>=10||!complete(active()))return;
+   if(!complete(active()))return;
    if(addEntry())setStage("pack");
  });
  el("basket-add-variety")?.addEventListener("click",()=>{
-   if(state.entries.length>=10||!complete(active()))return;
+   if(!complete(active()))return;
+   if(state.entries.length>=maxOnlinePacks){showBulkOrder();return;}
    if(docked())return;
    const opening=sproutPicker.hidden;
    sproutPicker.hidden=!opening;
@@ -411,6 +440,17 @@
  el("basket-remove-entry").addEventListener("click",()=>removeEntry(state.activeId));
  document.addEventListener("keydown",event=>{
    if(overlay.hidden)return;
+   if(!bulkDialog.hidden){
+     if(event.key==="Escape"){event.preventDefault();closeBulkOrder();return;}
+     if(event.key==="Tab"){
+       if(event.shiftKey&&document.activeElement===bulkClose){
+         event.preventDefault();bulkLink.focus();
+       }else if(!event.shiftKey&&document.activeElement===bulkLink){
+         event.preventDefault();bulkClose.focus();
+       }
+     }
+     return;
+   }
    if(event.key==="Escape"){event.preventDefault();closeCart();return;}
    if(event.key!=="Tab")return;
    const nodes=focusable();if(!nodes.length)return;

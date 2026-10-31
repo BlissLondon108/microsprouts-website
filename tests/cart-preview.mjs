@@ -60,7 +60,8 @@ const ids=[
  "basket-items-control","basket-stage","basket-current-item","basket-current-price","basket-shared-details",
  "basket-calendar-grid","basket-calendar-month","basket-calendar-prev","basket-calendar-next",
  "basket-date-label","basket-selected-pack","basket-selected-order","basket-selected-delivery",
- "basket-other-items","close-cart","checkout-button","basket-add-variety","basket-current-photo","basket-current-name"
+ "basket-other-items","close-cart","checkout-button","basket-add-variety","basket-current-photo","basket-current-name",
+ "basket-bulk-overlay","basket-bulk-close","basket-bulk-whatsapp"
 ];
 const elements=new Map(ids.map(id=>[id,new Fake(id)]));
 const el=id=>elements.get(id);
@@ -83,6 +84,7 @@ el("basket-sprout-picker").hidden=true;
 el("basket-picker-home").append(el("basket-sprout-picker"));
 el("basket-picker-dock").hidden=true;
 el("cart-overlay").hidden=true;
+el("basket-bulk-overlay").hidden=true;
 el("checkout-button").dataset.pack="500";
 el("checkout-button").dataset.frequency="once";
 const stages=["pack","order","delivery","details"].map(id=>{
@@ -116,7 +118,7 @@ const directButtons=[
  Object.assign(new Fake("button"),{dataset:{variety:"radish"}})
 ];
 openButtons[1].dataset.frequency="once";openButtons[2].dataset.frequency="weekly";
-const backdrop=new Fake("backdrop"),photo=new Fake("photo");
+const backdrop=new Fake("backdrop"),bulkBackdrop=new Fake("backdrop"),photo=new Fake("photo");
 photo.complete=false;photo.naturalWidth=100;
 photo.parentElement={classList:{add(k){photo.fallback=k}}};
 let submitted=null,paymentUrl=null;
@@ -136,6 +138,7 @@ document={
  querySelectorAll(sel){
   if(sel==="[data-cart-open]")return openButtons;
   if(sel==="[data-cart-close]")return [el("close-cart"),backdrop];
+  if(sel==="[data-bulk-close]")return [el("basket-bulk-close"),bulkBackdrop];
   if(sel==="[data-cart-add-variety]")return directButtons;
   if(sel===".sprout-orb__photo")return [photo];
   return [];
@@ -386,4 +389,38 @@ packs[0].listeners.click();
 check("Adding a 200g pack updates the mixed-variety total",
  el("basket-total").textContent==="£36.97"&&
  !stages[1].hidden);
+// Repeated clicks keep normal checkout for ten, then invite a personal bulk enquiry.
+for(let count=3;count<10;count++)sproutTrack.listeners.click({target:broccoliAdd,detail:1});
+check("Ten packs remain selectable in the ordinary basket",
+ el("nav-cart-count").textContent==="10"&&
+ el("basket-bulk-overlay").hidden&&
+ !el("basket-add-another").disabled);
+sproutTrack.listeners.click({target:radishAdd,detail:1});
+const enquiry=decodeURIComponent(el("basket-bulk-whatsapp").href.split("?text=")[1]||"");
+check("The eleventh picker click opens the bulk enquiry without losing ten packs",
+ !el("basket-bulk-overlay").hidden&&
+ document.activeElement===el("basket-bulk-close")&&
+ el("nav-cart-count").textContent==="10"&&
+ el("basket-other-items").children.length===10&&
+ el("basket-bulk-whatsapp").href.startsWith("https://wa.me/447386853514?text=")&&
+ enquiry.includes("personal bulk discount")&&
+ enquiry.includes("delivery or collection")&&
+ enquiry.includes("Radish sprouts")&&
+ enquiry.includes("I have 10 packs"));
+document.events.keydown({key:"Escape",preventDefault(){}});
+check("Escape dismisses only the bulk invitation, leaving the basket open",
+ el("basket-bulk-overlay").hidden&&!el("cart-overlay").hidden);
+directButtons[1].listeners.click();
+check("More Sprouts card triggers the same bulk invitation at ten packs",
+ !el("basket-bulk-overlay").hidden&&
+ el("nav-cart-count").textContent==="10");
+el("basket-bulk-close").listeners.click();
+check("Bulk close button returns to the unchanged basket",
+ el("basket-bulk-overlay").hidden&&!el("cart-overlay").hidden);
+el("basket-remove-entry").listeners.click();
+check("Removing a pack allows normal checkout additions again",
+ el("nav-cart-count").textContent==="9");
+sproutTrack.listeners.click({target:radishAdd,detail:1});
+check("A tenth pack can be added normally after reducing the basket",
+ el("nav-cart-count").textContent==="10"&&el("basket-bulk-overlay").hidden);
 console.log("\nOrdered basket + inline calendar tests passed: "+checks);
