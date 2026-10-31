@@ -275,13 +275,13 @@ for (const [name,markup] of Object.entries(docs)) {
 const navMatches = markup => /href="sprouts\.html"[^>]*>More Sprouts<\/a><\/li>\s*<li><a href="science\.html"[^>]*>Science of Sprouts<\/a>/.test(markup);
 check("New navigation tabs in requested order on all pages", Object.values(docs).every(navMatches));
 check("All eight varieties appear on More Sprouts", (sprouts.match(/<article class="sprout-card"/g) || []).length === 8 && ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(id => sprouts.includes('id="'+id+'"')));
-check("Redundant discovery and scheduling notes are removed, hero jar design untouched",
+check("Redundant notes removed and the approved glowing hero replaces the jar",
  !sprouts.includes('Broccoli packs are available through our secure checkout.')&&
  !sprouts.includes('All varieties are subject to growing schedules')&&
- sprouts.includes('assets/approved/harvest.webp')&&
- sprouts.includes('Small seeds. Fresh beginnings.'));
+ sprouts.includes('class="ms-orb-scene"')&&
+ !sprouts.includes('Small seeds. Fresh beginnings.'));
 check("Broccoli retains checkout link, price and pack size", sprouts.includes('href="index.html#products"') && ["£9.99","£16.99","200g","500g"].every(t => sprouts.includes(t)));
-check("All six unpriced varieties retain direct WhatsApp enquiries", ["radish%20sprouts","mung%20bean%20sprouts","leek%20sprouts","mustard%20sprouts","fenugreek%20sprouts","alfalfa%20sprouts"].every(q => sprouts.includes(q)) && !sprouts.includes("£0.00"));
+check("All seven unpriced varieties retain direct WhatsApp enquiries", ["radish%20sprouts","mung%20bean%20sprouts","leek%20sprouts","mustard%20sprouts","fenugreek%20sprouts","alfalfa%20sprouts","green%20pea%20sprouts"].every(q => sprouts.includes(q)) && !sprouts.includes("£0.00"));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#glucoraphanin">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
