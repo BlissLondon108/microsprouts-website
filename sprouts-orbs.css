@@ -119,7 +119,7 @@
   z-index:2;bottom:15px;left:15px;color:#153a28!important;
   padding:7px 10px;background:rgba(252,255,246,.86);
   border:1px solid rgba(255,255,255,.53);border-radius:99px;
-  backdrop-filter:blur(3px)
+  /* legible label without a browser backdrop layer */
 }
 .sprouts-page .sprout-card__visual--broccoli{background:radial-gradient(ellipse at 65% 18%,#d5edbc,#80b795 65%,#36765d)}
 @media(max-width:650px){.sprouts-page .sprout-card__visual .sprout-card__art{padding:14px 28px}}
