@@ -342,7 +342,7 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=6')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=7')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
  read('sprouts-orbs.js').includes('pointermove')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
@@ -353,7 +353,8 @@ check("Orb artwork has no opaque secondary glass disk, and unnecessary counter i
  !sproutsDetails.includes('Explore the collection')&&
  !read('sprouts-orbs.css').includes('backdrop-filter')&&
  read('sprouts-orbs.css').includes('background:transparent')&&
- read('sprouts-orbs.css').includes('.ms-orb-link::after{'));
+ read('sprouts-orbs.css').includes('.ms-orb-link::after{')&&
+ (sproutsDetails.match(/class="ms-orb-surface"/g)||[]).length===8);
 check("Animated orbs use bounded collision physics instead of CSS drift",
  read('sprouts-orbs.js').includes('requestAnimationFrame')&&
  read('sprouts-orbs.js').includes('const separate=elastic=>')&&
@@ -361,11 +362,13 @@ check("Animated orbs use bounded collision physics instead of CSS drift",
  read('sprouts-orbs.js').includes('prefers-reduced-motion: reduce')&&
  !read('sprouts-orbs.css').includes('@keyframes ms-orb-drift'));
 
-check("Water bubbles retain translucent surface and curved highlights",
- read("sprouts-orbs.css").includes("radial-gradient(ellipse 43% 19%")&&
- read("sprouts-orbs.css").includes("rgba(234,255,252,.68)")&&
- read("sprouts-orbs.css").includes("inset -8px -10px")&&
- !read("sprouts-orbs.css").includes("backdrop-filter"));
+check("Water bubbles use one stable reflection layer without a target reticle",
+ (sproutsDetails.match(/class="ms-orb-surface"/g)||[]).length===8&&
+ read("sprouts-orbs.css").includes("radial-gradient(ellipse 36% 16%")&&
+ read("sprouts-orbs.css").includes("border:1px solid rgba(240,255,245,.72)")&&
+ !read("sprouts-orbs.css").includes("backdrop-filter")&&
+ !read("sprouts-orbs.css").includes("var(--orb-pointer-x)")&&
+ !read("sprouts-orbs.css").includes("radial-gradient(circle 57px"));
 check("Hover glows never meet the rectangular sphere viewport boundary",
  read("sprouts-orbs.css").includes("overflow:visible;background:transparent")&&
  read("sprouts-orbs.js").includes("s.r*1.12+32")&&
@@ -405,11 +408,12 @@ check("Homepage and catalogue images never trigger native hover search arrows",
  (sprouts.match(/class="sprout-card__art" role="img"/g)||[]).length===8&&
  !sprouts.includes('<img class="sprout-card__art"')&&
  !html.includes('<img class="sprout-orb__photo"')&&
- read("sprouts-orbs.css").includes(".ms-orb-link::before{content:none!important}"));
+ read("sprouts-orbs.css").includes(".ms-orb-link::before,"));
 
 check("Liquid glass bubbles have no hover target overlay",
  read("sprouts-orbs.css").includes(".ms-orb-link::before,")&&
  read("sprouts-orbs.css").includes("content:none!important;display:none!important")&&
+ (sproutsDetails.match(/class="ms-orb-surface"/g)||[]).length===8&&
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8);
 check("Server validates all eight varieties and creates distinct Stripe names",
  read("worker.js").includes('const validVariety=slug=>')&&
@@ -417,3 +421,11 @@ check("Server validates all eight varieties and creates distinct Stripe names",
  read("worker.js").includes('variety:item.variety===undefined?"broccoli":item.variety')&&
  read("worker.js").includes('variety==="broccoli"')&&
  !read("worker.js").includes('unit_amount]","0"'));
+
+check("All bubble captions remain outside the sphere and collision physics is unchanged",
+ read("sprouts-orbs.css").includes("overflow:visible;background:transparent")&&
+ read("sprouts-orbs.css").includes("border-radius:50%;isolation:isolate;overflow:visible")&&
+ read("sprouts-orbs.css").includes("bottom:-21px")&&
+ read("sprouts-orbs.js").includes("const separate=elastic=>")&&
+ !read("sprouts-orbs.css").includes("overflow:hidden")&&
+ (sproutsDetails.match(/class="ms-orb-caption"/g)||[]).length===8);

@@ -1,9 +1,10 @@
-/* MicroSprouts — clear water bubbles with a single continuous surface. */
+/* MicroSprouts: stable, crosshair-free water bubbles.
+   A translucent circle, one specular surface, and the approved sprout artwork.
+   No hover-generated pseudoelements or animated radial-gradient layers. */
 .ms-orb-scene{
  position:relative;isolation:isolate;min-width:0;width:100%;
- height:clamp(390px,37vw,490px);
- /* Glows can extend past this invisible animation area without a square clipping line. */
- overflow:visible;background:transparent;--orb-zoom:1;
+ height:clamp(390px,37vw,490px);overflow:visible;background:transparent;
+ --orb-zoom:1;
 }
 .ms-orb-floating{
  position:absolute;left:var(--orb-x);top:var(--orb-y);width:0;height:0;
@@ -12,85 +13,79 @@
 .ms-orb-scene[data-orb-ready="true"] .ms-orb-floating{left:0;top:0}
 .ms-orb-floating:hover,.ms-orb-floating:focus-within{z-index:10}
 .ms-orb-link{
- --glow-hue:125;--orb-pointer-x:50%;--orb-pointer-y:50%;
+ --glow-hue:125;
  box-sizing:border-box;display:block;position:absolute;top:0;left:0;
  width:calc(var(--orb-size) * var(--orb-zoom));
  height:calc(var(--orb-size) * var(--orb-zoom));
- transform:translate(-50%,-50%);scale:1;border-radius:50%;
- /* The sprout lives inside this one translucent liquid-glass sphere,
-    not on top of a separate opaque backing disk. */
- border:1px solid rgba(234,255,252,.68);
- background:
-  radial-gradient(ellipse at 25% 18%,rgba(255,255,255,.19),transparent 43%),
-  radial-gradient(ellipse at 79% 84%,rgba(192,247,212,.13),transparent 50%),
-  radial-gradient(circle at 50% 50%,rgba(235,255,246,.028) 40%,
-    rgba(199,245,239,.065) 67%,rgba(235,255,252,.16) 95%);
+ transform:translate(-50%,-50%);
+ border-radius:50%;isolation:isolate;overflow:visible;
+ border:1px solid rgba(240,255,245,.72);
+ background:rgba(235,255,240,.06);
  box-shadow:
-  inset 5px 7px 12px rgba(255,255,255,.19),
-  inset -8px -10px 14px rgba(118,181,136,.12),
-  inset 0 0 0 1px rgba(228,255,250,.12),
+  inset 0 1px 0 rgba(255,255,255,.35),
+  inset 0 -8px 18px rgba(170,220,185,.10),
   0 5px 19px rgba(0,24,17,.25),
   0 0 11px rgba(181,247,224,.11);
  color:#f9ffe9;text-decoration:none;outline:none;
- transition:scale .24s ease,box-shadow .24s ease;
+ transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease;
  -webkit-tap-highlight-color:transparent;
 }
-.ms-orb-link::before{
- content:"";pointer-events:none;position:absolute;inset:0;z-index:2;
- border-radius:inherit;opacity:0;
- background:radial-gradient(circle 57px at var(--orb-pointer-x) var(--orb-pointer-y),
-  hsl(var(--glow-hue) 95% 83% / .38),transparent 85%);
- transition:opacity .2s ease;
-}
-.ms-orb-link::after{
- /* Curved specular glints make the single sphere read as a water bubble. */
- content:"";pointer-events:none;position:absolute;inset:2px;z-index:3;
- border-radius:inherit;border-top:1px solid rgba(255,255,255,.62);
- border-right:1px solid rgba(216,255,255,.28);
- border-bottom:1px solid rgba(214,243,219,.23);
+/* Explicitly disable the original targeting/shine pseudo layers. */
+.ms-orb-link::before,
+.ms-orb-link::after{content:none!important;display:none!important}
+/* One noninteractive, fixed water reflection per sphere; it does not respond
+   to pointer coordinates and cannot draw centre-line reticles. */
+.ms-orb-surface{
+ position:absolute;inset:1px;z-index:2;pointer-events:none;
+ border-radius:50%;
  background:
-  radial-gradient(ellipse 43% 19% at 31% 15%,rgba(255,255,255,.56),
-    rgba(255,255,255,.09) 68%,transparent 100%),
-  radial-gradient(ellipse 22% 13% at 77% 84%,rgba(223,255,252,.2),transparent 100%);
+  radial-gradient(ellipse 36% 16% at 30% 17%,
+    rgba(255,255,255,.46),rgba(255,255,255,.10) 54%,transparent 100%),
+  radial-gradient(ellipse 18% 10% at 78% 83%,
+    rgba(240,255,245,.19),transparent 100%);
 }
 .ms-orb-art{
- position:absolute;inset:7%;width:86%;height:86%;z-index:1;
+ display:block;position:absolute;inset:7%;width:86%;height:86%;z-index:1;
  background-repeat:no-repeat;background-size:contain;background-position:center;
  pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,26,14,.32));
  transition:filter .24s ease;
 }
 .ms-orb-link:hover,.ms-orb-link:focus-visible{
- scale:1.12;
+ transform:translate(-50%,-50%) scale(1.12);
+ border-color:rgba(247,255,249,.92);
  box-shadow:
-  inset 6px 7px 14px rgba(255,255,255,.29),
-  inset -8px -10px 16px rgba(165,222,177,.16),
-  inset 0 0 0 1px rgba(244,255,255,.2),
+  inset 0 1px 0 rgba(255,255,255,.48),
+  inset 0 -10px 20px rgba(170,220,185,.13),
   0 8px 22px rgba(0,22,15,.3),
-  0 0 9px hsl(var(--glow-hue) 90% 82% / .30),
-  0 0 25px hsl(var(--glow-hue) 80% 74% / .39);
+  0 0 10px hsl(var(--glow-hue) 90% 82% / .28),
+  0 0 24px hsl(var(--glow-hue) 80% 74% / .34);
 }
-.ms-orb-link:hover::before,.ms-orb-link:focus-visible::before{opacity:1}
 .ms-orb-link:hover .ms-orb-art,.ms-orb-link:focus-visible .ms-orb-art{
- filter:drop-shadow(0 0 8px hsl(var(--glow-hue) 90% 78% / .58))
- drop-shadow(0 0 15px hsl(var(--glow-hue) 82% 70% / .37));
+ filter:
+  drop-shadow(0 0 8px hsl(var(--glow-hue) 90% 78% / .52))
+  drop-shadow(0 0 15px hsl(var(--glow-hue) 82% 70% / .30));
 }
 .ms-orb-link:focus-visible{outline:2px solid #e0f9c3;outline-offset:4px}
 .ms-orb-caption{
- position:absolute;bottom:-21px;left:50%;transform:translateX(-50%);
- padding:3px 7px;white-space:nowrap;font:600 11px/1.3 Arial,Helvetica,sans-serif;
- letter-spacing:.01em;color:#e6f3d5;text-shadow:0 2px 6px #001f0f;
+ position:absolute;bottom:-21px;left:50%;transform:translateX(-50%);z-index:3;
+ padding:3px 7px;white-space:nowrap;
+ font:600 11px/1.3 Arial,Helvetica,sans-serif;letter-spacing:.01em;
+ color:#e6f3d5;text-shadow:0 2px 6px #001f0f;
  pointer-events:none;
 }
 .ms-orb-link:hover .ms-orb-caption,.ms-orb-link:focus-visible .ms-orb-caption{color:#fff}
+.ms-orb-link,.ms-orb-link *{
+ cursor:default;-webkit-user-drag:none;user-select:none;-webkit-user-select:none;
+ -webkit-touch-callout:none;
+}
 @media(max-width:1050px){.ms-orb-scene{--orb-zoom:.89}}
 @media(max-width:770px){.ms-orb-scene{height:390px;--orb-zoom:.82;width:min(100%,580px);margin:0 auto}}
 @media(max-width:480px){.ms-orb-scene{height:350px;--orb-zoom:.56}.ms-orb-caption{font-size:10px;bottom:-18px}}
 @media(max-width:360px){.ms-orb-scene{--orb-zoom:.5}}
 @media(prefers-reduced-motion:reduce){
  .ms-orb-floating{will-change:auto}
- .ms-orb-link,.ms-orb-art,.ms-orb-link::before{transition:none}
+ .ms-orb-link,.ms-orb-art{transition:none}
 }
-/* Keep the approved More Sprouts composition isolated from other pages. */
 .sprouts-page .subpage-hero__inner{
  grid-template-columns:minmax(0,1fr) minmax(0,1.03fr);
  gap:clamp(25px,4vw,55px)
@@ -101,11 +96,6 @@
 @media(max-width:770px){
  .sprouts-page .subpage-hero__inner{grid-template-columns:1fr;gap:12px}
 }
-
-/* The circles navigate on click, but never add visual-search targets or hover arrows. */
-.ms-orb-link,.ms-orb-link *{cursor:default;-webkit-user-drag:none;user-select:none}
-.ms-orb-art{display:block}
-
 /* Approved botanical WebP cutouts replace the placeholder letters and old broccoli jar. */
 .sprouts-page .sprout-card__visual{isolation:isolate;display:grid;place-items:center}
 .sprouts-page .sprout-card__visual .sprout-card__art{
@@ -125,24 +115,3 @@
 @media(max-width:650px){.sprouts-page .sprout-card__visual .sprout-card__art{padding:14px 28px}}
 
 
-/* No transient circular reticle on hover. Preserve the water-bubble rim and outer glow. */
-.sprouts-page .ms-orb-link::before{content:none!important}
-.sprouts-page .ms-orb-link,
-.sprouts-page .ms-orb-link *{
- -webkit-user-drag:none;-webkit-user-select:none;user-select:none;
- -webkit-touch-callout:none;
-}
-
-/* Clean water bubble surface — no internal targeting reticle or cross lines.
-   The actual approved WebP sprout assets contain no crosshairs. */
-.sprouts-page .ms-orb-link::before,
-.sprouts-page .ms-orb-link::after{
- content:none!important;display:none!important;
-}
-.sprouts-page .ms-orb-link{
- background:
-  radial-gradient(ellipse 34% 16% at 32% 16%,rgba(255,255,255,.44),transparent 94%),
-  radial-gradient(ellipse 22% 13% at 78% 84%,rgba(228,252,225,.18),transparent 95%),
-  radial-gradient(circle at 49% 49%,rgba(238,255,237,.025) 43%,rgba(221,250,225,.1) 96%);
- border:1px solid rgba(230,251,232,.72);
-}
