@@ -342,7 +342,7 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=5')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=6')&&sproutsDetails.includes('sprouts-orbs.js?v=3')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
  read('sprouts-orbs.js').includes('pointermove')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
