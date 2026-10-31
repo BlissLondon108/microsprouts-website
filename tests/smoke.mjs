@@ -342,7 +342,7 @@ console.log("\nMicroSprouts static smoke tests passed: " + total);
 
 check("More Sprouts hero uses the eight approved botanical glow spheres", 
  (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
- sproutsDetails.includes('sprouts-orbs.css?v=8')&&sproutsDetails.includes('sprouts-orbs.js?v=4')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=9')&&sproutsDetails.includes('sprouts-orbs.js?v=4')&&
  read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
  read('sprouts-orbs.js').includes('pointerenter')&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
@@ -364,7 +364,7 @@ check("Animated orbs use bounded collision physics instead of CSS drift",
 
 check("Water bubbles use one stable reflection layer without a target reticle",
  (sproutsDetails.match(/class="ms-orb-surface"/g)||[]).length===8&&
- read("sprouts-orbs.css").includes('url("assets/sprout-orbs/water-bubble.svg")')&&
+ read("sprouts-orbs.css").includes('url("assets/sprout-orbs/water-bubble.svg?v=2")')&&
  read("assets/sprout-orbs/water-bubble.svg").includes('<circle cx="256" cy="256" r="242"')&&
  !read("assets/sprout-orbs/water-bubble.svg").includes("<radialGradient")&&
  !read("sprouts-orbs.css").includes("backdrop-filter")&&
@@ -431,10 +431,17 @@ check("All bubble captions remain outside the sphere and collision physics is un
  (sproutsDetails.match(/class="ms-orb-caption"/g)||[]).length===8);
 
 check("All eight spheres share one Firefox-safe static SVG with no circular CSS seams",
-  read("sprouts-orbs.css").includes('url("assets/sprout-orbs/water-bubble.svg")')&&
+  read("sprouts-orbs.css").includes('url("assets/sprout-orbs/water-bubble.svg?v=2")')&&
   (sproutsDetails.match(/class="ms-orb-surface"/g)||[]).length===8&&
   read("sprouts-orbs.css").includes("border:0;outline:none;background:none;box-shadow:none")&&
   !read("sprouts-orbs.js").includes("--orb-pointer-x")&&
   !read("sprouts-orbs.css").includes("inset 0 -")&&
   !read("assets/sprout-orbs/water-bubble.svg").includes("<radialGradient")&&
   read("sprouts-orbs.js").includes("const separate=elastic=>"));
+
+check("Bubble SVG has no upper-left streaks and uses a fresh cached URL",
+ !read("assets/sprout-orbs/water-bubble.svg").includes('d="M79 153')&&
+ !read("assets/sprout-orbs/water-bubble.svg").includes('d="M78 165')&&
+ read("assets/sprout-orbs/water-bubble.svg").includes('cx="256" cy="256" r="242"')&&
+ read("sprouts-orbs.css").includes('water-bubble.svg?v=2')&&
+ sproutsDetails.includes('sprouts-orbs.css?v=9'));

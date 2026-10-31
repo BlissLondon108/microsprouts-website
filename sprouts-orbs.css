@@ -24,7 +24,7 @@
 .ms-orb-link::before,.ms-orb-link::after{content:none!important;display:none!important}
 .ms-orb-surface{
  position:absolute;inset:0;z-index:2;pointer-events:none;
- background:transparent url("assets/sprout-orbs/water-bubble.svg") center / 100% 100% no-repeat;
+ background:transparent url("assets/sprout-orbs/water-bubble.svg?v=2") center / 100% 100% no-repeat;
  /* The glow follows the SVG's alpha, not a CSS border-radius box. */
  filter:drop-shadow(0 4px 9px rgba(0,24,17,.22));
  transition:filter .24s ease;
