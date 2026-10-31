@@ -11,7 +11,6 @@
     <section class="cart-overlay__panel basket-flow" id="basket" role="dialog" aria-modal="true" aria-labelledby="basket-title" tabindex="-1">
       <div class="cart-overlay__top">
         <div>
-          <span class="cart-overlay__brand">MICROSPROUTS</span>
           <h2 id="basket-title" class="serif basket-drawer-title">Your basket</h2>
         </div>
         <button type="button" class="cart-overlay__close" id="close-cart" data-cart-close aria-label="Close shopping basket">Close <span aria-hidden="true">×</span></button>
@@ -26,8 +25,7 @@
           <div id="basket-picker-home" class="basket-flow__picker-home">
           <section class="basket-sprout-picker" id="basket-sprout-picker" aria-label="Choose your sprouts" hidden>
               <div class="basket-sprout-picker__heading">
-                <span>EXPLORE THE COLLECTION</span>
-                <span class="basket-sprout-picker__hint">Drag or swipe</span>
+                <span>SELECT YOUR FAVORITE</span>
               </div>
               <div id="basket-sprout-track" class="basket-sprout-track" role="list" aria-roledescription="carousel" aria-label="Eight draggable sprout varieties">
                 <article role="listitem" class="basket-sprout-card basket-sprout-card--broccoli" data-sprout-card="broccoli" aria-label="Broccoli sprouts">

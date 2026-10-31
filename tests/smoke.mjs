@@ -71,7 +71,7 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
  html.includes('src="cart-preview.js?v=17"')&&
- html.includes('href="basket-flow.css?v=11"'));
+ html.includes('href="basket-flow.css?v=12"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
  cartClient.includes('button.textContent=label')&&
@@ -467,8 +467,8 @@ const homepageShell=homepageStart>=0&&homepageEnd>homepageStart?
  html.slice(homepageStart,homepageEnd).trim():"";
 check("All three main pages have a nav basket with the same full shopping drawer",
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
- [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=2"')&&
- doc.includes('src="cart-preview.js?v=17"')&&doc.includes('href="basket-flow.css?v=11"')&&
+ [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=3"')&&
+ doc.includes('src="cart-preview.js?v=17"')&&doc.includes('href="basket-flow.css?v=12"')&&
  doc.includes('href="basket-crosspage.css?v=4"'))&&
  savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
@@ -521,3 +521,21 @@ check("Basket drawer header matches dark navigation and carousel docks above Due
  cartClient.includes('sproutTrack.addEventListener("pointerdown"')&&
  cartClient.includes('sproutTrack.addEventListener("pointermove"')&&
  cartClient.includes('suppressClick=true'));
+
+check("Basket header uses brand wordmark typography without duplicate MicroSprouts text",
+ html.includes('id="basket-title" class="serif basket-drawer-title">Your basket</h2>')&&
+ !html.includes('class="cart-overlay__brand"')&&
+ !read("basket-shell.js").includes('class="cart-overlay__brand"')&&
+ flowCss.includes('font-family:Georgia,"Times New Roman",serif;')&&
+ flowCss.includes('font-size:34px;font-weight:bold;letter-spacing:-.032em;'));
+check("Carousel says Select Your Favorite and fades both horizontal edges",
+ html.includes('>SELECT YOUR FAVORITE</span>')&&
+ !html.includes('EXPLORE THE COLLECTION')&&
+ !html.includes('Drag or swipe')&&
+ !read("basket-shell.js").includes('Drag or swipe')&&
+ !read("basket-shell.js").includes('EXPLORE THE COLLECTION')&&
+ flowCss.includes('-webkit-mask-image:linear-gradient(to right,')&&
+ flowCss.includes('mask-image:linear-gradient(to right,')&&
+ flowCss.includes('#000 calc(100% - 24px),transparent 100%')&&
+ (html.match(/class="basket-sprout-card__hit"/g)||[]).length===8&&
+ [html,sprouts,science].every(s=>s.includes('basket-flow.css?v=12')));

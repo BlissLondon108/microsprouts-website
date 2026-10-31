@@ -681,3 +681,27 @@
 @media(prefers-reduced-motion:reduce){
  .basket-sprout-card{transition:none}
 }
+
+/* Basket refinements: a single wordmark-style heading and softly faded
+   carousel edges. The SVG/artwork, cards, and drag handling are unchanged. */
+.basket-flow .basket-drawer-title{
+ font-family:Georgia,"Times New Roman",serif;
+ font-size:34px;font-weight:bold;letter-spacing:-.032em;
+ line-height:1.05;color:#f8fbf4;margin:0;
+}
+.basket-sprout-picker__heading{justify-content:flex-start}
+.basket-sprout-track{
+ -webkit-mask-image:linear-gradient(to right,
+  transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%);
+ mask-image:linear-gradient(to right,
+  transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%);
+}
+@media(max-width:520px){
+ .basket-flow .basket-drawer-title{font-size:28px}
+ .basket-sprout-track{
+  -webkit-mask-image:linear-gradient(to right,
+   transparent 0,#000 17px,#000 calc(100% - 17px),transparent 100%);
+  mask-image:linear-gradient(to right,
+   transparent 0,#000 17px,#000 calc(100% - 17px),transparent 100%);
+ }
+}
