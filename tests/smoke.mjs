@@ -451,14 +451,20 @@ check("Bubble SVG has no upper-left streaks and uses a fresh cached URL",
 
 const basketShell=read("basket-shell.js");
 const basketSharedCSS=read("basket-crosspage.css");
-const savedShell=basketShell.match(/const markup = \`([\\s\\S]*?)\`;/);
-const homepageShell=html.match(/  <div id="cart-overlay" class="cart-overlay" hidden>[\\s\\S]*?  <\\/div>\\s*(?=<footer class="footer">)/);
+const embeddedStart=basketShell.indexOf("const markup = `");
+const embeddedEnd=basketShell.lastIndexOf("`;");
+const savedShell=embeddedStart>=0&&embeddedEnd>embeddedStart?
+ basketShell.slice(embeddedStart+"const markup = `".length,embeddedEnd).trim():"";
+const homepageStart=html.indexOf('  <div id="cart-overlay" class="cart-overlay" hidden>');
+const homepageEnd=html.indexOf('<footer class="footer">',homepageStart);
+const homepageShell=homepageStart>=0&&homepageEnd>homepageStart?
+ html.slice(homepageStart,homepageEnd).trim():"";
 check("All three main pages have a nav basket with the same full shopping drawer",
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
  [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=1"')&&
  doc.includes('src="cart-preview.js?v=15"')&&doc.includes('href="basket-flow.css?v=10"')&&
  doc.includes('href="basket-crosspage.css?v=1"'))&&
- savedShell&&homepageShell&&savedShell[1].trim()===homepageShell[0].trim()&&
+ savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
  basketShell.indexOf('insertAdjacentHTML("beforeend",markup)')!==-1);
 check("Pages share pack and basket persistence safely",
