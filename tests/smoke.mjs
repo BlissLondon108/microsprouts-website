@@ -394,12 +394,13 @@ check("Animated hero uses non-image background art without hover target arrows",
  (sprouts.match(/<span class="ms-orb-art"/g)||[]).length===8&&
  read("sprouts-orbs.css").includes("cursor:default;-webkit-user-drag:none")&&
  !html.includes('class="sprout-orb__add"'));
-check("All basket varieties use ready-to-order buttons and proper deep links",
- (html.match(/Ready to order<\/span>/g)||[]).length===8&&
+check("All basket varieties have full-card selection, botanical images and safe deep links",
+ (html.match(/class="basket-sprout-card__hit"/g)||[]).length===8&&
  (html.match(/data-sprout-add="/g)||[]).length===8&&
  html.includes('id="basket-add-variety"')&&
  cartClient.includes('params.get("add-sprout")')&&
  cartClient.includes("variety:item.variety")&&
+ !html.includes("Ready to order</span>")&&
  !html.includes("Available by enquiry"));
 
 check("All eight catalogue cards have matching colour spotlight effects", 
