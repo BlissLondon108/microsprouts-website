@@ -42,7 +42,7 @@ check("Add Sprouts opens an accessible eight-variety carousel, without selling u
  html.includes('id="basket-sprout-picker"')&&
  (html.match(/data-sprout-card="/g)||[]).length===8&&
  html.includes('data-sprout-add="broccoli"')&&
- (html.match(/class="basket-sprout-card__action"/g)||[]).length===7);
+ (html.match(/class="basket-sprout-card__action" href="https:\/\/wa\.me\//g)||[]).length===7&&
  cartClient.includes('const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")]')&&
  cartClient.includes('sproutTrack.addEventListener("scroll"')&&
  cartClient.includes('sproutTrack.addEventListener("click"')&&
@@ -384,4 +384,4 @@ check("Unpriced sprouts are visibly available to enquire about, not incorrectly 
  (html.match(/Available by enquiry/g)||[]).length===7&&
  !sprouts.includes('Ask about availability')&&
  html.includes('data-sprout-add="broccoli"')&&
- (html.match(/class="basket-sprout-card__action" href="https:\\/\\/wa\\.me\\//g)||[]).length===7);
+ (html.match(/class="basket-sprout-card__action"/g)||[]).length===7);
