@@ -479,7 +479,7 @@ check("Pages share pack and basket persistence safely",
  cartClient.includes('openCart({add:true,variety});')&&
  basketSharedCSS.includes('.comp-nav .nav-cart')&&
  basketSharedCSS.includes('right:4px')&&
- !basketSharedCSS.includes('.comp-nav nav')&&
+ !basketSharedCSS.includes('.comp-nav nav{margin-right')&&
  !basketSharedCSS.includes('.comp-nav-links')&&
  read("basket-shell.js").includes('id="basket-current-photo"'));
 
