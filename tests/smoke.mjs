@@ -468,7 +468,7 @@ check("All three main pages have a nav basket with the same full shopping drawer
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
  [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=1"')&&
  doc.includes('src="cart-preview.js?v=16"')&&doc.includes('href="basket-flow.css?v=10"')&&
- doc.includes('href="basket-crosspage.css?v=2"'))&&
+ doc.includes('href="basket-crosspage.css?v=3"'))&&
  savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
  basketShell.indexOf('insertAdjacentHTML("beforeend",markup)')!==-1);
@@ -488,4 +488,15 @@ check("Collection has a centered single action and preserves responsive navigati
  basketSharedCSS.includes('width:min(100%,222px)')&&
  !basketSharedCSS.includes('margin-right:69px')&&
  !basketSharedCSS.includes('.menu-btn')&&
- [html,sprouts,science].every(doc=>doc.includes('basket-crosspage.css?v=2')));
+ [html,sprouts,science].every(doc=>doc.includes('basket-crosspage.css?v=3')));
+
+check("Homepage Benefits aligns with Broccoli heading on wide desktops while cart moves independently",
+ basketSharedCSS.includes("left:calc(61.867704% + 6.9px)")&&
+ basketSharedCSS.includes("@media(min-width:1536px)")&&
+ basketSharedCSS.includes(".site-hero .comp-nav nav")&&
+ basketSharedCSS.includes("right:calc(732px - 50vw)")&&
+ basketSharedCSS.includes("@media(min-width:1460px)")&&
+ !basketSharedCSS.includes(".comp-nav-links{")&&
+ !basketSharedCSS.includes(".comp-nav{padding")&&
+ !basketSharedCSS.includes("letter-spacing:")&&
+ [html,sprouts,science].every(markup=>markup.includes('href="basket-crosspage.css?v=3"')));

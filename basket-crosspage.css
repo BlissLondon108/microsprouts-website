@@ -6,6 +6,23 @@
   width:36px;height:36px
  }
 }
+/* On wide screens the 1440px header is centred, but the basket should
+   sit near the browser edge. The basket is absolutely positioned so no
+   navigation link or wordmark moves when its horizontal position changes. */
+@media(min-width:1460px){
+ .comp-nav .nav-cart{right:calc(732px - 50vw)}
+}
+/* The homepage hero and header both cap at 1440px. Above 1535px,
+   the left edge of its Benefits link is aligned to the product-panel h1's
+   two-column grid origin (1.59fr / 2.57fr, 40px pad, 43px gap).
+   The other nav links retain their original font sizes and spacing.
+   At smaller viewports retain the approved responsive navigation so
+   the five links cannot overflow into the basket. */
+@media(min-width:1536px){
+ .site-hero .comp-nav nav{
+  position:absolute;left:calc(61.867704% + 6.9px);margin-left:0
+ }
+}
 /* Keep mobile navigation and menu spacing as defined in comp.css. */
 
 /* Eight concise variety actions, with pack size chosen inside the basket. */
