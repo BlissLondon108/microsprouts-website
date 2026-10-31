@@ -239,7 +239,7 @@
    returnFocus=document.activeElement;
    // The nav cart simply opens the basket. Explicit shopping CTAs create
    // one separate entry, but opening an empty basket never creates broccoli.
-   if(options.add)addEntry(options);
+   if(options.add){closeSproutPicker();addEntry(options);}
    if(active()&&!complete(active())&&state.stage==="details")
      state.stage=active().frequency?"delivery":active().pack?"order":"pack";
    overlay.hidden=false;document.body.classList.add("overlay-open");

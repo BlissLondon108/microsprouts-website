@@ -12,7 +12,11 @@
 <link rel="preload" as="image" href="assets/approved/macro.webp">
 <link rel="stylesheet" href="comp.css">
 <link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="basket-flow.css?v=10">
+<link rel="stylesheet" href="basket-crosspage.css?v=1">
 <script src="pages.js" defer></script>
+<script src="basket-shell.js?v=1" defer></script>
+<script src="cart-preview.js?v=15" defer></script>
 </head>
 <body class="interior-page">
 <div class="interior-head" id="top">
@@ -27,6 +31,10 @@
         <li><a href="index.html#faq">FAQ</a></li>
       </ul>
     </nav>
+      <button type="button" class="nav-cart" id="open-cart" aria-label="Open shopping basket, 0 items" aria-haspopup="dialog" aria-controls="cart-overlay">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l2.1 11.2a2 2 0 0 0 2 1.6h9.3a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="20" r="1"/><circle cx="19" cy="20" r="1"/></svg>
+        <span class="nav-cart__count" id="nav-cart-count" aria-hidden="true">0</span>
+      </button>
     <button type="button" class="menu-btn" id="menu-toggle" aria-controls="nav-links" aria-expanded="false">Menu ☰</button>
   </header>
 </div>

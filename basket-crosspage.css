@@ -1,0 +1,44 @@
+/* Shared nav basket spacing and the two direct pack buttons. */
+@media(min-width:771px){
+ .comp-nav nav{margin-right:clamp(72px,7.2vw,110px)}
+ .comp-nav .nav-cart{
+  right:clamp(16px,3.3vw,48px);
+  top:50%;transform:translateY(-50%);
+  width:42px;height:42px
+ }
+}
+@media(min-width:771px) and (max-width:920px){
+ .comp-nav-links{gap:clamp(9px,1.3vw,16px)}
+ .comp-nav-links a{font-size:12px}
+ .comp-nav nav{margin-right:69px}
+ .comp-nav .nav-cart{right:16px}
+}
+@media(max-width:770px){
+ .comp-nav .nav-cart{right:12px}
+ .comp-nav .menu-btn{margin-right:60px}
+}
+.sprouts-page .sprout-card__bottom{display:block}
+.sprouts-page .sprout-card__pack-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sprouts-page .sprout-card__pack-button{
+ appearance:none;border:1px solid #a7c4a1;border-radius:999px;
+ background:#103e26;color:#f8ffec;padding:12px 10px;
+ font:700 13px/1.2 Arial,Helvetica,sans-serif;cursor:pointer;
+ transition:background .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+.sprouts-page .sprout-card__pack-button:hover,
+.sprouts-page .sprout-card__pack-button:focus-visible{
+ background:#246c3a;border-color:#c9e8af;
+ box-shadow:0 4px 14px rgba(16,80,35,.19);
+ transform:translateY(-1px)
+}
+.sprouts-page .sprout-card__pack-button:focus-visible{
+ outline:2px solid #5b8b4c;outline-offset:3px
+}
+@media(max-width:380px){
+ .sprouts-page .sprout-card__pack-buttons{gap:6px}
+ .sprouts-page .sprout-card__pack-button{padding:11px 7px;font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .sprouts-page .sprout-card__pack-button{transition:none}
+ .sprouts-page .sprout-card__pack-button:hover{transform:none}
+}

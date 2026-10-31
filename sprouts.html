@@ -12,9 +12,13 @@
 <link rel="preload" as="image" href="assets/sprout-orbs/broccoli.webp">
 <link rel="stylesheet" href="comp.css">
 <link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="basket-flow.css?v=10">
+<link rel="stylesheet" href="basket-crosspage.css?v=1">
 <link rel="stylesheet" href="sprouts-orbs.css?v=9">
 <link rel="stylesheet" href="sprouts-spotlight.css?v=1">
 <script src="pages.js" defer></script>
+<script src="basket-shell.js?v=1" defer></script>
+<script src="cart-preview.js?v=15" defer></script>
 <script src="sprouts-orbs.js?v=4" defer></script>
 <script src="sprouts-spotlight.js?v=1" defer></script>
 </head>
@@ -31,6 +35,10 @@
         <li><a href="index.html#faq">FAQ</a></li>
       </ul>
     </nav>
+      <button type="button" class="nav-cart" id="open-cart" aria-label="Open shopping basket, 0 items" aria-haspopup="dialog" aria-controls="cart-overlay">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l2.1 11.2a2 2 0 0 0 2 1.6h9.3a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="20" r="1"/><circle cx="19" cy="20" r="1"/></svg>
+        <span class="nav-cart__count" id="nav-cart-count" aria-hidden="true">0</span>
+      </button>
     <button type="button" class="menu-btn" id="menu-toggle" aria-controls="nav-links" aria-expanded="false">Menu ☰</button>
   </header>
 </div>
@@ -120,8 +128,10 @@
           <h3>Broccoli Sprouts</h3>
           <p class="sprout-card__description">Delicate little green shoots with a fresh, gently peppery flavour. An easy addition to toast, sandwiches and salads.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html#products">Choose your broccoli pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Broccoli sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="broccoli" data-pack="200" aria-label="Add 200 gram Broccoli sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="broccoli" data-pack="500" aria-label="Add 500 gram Broccoli sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>
@@ -136,8 +146,10 @@
           <h3>Radish Sprouts</h3>
           <p class="sprout-card__description">Bright, punchy and peppery. A lovely way to bring fresh flavour and a little colour to your everyday meals.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html?add-sprout=radish#basket">Choose your radish pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Radish sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="radish" data-pack="200" aria-label="Add 200 gram Radish sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="radish" data-pack="500" aria-label="Add 500 gram Radish sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>
@@ -152,8 +164,10 @@
           <h3>Mung Bean Sprouts</h3>
           <p class="sprout-card__description">Juicy, crunchy stems with a gentle nutty flavour. Especially good in noodle dishes, soups and stir-fries.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html?add-sprout=mung-bean#basket">Choose your mung bean pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Mung bean sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="mung-bean" data-pack="200" aria-label="Add 200 gram Mung bean sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="mung-bean" data-pack="500" aria-label="Add 500 gram Mung bean sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>
@@ -168,8 +182,10 @@
           <h3>Leek Sprouts</h3>
           <p class="sprout-card__description">Fine, slender sprouts with a gentle onion-like flavour. A savoury finishing touch for salads and bowls.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html?add-sprout=leek#basket">Choose your leek pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Leek sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="leek" data-pack="200" aria-label="Add 200 gram Leek sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="leek" data-pack="500" aria-label="Add 500 gram Leek sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>
@@ -184,8 +200,10 @@
           <h3>Mustard Sprouts</h3>
           <p class="sprout-card__description">A lively, mustardy bite with a crisp finish. Wonderful scattered over sandwiches, salads and savoury bowls.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html?add-sprout=mustard#basket">Choose your mustard pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Mustard sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="mustard" data-pack="200" aria-label="Add 200 gram Mustard sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="mustard" data-pack="500" aria-label="Add 500 gram Mustard sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>
@@ -200,8 +218,10 @@
           <h3>Fenugreek Sprouts</h3>
           <p class="sprout-card__description">Gently earthy and nutty, with a distinctive aromatic flavour. Try them in grain bowls and hearty salads.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html?add-sprout=fenugreek#basket">Choose your fenugreek pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Fenugreek sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="fenugreek" data-pack="200" aria-label="Add 200 gram Fenugreek sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="fenugreek" data-pack="500" aria-label="Add 500 gram Fenugreek sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>
@@ -216,8 +236,10 @@
           <h3>Alfalfa Sprouts</h3>
           <p class="sprout-card__description">Fine, tender shoots with a mild, fresh flavour. A simple topping for wraps, toast and sandwiches.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html?add-sprout=alfalfa#basket">Choose your alfalfa pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Alfalfa sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="alfalfa" data-pack="200" aria-label="Add 200 gram Alfalfa sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="alfalfa" data-pack="500" aria-label="Add 500 gram Alfalfa sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>
@@ -232,8 +254,10 @@
           <h3>Green Pea Sprouts</h3>
           <p class="sprout-card__description">Tender shoots sprouted from green peas, with a fresh, pleasantly sweet pea flavour. Enjoy them as a colourful addition to salads and bowls.</p>
           <div class="sprout-card__bottom">
-            <p class="sprout-card__details">200g Single Pack £9.99 · 500g Family Pack £16.99</p>
-            <a class="sprout-card__link" href="index.html?add-sprout=green-pea#basket">Choose your green pea pack <span aria-hidden="true">↗</span></a>
+            <div class="sprout-card__pack-buttons" role="group" aria-label="Add Green pea sprouts to your basket">
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="green-pea" data-pack="200" aria-label="Add 200 gram Green pea sprouts pack to basket">200g pack</button>
+              <button type="button" class="sprout-card__pack-button" data-cart-add-pack data-variety="green-pea" data-pack="500" aria-label="Add 500 gram Green pea sprouts pack to basket">500g pack</button>
+            </div>
           </div>
         </div>
       </article>

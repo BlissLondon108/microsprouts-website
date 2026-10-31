@@ -70,7 +70,7 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=14"')&&
+ html.includes('src="cart-preview.js?v=15"')&&
  html.includes('href="basket-flow.css?v=10"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
@@ -280,12 +280,15 @@ check("Redundant notes removed and the approved glowing hero replaces the jar",
  !sprouts.includes('All varieties are subject to growing schedules')&&
  sprouts.includes('class="ms-orb-scene"')&&
  !sprouts.includes('Small seeds. Fresh beginnings.'));
-check("Broccoli retains checkout link, price and pack size", sprouts.includes('href="index.html#products"') && ["£9.99","£16.99","200g","500g"].every(t => sprouts.includes(t)));
-check("All eight varieties display approved online prices and ordering links",
-  (sprouts.match(/Ready to order online/g)||[]).length===8&&
-  (sprouts.match(/200g Single Pack £9.99 · 500g Family Pack £16.99/g)||[]).length===8&&
-  ["radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>
-    sprouts.includes('href="index.html?add-sprout='+slug+'#basket"')));
+check("All eight collection varieties have direct 200g and 500g basket buttons",
+ (sprouts.match(/Ready to order online/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__pack-button"/g)||[]).length===16&&
+ ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>
+   ['200','500'].every(pack=>sprouts.includes('data-variety="'+slug+'" data-pack="'+pack+'"')))&&
+ !sprouts.includes("sprout-card__details")&&
+ !sprouts.includes("sprout-card__link")&&
+ cartClient.includes('document.querySelectorAll("[data-cart-add-pack]")')&&
+ cartClient.includes('state.stage=entry.pack?"order":"pack"'));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#glucoraphanin">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
@@ -445,3 +448,24 @@ check("Bubble SVG has no upper-left streaks and uses a fresh cached URL",
  read("assets/sprout-orbs/water-bubble.svg").includes('cx="256" cy="256" r="242"')&&
  read("sprouts-orbs.css").includes('water-bubble.svg?v=2')&&
  sproutsDetails.includes('sprouts-orbs.css?v=9'));
+
+const basketShell=read("basket-shell.js");
+const basketSharedCSS=read("basket-crosspage.css");
+const savedShell=basketShell.match(/const markup = \`([\\s\\S]*?)\`;/);
+const homepageShell=html.match(/  <div id="cart-overlay" class="cart-overlay" hidden>[\\s\\S]*?  <\\/div>\\s*(?=<footer class="footer">)/);
+check("All three main pages have a nav basket with the same full shopping drawer",
+ [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
+ [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=1"')&&
+ doc.includes('src="cart-preview.js?v=15"')&&doc.includes('href="basket-flow.css?v=10"')&&
+ doc.includes('href="basket-crosspage.css?v=1"'))&&
+ savedShell&&homepageShell&&savedShell[1].trim()===homepageShell[0].trim()&&
+ !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
+ basketShell.indexOf('insertAdjacentHTML("beforeend",markup)')!==-1);
+check("Pages share pack and basket persistence safely",
+ cartClient.includes('microsprouts-basket-entries-v3')&&
+ cartClient.includes('sessionStorage.setItem(storeKey')&&
+ cartClient.includes('sessionStorage.getItem(storeKey')&&
+ cartClient.includes('openCart({add:true,variety,pack})')&&
+ basketSharedCSS.includes('.comp-nav .nav-cart')&&
+ basketSharedCSS.includes('margin-right:clamp(72px,7.2vw,110px)')&&
+ read("basket-shell.js").includes('id="basket-current-photo"'));
