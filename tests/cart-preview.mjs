@@ -110,8 +110,8 @@ el("basket-flow-form").querySelector=sel=>{
 el("basket").querySelectorAll=()=>[el("close-cart"),...packs,...orders,...methods,el("basket-pay")];
 const openButtons=[el("checkout-button"),new Fake("once-card"),new Fake("weekly-card")];
 const directButtons=[
- Object.assign(new Fake("button"),{dataset:{variety:"green-pea",pack:"500"}}),
- Object.assign(new Fake("button"),{dataset:{variety:"radish",pack:"200"}})
+ Object.assign(new Fake("button"),{dataset:{variety:"green-pea"}}),
+ Object.assign(new Fake("button"),{dataset:{variety:"radish"}})
 ];
 openButtons[1].dataset.frequency="once";openButtons[2].dataset.frequency="weekly";
 const backdrop=new Fake("backdrop"),photo=new Fake("photo");
@@ -134,7 +134,7 @@ document={
  querySelectorAll(sel){
   if(sel==="[data-cart-open]")return openButtons;
   if(sel==="[data-cart-close]")return [el("close-cart"),backdrop];
-  if(sel==="[data-cart-add-pack]")return directButtons;
+  if(sel==="[data-cart-add-variety]")return directButtons;
   if(sel===".sprout-orb__photo")return [photo];
   return [];
  }
@@ -347,20 +347,30 @@ el("basket-add-variety").listeners.click();
 check("Customers can choose additional varieties without removing their existing pack",
  !el("basket-sprout-picker").hidden&&el("nav-cart-count").textContent==="1");
 directButtons[0].listeners.click();
-check("500g green pea card directly adds its preselected pack and opens order frequency",
+check("Add to Basket creates green pea with size left to choose",
  !el("cart-overlay").hidden&&
  el("basket-current-name").textContent==="Green pea Sprouts"&&
+ el("basket-selected-pack").hidden&&
+ el("basket-total").textContent==="£9.99"&&
+ !stages[0].hidden&&
+ JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).variety==="green-pea"&&
+ JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).pack===null);
+packs[1].listeners.click();
+check("Basket lets customers choose 500g after clicking Add to Basket",
  el("basket-selected-pack").textContent==="500g"&&
  el("basket-total").textContent==="£26.98"&&
- !stages[1].hidden&&
- JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).variety==="green-pea"&&
- JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).pack==="500");
+ !stages[1].hidden);
 orders[0].listeners.click();methods[0].listeners.click();
 directButtons[1].listeners.click();
-check("200g radish card adds a second variety and skips pack selection",
+check("Add to Basket adds radish without choosing an arbitrary pack",
  el("nav-cart-count").textContent==="3"&&
  el("basket-current-name").textContent==="Radish Sprouts"&&
- !stages[1].hidden&&el("basket-selected-pack").textContent==="200g"&&
+ !stages[0].hidden&&el("basket-selected-pack").hidden&&
  JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).variety==="radish"&&
- el("basket-total").textContent==="£36.97");
+ JSON.parse(saved.get("microsprouts-basket-entries-v3")).entries.at(-1).pack===null&&
+ el("basket-total").textContent==="£26.98");
+packs[0].listeners.click();
+check("Adding a 200g pack updates the mixed-variety total",
+ el("basket-total").textContent==="£36.97"&&
+ !stages[1].hidden);
 console.log("\nOrdered basket + inline calendar tests passed: "+checks);

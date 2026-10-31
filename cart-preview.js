@@ -253,17 +253,18 @@
    returnFocus?.focus?.();
  }
  trigger.addEventListener("click",()=>openCart());
- document.querySelectorAll("[data-cart-add-pack]").forEach(button=>{
+ document.querySelectorAll("[data-cart-add-variety]").forEach(button=>{
    button.addEventListener("click",()=>{
-     const variety=button.dataset.variety,pack=button.dataset.pack;
-     if(!validVariety(variety)||!["200","500"].includes(pack))return;
+     const variety=button.dataset.variety;
+     if(!validVariety(variety))return;
      if(state.entries.length>=10){
        openCart();
        showError("Your basket can contain up to 10 sprout packs.");
        return;
      }
-     openCart({add:true,variety,pack});
-     setStage("order");
+     // The catalogue only selects the variety; the basket asks 200g or 500g.
+     openCart({add:true,variety});
+     setStage("pack");
    });
  });
  document.querySelectorAll("[data-cart-open]").forEach(button=>button.addEventListener("click",event=>{

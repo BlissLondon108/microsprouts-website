@@ -70,7 +70,7 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=15"')&&
+ html.includes('src="cart-preview.js?v=16"')&&
  html.includes('href="basket-flow.css?v=10"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
@@ -280,15 +280,20 @@ check("Redundant notes removed and the approved glowing hero replaces the jar",
  !sprouts.includes('All varieties are subject to growing schedules')&&
  sprouts.includes('class="ms-orb-scene"')&&
  !sprouts.includes('Small seeds. Fresh beginnings.'));
-check("All eight collection varieties have direct 200g and 500g basket buttons",
+check("All eight catalogue cards have one centered Add to Basket action and no image labels",
  (sprouts.match(/Ready to order online/g)||[]).length===8&&
- (sprouts.match(/class="sprout-card__pack-button"/g)||[]).length===16&&
+ (sprouts.match(/class="sprout-card__add-button"/g)||[]).length===8&&
+ (sprouts.match(/>Add to Basket<\/button>/g)||[]).length===8&&
  ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>
-   ['200','500'].every(pack=>sprouts.includes('data-variety="'+slug+'" data-pack="'+pack+'"')))&&
+   sprouts.includes('data-cart-add-variety data-variety="'+slug+'"'))&&
+ !sprouts.includes('sprout-card__visual-label')&&
+ !sprouts.includes('data-cart-add-pack')&&
+ !sprouts.includes('sprout-card__pack-button')&&
  !sprouts.includes("sprout-card__details")&&
  !sprouts.includes("sprout-card__link")&&
- cartClient.includes('document.querySelectorAll("[data-cart-add-pack]")')&&
- cartClient.includes('state.stage=entry.pack?"order":"pack"'));
+ cartClient.includes('document.querySelectorAll("[data-cart-add-variety]")')&&
+ cartClient.includes('openCart({add:true,variety});')&&
+ cartClient.includes('setStage("pack")'));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#glucoraphanin">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
@@ -462,8 +467,8 @@ const homepageShell=homepageStart>=0&&homepageEnd>homepageStart?
 check("All three main pages have a nav basket with the same full shopping drawer",
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
  [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=1"')&&
- doc.includes('src="cart-preview.js?v=15"')&&doc.includes('href="basket-flow.css?v=10"')&&
- doc.includes('href="basket-crosspage.css?v=1"'))&&
+ doc.includes('src="cart-preview.js?v=16"')&&doc.includes('href="basket-flow.css?v=10"')&&
+ doc.includes('href="basket-crosspage.css?v=2"'))&&
  savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
  basketShell.indexOf('insertAdjacentHTML("beforeend",markup)')!==-1);
@@ -471,7 +476,16 @@ check("Pages share pack and basket persistence safely",
  cartClient.includes('microsprouts-basket-entries-v3')&&
  cartClient.includes('sessionStorage.setItem(storeKey')&&
  cartClient.includes('sessionStorage.getItem(storeKey')&&
- cartClient.includes('openCart({add:true,variety,pack})')&&
+ cartClient.includes('openCart({add:true,variety});')&&
  basketSharedCSS.includes('.comp-nav .nav-cart')&&
- basketSharedCSS.includes('margin-right:clamp(72px,7.2vw,110px)')&&
+ basketSharedCSS.includes('right:4px')&&
+ !basketSharedCSS.includes('.comp-nav nav')&&
+ !basketSharedCSS.includes('.comp-nav-links')&&
  read("basket-shell.js").includes('id="basket-current-photo"'));
+
+check("Collection has a centered single action and preserves responsive navigation",
+ basketSharedCSS.includes('.sprout-card__add-action{display:flex;justify-content:center;align-items:center}')&&
+ basketSharedCSS.includes('width:min(100%,222px)')&&
+ !basketSharedCSS.includes('margin-right:69px')&&
+ !basketSharedCSS.includes('.menu-btn')&&
+ [html,sprouts,science].every(doc=>doc.includes('basket-crosspage.css?v=2')));
