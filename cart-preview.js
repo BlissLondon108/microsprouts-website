@@ -15,7 +15,7 @@
  // draft; do not restore it as an item on existing visitors' next load.
  const state={entries:[],activeId:null,stage:"pack",nextId:1};
  const storeKey="microsprouts-basket-entries-v3";
- // The picker is for discovering the seven varieties. Only broccoli has
+ // The picker is for discovering the eight varieties. Only broccoli has
  // verified Stripe prices, so other varieties link to a direct enquiry.
  const sproutPicker=el("basket-sprout-picker"),sproutTrack=el("basket-sprout-track");
  const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")];

@@ -21,6 +21,7 @@ jobs:
           node --check comp.js
           node --check cart-preview.js
           node --check carousel-interaction.js
+          node --check sprouts-orbs.js
           node --check pages.js
           node --check worker.js
           node --check stripe-catalog.js

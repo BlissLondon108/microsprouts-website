@@ -67,7 +67,7 @@ const el=id=>elements.get(id);
 // Simulate real document connectivity: removing the reusable editor from
 // its parent makes getElementById fail until the editor is reattached.
 el("basket-other-items").append(el("basket-current-item"));
-const sproutSlugs=["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa"];
+const sproutSlugs=["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"];
 const sproutCards=sproutSlugs.map((slug,i)=>{
  const card=new Fake("article");card.dataset.sproutCard=slug;card.offsetLeft=220*i;return card;
 });
@@ -162,27 +162,27 @@ check("Opening nav basket doesn't add broccoli or start checkout",
  el("nav-cart-count").textContent==="0");
 el("close-cart").listeners.click();
 el("basket-start").listeners.click();
-check("Add Sprouts opens the seven-variety picker without adding a product",
+check("Add Sprouts opens the eight-variety picker without adding a product",
  !el("basket-sprout-picker").hidden&&
  el("basket-start").attributes["aria-expanded"]==="true"&&
  el("nav-cart-count").textContent==="0"&&
  el("basket-other-items").hidden&&
- el("basket-sprout-progress").textContent==="1 of 7"&&
+ el("basket-sprout-progress").textContent==="1 of 8"&&
  el("basket-sprout-prev").disabled&&
  !el("basket-sprout-next").disabled);
 el("basket-sprout-next").listeners.click();
 check("Carousel next arrow advances to radish, updating progress and scroll",
- el("basket-sprout-progress").textContent==="2 of 7"&&
+ el("basket-sprout-progress").textContent==="2 of 8"&&
  sproutTrack.scrollLeft===220);
-sproutTrack.scrollLeft=1320;
+sproutTrack.scrollLeft=1540;
 sproutTrack.listeners.scroll();
 check("Touch scrolling updates picker progress and arrow bounds",
- el("basket-sprout-progress").textContent==="7 of 7"&&
+ el("basket-sprout-progress").textContent==="8 of 8"&&
  el("basket-sprout-next").disabled);
 el("basket-sprout-prev").listeners.click();
-check("Previous arrow returns to fenugreek",
- el("basket-sprout-progress").textContent==="6 of 7"&&
- sproutTrack.scrollLeft===1100);
+check("Previous arrow returns to alfalfa",
+ el("basket-sprout-progress").textContent==="7 of 8"&&
+ sproutTrack.scrollLeft===1320);
 sproutTrack.listeners.click({target:broccoliAdd});
 check("Selecting broccoli reveals the pack editor and updates badge",
  el("basket-empty").hidden&&!el("basket-other-items").hidden&&
@@ -314,7 +314,7 @@ el("basket-start").listeners.click();
 check("Picker reopens after emptying without auto-adding broccoli",
  el("nav-cart-count").textContent==="0"&&
  !el("basket-sprout-picker").hidden&&
- el("basket-sprout-progress").textContent==="1 of 7");
+ el("basket-sprout-progress").textContent==="1 of 8");
 sproutTrack.listeners.click({target:broccoliAdd});
 check("Choosing broccoli again works without refresh",
  el("nav-cart-count").textContent==="1"&&

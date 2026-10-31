@@ -37,12 +37,12 @@ check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('if(options.add)addEntry(options)')&&
  cartClient.includes('el("basket-start").addEventListener("click"')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
-check("Add Sprouts opens an accessible seven-variety carousel, without selling unpriced varieties",
+check("Add Sprouts opens an accessible eight-variety carousel, without selling unpriced varieties",
  html.includes('>Add Sprouts <span')&&
  html.includes('id="basket-sprout-picker"')&&
- (html.match(/data-sprout-card="/g)||[]).length===7&&
+ (html.match(/data-sprout-card="/g)||[]).length===8&&
  html.includes('data-sprout-add="broccoli"')&&
- (html.match(/class="basket-sprout-card__action" href="https:\/\/wa\.me\//g)||[]).length===6&&
+ (html.match(/class="basket-sprout-card__action" href="https:\/\/wa\.me\//g)||[]).length===7&&
  cartClient.includes('const sproutCards=[...sproutTrack.querySelectorAll("[data-sprout-card]")]')&&
  cartClient.includes('sproutTrack.addEventListener("scroll"')&&
  cartClient.includes('sproutTrack.addEventListener("click"')&&
@@ -274,7 +274,7 @@ for (const [name,markup] of Object.entries(docs)) {
 }
 const navMatches = markup => /href="sprouts\.html"[^>]*>More Sprouts<\/a><\/li>\s*<li><a href="science\.html"[^>]*>Science of Sprouts<\/a>/.test(markup);
 check("New navigation tabs in requested order on all pages", Object.values(docs).every(navMatches));
-check("All seven varieties appear on More Sprouts", (sprouts.match(/<article class="sprout-card"/g) || []).length === 7 && ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa"].every(id => sprouts.includes('id="'+id+'"')));
+check("All eight varieties appear on More Sprouts", (sprouts.match(/<article class="sprout-card"/g) || []).length === 8 && ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(id => sprouts.includes('id="'+id+'"')));
 check("Redundant discovery and scheduling notes are removed, hero jar design untouched",
  !sprouts.includes('Broccoli packs are available through our secure checkout.')&&
  !sprouts.includes('All varieties are subject to growing schedules')&&
@@ -335,3 +335,11 @@ check("Stripe catalogue uses new v2 recurring prices, preserving v1 one-time pri
   catalog.includes('?"v2":"v1"')&&catalog.includes('subscriptionAmount:899')&&catalog.includes('subscriptionAmount:1549'));
 
 console.log("\nMicroSprouts static smoke tests passed: " + total);
+
+check("More Sprouts hero uses the eight approved botanical glow spheres", 
+ (sproutsDetails.match(/class="ms-orb-link"/g)||[]).length===8 &&
+ sproutsDetails.includes('sprouts-orbs.css?v=1')&&sproutsDetails.includes('sprouts-orbs.js?v=1')&&
+ read('sprouts-orbs.css').includes('prefers-reduced-motion:reduce')&&
+ read('sprouts-orbs.js').includes('pointermove')&&
+ ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea']
+ .every(name=>fs.existsSync(path.join(root,'assets','sprout-orbs',name+'.webp'))));
