@@ -287,7 +287,7 @@ check("Redundant notes removed and the approved glowing hero replaces the jar",
  !sprouts.includes('All varieties are subject to growing schedules')&&
  sprouts.includes('class="ms-orb-scene"')&&
  !sprouts.includes('Small seeds. Fresh beginnings.'));
-check("All eight catalogue cards have one centered Add to Basket action and no image labels",
+check("All eight catalogue cards have accessible Learn more expansions and Add to Basket actions",
  (sprouts.match(/Ready to order online/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__add-button"/g)||[]).length===8&&
  (sprouts.match(/>Add to Basket<\/button>/g)||[]).length===8&&
@@ -301,6 +301,23 @@ check("All eight catalogue cards have one centered Add to Basket action and no i
  cartClient.includes('document.querySelectorAll("[data-cart-add-variety]")')&&
  cartClient.includes('openCart({add:true,variety});')&&
  cartClient.includes('setStage("pack")'));
+check("Catalogue badges appear inside pictures and native detail controls reveal variety-specific information",
+ (sprouts.match(/class="sprout-card__status"/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__expand"/g)||[]).length===8&&
+ (sprouts.match(/<summary class="sprout-card__learn">Learn more/g)||[]).length===8&&
+ (sprouts.match(/<strong>Flavour &amp; texture<\\/strong>/g)||[]).length===8&&
+ (sprouts.match(/<strong>Ways to enjoy<\\/strong>/g)||[]).length===8&&
+ ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>{
+   const part=sprouts.split('id="'+slug+'">')[1]?.split('</article>')[0]||'';
+   return part.indexOf('class="sprout-card__status"')<part.indexOf('class="sprout-card__art"')&&
+    part.indexOf('class="sprout-card__art"')<part.indexOf('class="sprout-card__body"')&&
+    part.indexOf('class="sprout-card__body"')<part.indexOf('<h3>')&&
+    part.indexOf('class="sprout-card__expand"')<part.indexOf('data-cart-add-variety');
+ })&&
+ sprouts.includes('href="sprouts-details.css?v=1"')&&
+ read("sprouts-details.css").includes('.sprout-card__expand[open] .sprout-card__learn-icon')&&
+ read("sprouts-details.css").includes('.sprout-card__visual .sprout-card__status')&&
+ !sprouts.includes('data-cart-add-pack'));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#top">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));

@@ -1,0 +1,74 @@
+/* Sprout catalogue: photo-badge and accessible expandable details.
+   Native <details> avoids an extra JS dependency and works with keyboard/touch. */
+.sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__status{
+ position:absolute;top:16px;left:16px;z-index:3;
+ display:inline-flex;align-items:center;gap:7px;
+ margin:0;padding:8px 11px;max-width:calc(100% - 32px);
+ background:rgba(249,255,240,.94);color:#275b35;
+ border:1px solid rgba(238,255,220,.9);border-radius:999px;
+ box-shadow:0 4px 18px rgba(12,47,25,.12);
+ font:700 10px/1.2 Arial,Helvetica,sans-serif;
+ letter-spacing:.012em;white-space:nowrap
+}
+.sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__status::before{
+ content:"";width:6px;height:6px;flex:none;border-radius:50%;background:#4c8d38
+}
+.sprouts-page .sprouts-grid .sprout-card__body{
+ padding-top:23px
+}
+.sprouts-page .sprouts-grid .sprout-card__body h3{
+ margin-top:0;margin-bottom:10px
+}
+.sprouts-page .sprouts-grid .sprout-card__description{
+ margin-bottom:14px
+}
+.sprouts-page .sprout-card__expand{
+ width:100%;margin-bottom:15px;min-width:0
+}
+.sprouts-page .sprout-card__learn{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:10px;min-height:39px;width:100%;
+ padding:9px 13px;box-sizing:border-box;
+ border:1px solid #d0dfc9;border-radius:11px;
+ background:#f1f6eb;color:#245a35;
+ font:700 12px/1.35 Arial,Helvetica,sans-serif;
+ cursor:pointer;list-style:none;transition:background .18s ease,border-color .18s ease
+}
+.sprouts-page .sprout-card__learn::-webkit-details-marker{display:none}
+.sprouts-page .sprout-card__learn::marker{content:""}
+.sprouts-page .sprout-card__learn:hover,
+.sprouts-page .sprout-card__expand[open] .sprout-card__learn{
+ background:#e5f1dc;border-color:#a7c69d
+}
+.sprouts-page .sprout-card__learn:focus-visible{
+ outline:2px solid #356e41;outline-offset:3px
+}
+.sprouts-page .sprout-card__learn-icon{
+ display:grid;place-items:center;flex:none;width:21px;height:21px;
+ border-radius:50%;background:#dbead0;color:#285e38;
+ font-size:18px;font-weight:400;line-height:1;
+ transition:transform .18s ease
+}
+.sprouts-page .sprout-card__expand[open] .sprout-card__learn-icon{
+ transform:rotate(45deg)
+}
+.sprouts-page .sprout-card__extra{
+ padding:13px 3px 0;color:#526852;font-size:12px;line-height:1.6
+}
+.sprouts-page .sprout-card__extra p{margin:0 0 10px}
+.sprouts-page .sprout-card__extra p:last-child{margin-bottom:0}
+.sprouts-page .sprout-card__extra strong{
+ display:block;color:#315b37;font-size:10px;line-height:1.5;
+ font-weight:800;text-transform:uppercase;letter-spacing:.065em;margin-bottom:3px
+}
+@media(max-width:520px){
+ .sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__status{
+  top:13px;left:13px;padding:7px 10px;font-size:10px
+ }
+ .sprouts-page .sprouts-grid .sprout-card__body{padding-top:20px}
+ .sprouts-page .sprout-card__extra{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .sprouts-page .sprout-card__learn,
+ .sprouts-page .sprout-card__learn-icon{transition:none}
+}
