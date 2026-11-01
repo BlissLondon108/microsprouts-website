@@ -301,12 +301,13 @@ check("All eight catalogue cards have accessible Learn more expansions and Add t
  cartClient.includes('document.querySelectorAll("[data-cart-add-variety]")')&&
  cartClient.includes('openCart({add:true,variety});')&&
  cartClient.includes('setStage("pack")'));
-check("Each sprout card has an unchanged image, an order action, then a quiet Learn more / Show less toggle",
+check("Each sprout card has an unchanged image, a quiet Learn more control and a small detail-view back arrow",
  (sprouts.match(/class="sprout-card__status"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__swap"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__panel sprout-card__panel--intro"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__panel sprout-card__panel--details"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__learn" data-sprout-learn/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__back" data-sprout-back/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__learn-wrap"/g)||[]).length===8&&
  (sprouts.split('<strong>Vitamins studied</strong>').length===9)&&
  (sprouts.split('<strong>Minerals studied</strong>').length===9)&&
@@ -317,11 +318,12 @@ check("Each sprout card has an unchanged image, an order action, then a quiet Le
     part.indexOf('class="sprout-card__body"')<part.indexOf('<h3>')&&
     part.indexOf('id="sprout-detail-'+slug+'"')<part.indexOf('data-cart-add-variety')&&
     part.indexOf('data-cart-add-variety')<part.indexOf('data-sprout-learn')&&
-    part.includes('aria-expanded="false"')&&part.includes('aria-hidden="true" inert');
+    part.includes('aria-expanded="false"')&&part.includes('aria-hidden="true" inert')&&
+    part.indexOf('data-sprout-back')<part.indexOf('data-sprout-panel="intro"');
  })&&
- sprouts.includes('href="sprouts-details.css?v=4"')&&
- sprouts.includes('src="sprouts-details.js?v=2" defer')&&
- !sprouts.includes('data-sprout-back')&&
+ sprouts.includes('href="sprouts-details.css?v=5"')&&
+ sprouts.includes('src="sprouts-details.js?v=3" defer')&&
+ sprouts.includes('data-sprout-back')&&
  !sprouts.includes('sprout-card__learn-icon')&&
  !sprouts.includes('<details class="sprout-card__expand">')&&
  read("sprouts-details.css").includes('height:356px;min-height:356px')&&
@@ -330,8 +332,12 @@ check("Each sprout card has an unchanged image, an order action, then a quiet Le
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__panel--details')&&
  read("sprouts-details.css").includes('.sprout-card__learn-wrap{')&&
  read("sprouts-details.css").includes('border-top:1px solid #e1eade')&&
+ read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__learn-wrap')&&
+ read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__back')&&
  read("sprouts-details.css").includes('prefers-reduced-motion:reduce')&&
- read("sprouts-details.js").includes('toggle.textContent=open?"Show less":"Learn more"')&&
+ read("sprouts-details.js").includes('back.addEventListener("click",()=>setOpen(false,true))')&&
+ read("sprouts-details.js").includes('toggle.inert=open;')&&
+ read("sprouts-details.js").includes('back.inert=!open;')&&
  read("sprouts-details.js").includes('intro.inert=open;')&&
  read("sprouts-details.js").includes('detail.inert=!open;')&&
  (()=>{try{new vm.Script(read("sprouts-details.js"));return true}catch{return false}})()&&
@@ -343,17 +349,20 @@ check("Each sprout card has an unchanged image, an order action, then a quiet Le
  const handlers=new Map();
  function button(id){
    return {
-     id,attrs:{},textContent:"Learn more",
+     id,attrs:{},textContent:"Learn more",focused:false,
      setAttribute(k,v){this.attrs[k]=v},
-     addEventListener(k,cb){handlers.set(this.id+":"+k,cb)}
+     addEventListener(k,cb){handlers.set(this.id+":"+k,cb)},
+     focus(){this.focused=true}
    };
  }
- const toggle=button("toggle"),intro=button("intro"),detail=button("detail");
+ const toggle=button("toggle"),back=button("back"),intro=button("intro"),detail=button("detail");
+ back.inert=true;
  detail.inert=true;detail.scrollTop=7;
  const card={
    dataset:{},
    querySelector(selector){
      if(selector==="[data-sprout-learn]")return toggle;
+     if(selector==="[data-sprout-back]")return back;
      if(selector==='[data-sprout-panel="intro"]')return intro;
      if(selector==='[data-sprout-panel="details"]')return detail;
      return null;
@@ -362,17 +371,21 @@ check("Each sprout card has an unchanged image, an order action, then a quiet Le
  const document={querySelectorAll:()=>[card]};
  vm.runInNewContext(script,{document});
  handlers.get("toggle:click")();
- check("Learn more slides in detail while retaining the stationary purchase footer",
+ check("Learn more slides in detail, hides itself and reveals the tiny back arrow",
   card.dataset.detailOpen==="true"&&
-  toggle.textContent==="Show less"&&
+  toggle.textContent==="Learn more"&&
+  toggle.inert===true&&back.inert===false&&back.focused===true&&
+  toggle.attrs["aria-hidden"]==="true"&&back.attrs["aria-hidden"]==="false"&&
   toggle.attrs["aria-expanded"]==="true"&&
   intro.inert===true&&detail.inert===false&&
   intro.attrs["aria-hidden"]==="true"&&
   detail.attrs["aria-hidden"]==="false");
- handlers.get("toggle:click")();
- check("Show less returns to summary and resets detail scrolling",
+ handlers.get("back:click")();
+ check("Back arrow restores summary, Learn more and detail scroll state",
   card.dataset.detailOpen==="false"&&
   toggle.textContent==="Learn more"&&
+  toggle.inert===false&&back.inert===true&&toggle.focused===true&&
+  toggle.attrs["aria-hidden"]==="false"&&back.attrs["aria-hidden"]==="true"&&
   toggle.attrs["aria-expanded"]==="false"&&
   intro.inert===false&&detail.inert===true&&
   intro.attrs["aria-hidden"]==="false"&&
