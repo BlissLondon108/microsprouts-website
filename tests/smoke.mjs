@@ -323,7 +323,7 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
     part.indexOf('data-sprout-back')<part.indexOf('data-cart-add-variety')&&
     part.indexOf('data-sprout-back')>part.indexOf('data-sprout-panel="details"');
  })&&
- sprouts.includes('href="sprouts-details.css?v=7"')&&
+ sprouts.includes('href="sprouts-details.css?v=8"')&&
  sprouts.includes('src="sprouts-details.js?v=3" defer')&&
  sprouts.includes('data-sprout-back')&&
  !sprouts.includes('sprout-card__learn-icon')&&
@@ -337,14 +337,16 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__learn-wrap')&&
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__back')&&
  read("sprouts-details.css").includes('.sprout-card__add-action{position:relative}')&&
- read("sprouts-details.css").includes('width:min(100%,164px)')&&
- read("sprouts-details.css").includes('width:min(100%,148px)')&&
+ read("sprouts-details.css").includes('width:min(164px,calc(100% - 76px))')&&
+ read("sprouts-details.css").includes('font-size:12px;padding-inline:6px')&&
  read("sprouts-details.css").includes('padding-bottom:15px')&&
  !sprouts.includes('<h3>Mung Bean Sprouts</h3>')&&
  !sprouts.includes('<h3>Green Pea Sprouts</h3>')&&
  ['Broccoli','Radish','Mung Bean','Leek','Mustard','Fenugreek','Alfalfa','Green Pea'].every(name=>sprouts.includes('<h3>'+name+'</h3>'))&&
- read("sprouts-details.css").includes('position:absolute;top:50%;left:calc(50% - 82px - 36px);z-index:2')&&
+ read("sprouts-details.css").includes('position:absolute;top:50%;left:0;z-index:2')&&
  !read("sprouts-details.css").includes("padding-right:34px")&&
+ read("sprouts-details.css").includes('margin-bottom:8px')&&
+ (sprouts.match(/class="sprout-card__sources"/g)||[]).length===8&&
  read("sprouts-details.css").includes('prefers-reduced-motion:reduce')&&
  read("sprouts-details.js").includes('back.addEventListener("click",()=>setOpen(false,true))')&&
  read("sprouts-details.js").includes('toggle.inert=open;')&&
@@ -421,7 +423,8 @@ check("Eight distinct research-backed nutritional panels with source links and a
  !sprouts.includes("protect against cancers")&&
  read("sprouts-details.css").includes('.sprout-card__extra--research')&&
  read("sprouts-details.css").includes('.sprouts-research-note')&&
- read("sprouts-details.css").includes('overflow-y:auto'));
+ read("sprouts-details.css").includes('overflow:clip')&&
+ !read("sprouts-details.css").includes('overflow-y:auto'));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#top">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
