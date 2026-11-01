@@ -110,3 +110,37 @@
  .sprouts-page .sprout-card__learn{transition:none}
  .sprouts-page .sprout-card__panel{will-change:auto}
 }
+
+/* Evidence summaries sit in the original fixed-height slide panel; overflowing
+   text scrolls within the text area rather than resizing the photograph/card. */
+.sprouts-page .sprout-card__extra--research{
+ padding:1px 9px 9px 1px;
+ line-height:1.47;
+}
+.sprouts-page .sprout-card__extra--research p{margin:0 0 10px}
+.sprouts-page .sprout-card__extra--research strong{
+ display:block;font-size:9.5px;line-height:1.4;
+ letter-spacing:.065em;margin:0 0 2px;color:#31613d
+}
+.sprouts-page .sprout-card__sources{
+ display:flex;gap:4px 10px;flex-wrap:wrap;
+ border-top:1px solid #e2eadd;padding:10px 0 3px;
+}
+.sprouts-page .sprout-card__sources a{
+ color:#286b3e;font-size:11px;font-weight:700;
+ text-decoration:underline;text-decoration-color:#96b79a;text-underline-offset:3px;
+}
+.sprouts-page .sprout-card__sources a:hover{color:#123f25}
+.sprouts-page .sprout-card__sources a:focus-visible{
+ outline:2px solid #356e41;outline-offset:3px;border-radius:2px
+}
+.sprouts-research-note{
+ max-width:1030px;margin:30px auto 0;
+ padding:16px 20px;border:1px solid #dce7d5;border-radius:14px;
+ background:#f5f8ef;color:#536751;font-size:12px;line-height:1.65
+}
+.sprouts-research-note strong{color:#274c32}
+@media(max-width:520px){
+ .sprouts-research-note{margin-top:22px;padding:15px 17px}
+ .sprouts-page .sprout-card__extra--research{font-size:12px}
+}

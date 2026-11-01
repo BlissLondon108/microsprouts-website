@@ -308,8 +308,8 @@ check("Each sprout card has an unchanged image, an order action, then a quiet Le
  (sprouts.match(/class="sprout-card__panel sprout-card__panel--details"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__learn" data-sprout-learn/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__learn-wrap"/g)||[]).length===8&&
- (sprouts.split('<strong>Flavour &amp; texture</strong>').length===9)&&
- (sprouts.split('<strong>Ways to enjoy</strong>').length===9)&&
+ (sprouts.split('<strong>Vitamins studied</strong>').length===9)&&
+ (sprouts.split('<strong>Minerals studied</strong>').length===9)&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>{
    const part=sprouts.split('id="'+slug+'">')[1]?.split('</article>')[0]||'';
    return part.indexOf('class="sprout-card__status"')<part.indexOf('class="sprout-card__art"')&&
@@ -319,7 +319,7 @@ check("Each sprout card has an unchanged image, an order action, then a quiet Le
     part.indexOf('data-cart-add-variety')<part.indexOf('data-sprout-learn')&&
     part.includes('aria-expanded="false"')&&part.includes('aria-hidden="true" inert');
  })&&
- sprouts.includes('href="sprouts-details.css?v=3"')&&
+ sprouts.includes('href="sprouts-details.css?v=4"')&&
  sprouts.includes('src="sprouts-details.js?v=2" defer')&&
  !sprouts.includes('data-sprout-back')&&
  !sprouts.includes('sprout-card__learn-icon')&&
@@ -379,6 +379,25 @@ check("Each sprout card has an unchanged image, an order action, then a quiet Le
   detail.attrs["aria-hidden"]==="true"&&
   detail.scrollTop===0);
 }
+check("Eight distinct research-backed nutritional panels with source links and appropriate caveats",
+ (sprouts.split('<strong>Plant compounds &amp; research</strong>').length===9)&&
+ (sprouts.match(/class="sprout-card__extra sprout-card__extra--research"/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__sources"/g)||[]).length===8&&
+ (sprouts.match(/target="_blank" rel="noopener noreferrer"/g)||[]).length>=16&&
+ ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>{
+  const part=sprouts.split('id="'+slug+'">')[1]?.split('</article>')[0]||'';
+  return part.includes('<strong>Vitamins studied</strong>')&&
+   part.includes('<strong>Minerals studied</strong>')&&
+   part.includes('<strong>Plant compounds &amp; research</strong>')&&
+   part.includes('class="sprout-card__sources"')&&
+   part.includes('data-cart-add-variety data-variety="'+slug+'"');
+ })&&
+ sprouts.includes("not measured in MicroSprouts batches")&&
+ sprouts.includes("not proof of disease prevention or treatment")&&
+ !sprouts.includes("protect against cancers")&&
+ read("sprouts-details.css").includes('.sprout-card__extra--research')&&
+ read("sprouts-details.css").includes('.sprouts-research-note')&&
+ read("sprouts-details.css").includes('overflow-y:auto'));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#top">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
