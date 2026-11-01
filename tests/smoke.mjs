@@ -405,6 +405,17 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
   detail.attrs["aria-hidden"]==="true"&&
   detail.scrollTop===0);
 }
+check("Marketing-friendly nutrition cards and a variety-wide growing journey",
+ (sprouts.match(/<strong>Vitamins present<\/strong>/g)||[]).length===8&&
+ (sprouts.match(/<strong>Minerals present<\/strong>/g)||[]).length===8&&
+ !sprouts.includes("have been measured")&&
+ !sprouts.includes("composition records list")&&
+ !sprouts.includes("huge amounts")&&
+ html.includes('<span class="growth-caption">Seeds soaked in fresh water</span>')&&
+ html.includes('<span class="growth-caption">Sprouts ready for delivery</span>')&&
+ html.includes('aria-label="Our fresh sprout growing stages"')&&
+ !html.includes('<span class="growth-caption">Broccoli seeds</span>')&&
+ !html.includes('<span class="growth-caption">Fresh broccoli sprouts</span>'));
 check("Eight distinct research-backed nutritional panels with source links and appropriate caveats",
  (sprouts.split('<strong>Plant compounds &amp; research</strong>').length===9)&&
  (sprouts.match(/class="sprout-card__extra sprout-card__extra--research"/g)||[]).length===8&&
