@@ -114,7 +114,7 @@ check("Only the preferred date is collected in the basket, with identity at Stri
  !html.includes('id="basket-city"')&&
  !html.includes('id="basket-code"')&&
  !html.includes('id="basket-whatsapp"')&&
- html.includes('id="checkout-button" aria-label="Open shopping basket')&&
+ html.includes('id="checkout-button" data-variety="broccoli" aria-label="Open shopping basket')&&
  html.includes('data-cart-open data-frequency="once"')&&
  html.includes('data-cart-open data-frequency="weekly"')&&
  !app.includes("checkout.href = 'checkout.html?pack='")&&
