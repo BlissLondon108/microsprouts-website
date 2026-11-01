@@ -309,8 +309,8 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
  (sprouts.match(/class="sprout-card__learn" data-sprout-learn/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__back" data-sprout-back/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__learn-wrap"/g)||[]).length===8&&
- (sprouts.split('<strong>Vitamins studied</strong>').length===9)&&
- (sprouts.split('<strong>Minerals studied</strong>').length===9)&&
+ (sprouts.split('<strong>Vitamins present</strong>').length===9)&&
+ (sprouts.split('<strong>Minerals present</strong>').length===9)&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>{
    const part=sprouts.split('id="'+slug+'">')[1]?.split('</article>')[0]||'';
    return part.indexOf('class="sprout-card__status"')<part.indexOf('class="sprout-card__art"')&&
@@ -323,7 +323,7 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
     part.indexOf('data-sprout-back')<part.indexOf('data-cart-add-variety')&&
     part.indexOf('data-sprout-back')>part.indexOf('data-sprout-panel="details"');
  })&&
- sprouts.includes('href="sprouts-details.css?v=6"')&&
+ sprouts.includes('href="sprouts-details.css?v=7"')&&
  sprouts.includes('src="sprouts-details.js?v=3" defer')&&
  sprouts.includes('data-sprout-back')&&
  !sprouts.includes('sprout-card__learn-icon')&&
@@ -337,7 +337,13 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__learn-wrap')&&
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__back')&&
  read("sprouts-details.css").includes('.sprout-card__add-action{position:relative}')&&
- read("sprouts-details.css").includes('position:absolute;top:50%;left:0;z-index:2')&&
+ read("sprouts-details.css").includes('width:min(100%,164px)')&&
+ read("sprouts-details.css").includes('width:min(100%,148px)')&&
+ read("sprouts-details.css").includes('padding-bottom:15px')&&
+ !sprouts.includes('<h3>Mung Bean Sprouts</h3>')&&
+ !sprouts.includes('<h3>Green Pea Sprouts</h3>')&&
+ ['Broccoli','Radish','Mung Bean','Leek','Mustard','Fenugreek','Alfalfa','Green Pea'].every(name=>sprouts.includes('<h3>'+name+'</h3>'))&&
+ read("sprouts-details.css").includes('position:absolute;top:50%;left:calc(50% - 82px - 36px);z-index:2')&&
  !read("sprouts-details.css").includes("padding-right:34px")&&
  read("sprouts-details.css").includes('prefers-reduced-motion:reduce')&&
  read("sprouts-details.js").includes('back.addEventListener("click",()=>setOpen(false,true))')&&
@@ -404,8 +410,8 @@ check("Eight distinct research-backed nutritional panels with source links and a
  (sprouts.match(/target="_blank" rel="noopener noreferrer"/g)||[]).length>=16&&
  ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(slug=>{
   const part=sprouts.split('id="'+slug+'">')[1]?.split('</article>')[0]||'';
-  return part.includes('<strong>Vitamins studied</strong>')&&
-   part.includes('<strong>Minerals studied</strong>')&&
+  return part.includes('<strong>Vitamins present</strong>')&&
+   part.includes('<strong>Minerals present</strong>')&&
    part.includes('<strong>Plant compounds &amp; research</strong>')&&
    part.includes('class="sprout-card__sources"')&&
    part.includes('data-cart-add-variety data-variety="'+slug+'"');
