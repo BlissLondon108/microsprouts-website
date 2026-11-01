@@ -305,8 +305,8 @@ check("Catalogue badges appear inside pictures and native detail controls reveal
  (sprouts.match(/class="sprout-card__status"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__expand"/g)||[]).length===8&&
  (sprouts.match(/<summary class="sprout-card__learn">Learn more/g)||[]).length===8&&
- (sprouts.match(/<strong>Flavour &amp; texture<\\/strong>/g)||[]).length===8&&
- (sprouts.match(/<strong>Ways to enjoy<\\/strong>/g)||[]).length===8&&
+ (sprouts.split('<strong>Flavour &amp; texture</strong>').length===9)&&
+ (sprouts.split('<strong>Ways to enjoy</strong>').length===9)&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>{
    const part=sprouts.split('id="'+slug+'">')[1]?.split('</article>')[0]||'';
    return part.indexOf('class="sprout-card__status"')<part.indexOf('class="sprout-card__art"')&&
