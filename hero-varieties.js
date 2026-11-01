@@ -1,0 +1,111 @@
+/* Browses all eight sprouts without changing basket prices or pack state.
+ * Existing broccoli photos remain in their original gallery on the first slide. */
+(() => {
+ 'use strict';
+ const $ = id => document.getElementById(id);
+ const items = [
+  ['broccoli','Broccoli','Grown with love and care. Naturally contains glucoraphanin, the precursor to sulforaphane.'],
+  ['radish','Radish','Bright, peppery little greens that bring a lively crunch to everyday meals.'],
+  ['mung-bean','Mung Bean','Juicy and crisp with a gentle nutty flavour. Lovely in noodles and stir-fries.'],
+  ['leek','Leek','Fine green shoots with a savoury, onion-like flavour. A fresh finishing touch.'],
+  ['mustard','Mustard','Zesty sprouts with a distinctive mustardy bite for salads and sandwiches.'],
+  ['fenugreek','Fenugreek','Aromatic, earthy sprouts with a gentle nutty flavour and plenty of character.'],
+  ['alfalfa','Alfalfa','Light, tender shoots with a mild, fresh flavour for wraps, salads and toast.'],
+  ['green-pea','Green Pea','Sweet, fresh pea shoots that add colour and a delicate crunch to your plate.']
+ ];
+ const photo=$('hero-photo'),frame=document.querySelector('.gallery-main'),gallery=$('hero-product-gallery');
+ const row=$('gallery-thumbs'),originalThumbs=[...document.querySelectorAll('#gallery-thumbs .gallery-thumb')];
+ const slide=$('hero-variety-slide'),heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
+ const chooser=$('hero-package-options'),checkout=$('checkout-button'),count=$('hero-variety-index');
+ const path=slug=>'assets/sprout-orbs/'+slug+'.webp';
+ const packs={'200':['Single Pack','assets/single-ornate-wide-v1.svg'],'500':['Family Pack','assets/family-ornate-wide-v1.svg']};
+ let current=0,pack='200',photoRequest=0,slideTimer=null;
+ const reduced=()=>Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+ function imageForCurrent(){
+  const item=items[current],broccoli=current===0;
+  const src=broccoli?packs[pack][1]:path(item[0]);
+  const alt=broccoli?'Fresh broccoli sprouts on a porcelain plate, '+packs[pack][0]:'Fresh '+item[1].toLowerCase()+' sprouts';
+  const token=++photoRequest, image=new Image();
+  image.onload=()=>{
+   if(token!==photoRequest||!photo)return;
+   photo.src=src;photo.alt=alt;
+   photo.classList.toggle('is-pack-photo',broccoli);
+   photo.classList.toggle('is-variety-photo',!broccoli);
+   frame?.classList.toggle('is-variety-view',!broccoli);
+  };
+  image.src=src;
+ }
+ function previewButtons(){
+  if(!row)return;
+  row.querySelectorAll('.hero-variety-preview').forEach(button=>button.remove());
+  originalThumbs.forEach(button=>{button.hidden=current!==0;if(current!==0)button.setAttribute('aria-pressed','false')});
+  row.classList.toggle('is-variety-previews',current!==0);
+  gallery?.setAttribute('aria-label',items[current][1]+' sprouts gallery');
+  if(current===0)return;
+  for(const delta of [-1,0,1,2]){
+   const i=(current+delta+items.length)%items.length,entry=items[i],button=document.createElement('button');
+   button.type='button';button.className='gallery-thumb hero-variety-preview';
+   button.setAttribute('aria-label','Choose '+entry[1]+' sprouts');
+   button.setAttribute('aria-pressed',String(i===current));
+   const image=document.createElement('img');image.src=path(entry[0]);image.alt='';image.loading='lazy';
+   const caption=document.createElement('span');caption.className='hero-variety-preview__name';caption.textContent=entry[1];
+   button.append(image,caption);
+   button.addEventListener('click',()=>select(i,i<current?-1:1));
+   row.appendChild(button);
+  }
+ }
+ function render(){
+  const item=items[current];
+  heading.textContent=item[1]+' Sprouts';desc.textContent=item[2];
+  chooser?.setAttribute('aria-label','Choose your '+item[1].toLowerCase()+' sprouts pack');
+  if(checkout){
+   checkout.dataset.variety=item[0];checkout.dataset.pack=pack;
+   checkout.setAttribute('aria-label','Open shopping basket for '+item[1]+' sprouts, '+packs[pack][0]);
+  }
+  count.textContent=String(current+1).padStart(2,'0')+' / '+String(items.length).padStart(2,'0');
+  imageForCurrent();previewButtons();
+ }
+ function select(index,dir=1){
+  const target=(index+items.length)%items.length;
+  if(target===current&&!slideTimer)return;
+  current=target;
+  if(slideTimer){clearTimeout(slideTimer);slideTimer=null}
+  if(!slide||reduced()){render();return}
+  slide.classList.remove('is-entering-next','is-entering-prev','is-leaving-next','is-leaving-prev');
+  slide.classList.add(dir<0?'is-leaving-prev':'is-leaving-next');
+  slideTimer=setTimeout(()=>{
+   slide.classList.remove('is-leaving-next','is-leaving-prev');
+   const entering=dir<0?'is-entering-prev':'is-entering-next';
+   slide.classList.add(entering);render();
+   requestAnimationFrame(()=>requestAnimationFrame(()=>slide.classList.remove(entering)));
+   slideTimer=null;
+  },145);
+ }
+ $('hero-variety-prev')?.addEventListener('click',()=>select(current-1,-1));
+ $('hero-variety-next')?.addEventListener('click',()=>select(current+1,1));
+ window.MicroHeroVarieties={
+  onPack(value){
+   if(!packs[value])return false;
+   pack=value;
+   if(checkout){
+    checkout.dataset.pack=pack;
+    checkout.setAttribute('aria-label','Open shopping basket for '+items[current][1]+' sprouts, '+packs[pack][0]);
+   }
+   if(current===0)return false;
+   imageForCurrent();return true;
+  }
+ };
+ // Swipe only from non-interactive panel space; clicks on pack and checkout
+ // buttons remain their own actions, and vertical scrolling remains native.
+ const panel=$('hero-variety-panel');let start=null;
+ panel?.addEventListener('pointerdown',event=>{
+  if(event.target.closest('button,a,input,select'))return;
+  start={id:event.pointerId,x:event.clientX,y:event.clientY};
+ });
+ panel?.addEventListener('pointerup',event=>{
+  if(!start||event.pointerId!==start.id)return;
+  const dx=event.clientX-start.x,dy=event.clientY-start.y;start=null;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)select(current+(dx<0?1:-1),dx<0?1:-1);
+ });
+ panel?.addEventListener('pointercancel',()=>{start=null});
+})();

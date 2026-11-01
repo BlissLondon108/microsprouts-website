@@ -227,6 +227,23 @@ check("Legacy standalone checkout remains unchanged",
  read("checkout.html").includes('id="stripe-checkout-form"')&&
  read("checkout.html").includes('src="checkout.js?v=stripe-only-live-3"'));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
+check("Homepage copy and eight-variety hero carousel stay linked to the basket",
+ html.includes('Pure, simple and natural.<br>Fresh seeds, water and gentle care.')&&
+ !html.includes('class="separator" aria-hidden="true"')&&
+ html.includes('In as little as six days, tiny seeds become vibrant sprouts')&&
+ html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
+ html.includes('id="hero-variety-slide"')&&
+ html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
+ html.includes('href="hero-varieties.css?v=1"')&&
+ html.includes('src="hero-varieties.js?v=1" defer')&&
+ (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
+ read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
+ read("hero-varieties.js").includes("select(current+1,1)")&&
+ app.includes("window.MicroHeroVarieties?.onPack?.(pack)")&&
+ read("hero-varieties.css").includes('.hero-variety-slide.is-leaving-next')&&
+ read("hero-varieties.css").includes('.banner{grid-template-columns:')&&
+ (()=>{try{new vm.Script(read("hero-varieties.js"));return true}catch{return false}})());
+
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
 const localAssetPaths = [...new Set([...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m=>m[1]))];

@@ -44,7 +44,10 @@
       checkout.dataset.pack = pack;
     }
     thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'));
-    setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on an ornate cream-and-gold porcelain plate, ' + pack + ' gram ' + packLabels[pack].name + ' option', true);
+    // The variety browser owns imagery when a different sprout is selected.
+    if (!window.MicroHeroVarieties?.onPack?.(pack)) {
+      setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on an ornate cream-and-gold porcelain plate, ' + pack + ' gram ' + packLabels[pack].name + ' option', true);
+    }
   }
 
   buttons.forEach(btn => btn.addEventListener('click', () => setPack(btn.dataset.pack)));

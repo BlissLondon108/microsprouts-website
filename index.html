@@ -12,10 +12,12 @@
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=sprout-gallery-4">
+<link rel="stylesheet" href="hero-varieties.css?v=1">
 
 <link rel="stylesheet" href="basket-flow.css?v=14">
 <link rel="stylesheet" href="basket-crosspage.css?v=4">
 <script src="comp.js?v=basket-preview-1" defer></script>
+<script src="hero-varieties.js?v=1" defer></script>
 <script src="cart-preview.js?v=20" defer></script>
 
 </head>
@@ -40,7 +42,7 @@
       <button type="button" class="menu-btn" id="menu-toggle" aria-controls="nav-links" aria-expanded="false">Menu ☰</button>
     </header>
     <section class="hero-content" id="products" aria-labelledby="product-heading">
-      <div class="product-gallery" aria-label="Broccoli sprouts gallery">
+      <div class="product-gallery" id="hero-product-gallery" aria-label="Broccoli sprouts gallery">
         <div class="gallery-main">
           <img id="hero-photo" class="is-pack-photo" src="assets/single-ornate-wide-v1.svg" width="2400" height="768" alt="Generous 200g Single Pack of broccoli sprouts on an ornate cream-and-gold porcelain plate" fetchpriority="high" decoding="async">
         </div>
@@ -52,11 +54,17 @@
         </div>
       </div>
 
-      <div class="product-panel">
-        <h1 id="product-heading">Broccoli Sprouts</h1>
+      <div class="product-panel" id="hero-variety-panel">
+        <nav class="hero-variety-nav" aria-label="Browse sprout varieties">
+          <button type="button" class="hero-variety-arrow" id="hero-variety-prev" aria-label="Previous sprout variety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span class="hero-variety-index" id="hero-variety-index" aria-live="polite" aria-atomic="true">01 / 08</span>
+          <button type="button" class="hero-variety-arrow" id="hero-variety-next" aria-label="Next sprout variety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+        </nav>
+        <div class="hero-variety-slide" id="hero-variety-slide">
+          <h1 id="product-heading">Broccoli Sprouts</h1>
         <p class="tagline">Freshly grown in London</p>
         <p class="description">Grown with love and care. Naturally contains glucoraphanin, the precursor to sulforaphane.</p>
-        <div class="package-options" aria-label="Choose your broccoli sprouts pack">
+        <div class="package-options" id="hero-package-options" aria-label="Choose your broccoli sprouts pack">
           <button type="button" class="package-option" data-pack="200" aria-pressed="true">
             <span class="radio-circle" aria-hidden="true"></span>
             <span class="package-info"><strong class="package-grams">200g</strong><span class="package-title">Single Pack</span><strong class="package-price">£9.99</strong></span>
@@ -66,11 +74,12 @@
             <span class="package-info"><strong class="package-grams">500g</strong><span class="package-title">Family Pack</span><strong class="package-price">£16.99</strong></span>
           </button>
         </div>
-        <button type="button" class="checkout-btn" data-pack="200" data-cart-open data-frequency="once" id="checkout-button" aria-label="Open shopping basket for this broccoli pack">Checkout</button>
+        <button type="button" class="checkout-btn" data-pack="200" data-cart-open data-frequency="once" id="checkout-button" data-variety="broccoli" aria-label="Open shopping basket for this broccoli pack">Checkout</button>
         <div class="delivery-highlights">
           <span><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2 9h17v15H2zM19 14h6l5 6v4H19z"/><circle cx="9" cy="26" r="3"/><circle cx="24" cy="26" r="3"/></svg>£2.30 UK shipping</span>
           <i class="line" aria-hidden="true"></i>
           <span><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2 16 16 5l14 11M7 14v15h18V14M12 29V19h8v10"/></svg>Free collection</span>
+          </div>
         </div>
       </div>
     </section>
@@ -78,13 +87,12 @@
 
   <section class="banner" id="story" aria-labelledby="story-title">
     <h2 class="serif" id="story-title">From Seed to<br>Fresh Sprouts</h2>
-    <span class="separator" aria-hidden="true"></span>
-    <p>Pure, simple and natural —<br>thoughtfully chosen seeds, fresh water and time.</p>
+    <p>Pure, simple and natural.<br>Fresh seeds, water and gentle care.</p>
   </section>
 
   <section class="growth-section" id="journey" aria-labelledby="journey-title">
     <h2 class="serif" id="journey-title">From Seed to Harvest</h2>
-    <p class="growth-intro">From fresh water to flourishing shoots — each variety grows at its own pace.</p>
+    <p class="growth-intro">In as little as six days, tiny seeds become vibrant sprouts with their own natural mix of vitamins and minerals.</p>
     <div class="growth-grid" role="group" aria-label="Our fresh sprout growing stages">
       <button type="button" class="growth-item" data-stage="0" aria-pressed="true" aria-label="Day zero: seeds soaked in fresh water">
         <span class="growth-image"><img src="assets/approved/seeds.webp" width="600" height="400" alt="Brown broccoli seeds ready for sprouting" loading="lazy" decoding="async"></span>
