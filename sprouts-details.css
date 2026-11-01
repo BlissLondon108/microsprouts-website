@@ -1,5 +1,5 @@
 /* In-card sliding content. The image and overall card height never
-   change when Learn more / Back is pressed. */
+   change when Learn more / Show less is pressed. */
 .sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__status{
  position:absolute;top:16px;left:16px;z-index:3;
  display:inline-flex;align-items:center;gap:7px;
@@ -45,32 +45,32 @@
  font-size:13px;line-height:1.58;color:#576956;margin:0;
  max-width:none
 }
+/* A clear primary order action sits above the subtle secondary detail link.
+   This footer does not move when the information panel slides. */
+.sprouts-page .sprout-card__learn-wrap{
+ width:min(100%,222px);margin:12px auto 0;
+ padding:4px 0 0;border-top:1px solid #e1eade;
+ text-align:center
+}
 .sprouts-page .sprout-card__learn{
- appearance:none;display:flex;align-items:center;justify-content:space-between;
- margin-top:auto;width:100%;gap:9px;min-height:39px;
- padding:9px 12px;border:1px solid #d0dfc9;border-radius:11px;
- background:#f1f6eb;color:#245a35;
- font:700 12px/1.3 Arial,Helvetica,sans-serif;
- cursor:pointer;text-align:left;
- transition:background .18s,border-color .18s
+ appearance:none;display:block;width:100%;min-height:30px;
+ padding:6px 4px;border:0;border-radius:6px;
+ background:transparent;color:#42664a;
+ font:650 12px/1.4 Arial,Helvetica,sans-serif;
+ text-align:center;cursor:pointer;
+ text-decoration:none;text-underline-offset:3px;
+ transition:color .18s ease,background .18s ease
 }
 .sprouts-page .sprout-card__learn:hover{
- background:#e5f1dc;border-color:#a7c69d
+ color:#174c2c;text-decoration:underline;background:rgba(224,240,218,.34)
 }
-.sprouts-page .sprout-card__learn-icon{
- display:grid;place-items:center;flex:none;width:22px;height:22px;
- border-radius:50%;background:#dcebd3;color:#285e38;
- font-size:17px;font-weight:400;line-height:1
+.sprouts-page .sprout-card__learn:focus-visible{
+ outline:2px solid #356e41;outline-offset:3px
 }
-.sprouts-page .sprout-card__back{
- appearance:none;display:inline-flex;align-items:center;align-self:flex-start;
- gap:7px;margin:0 0 10px;padding:4px 0;
- background:transparent;border:0;color:#2b7040;
- font:700 12px/1.25 Arial,Helvetica,sans-serif;
- cursor:pointer
+.sprouts-page .sprout-card__panel--details{
+ overflow-y:auto;overscroll-behavior:contain;
+ scrollbar-width:thin;scrollbar-color:#b5caaa transparent
 }
-.sprouts-page .sprout-card__back:hover{text-decoration:underline;text-underline-offset:3px}
-.sprouts-page .sprout-card__back span{font-size:17px;line-height:1}
 .sprouts-page .sprout-card__extra{
  padding:0;min-width:0;color:#526852;
  font-size:12px;line-height:1.48
@@ -82,10 +82,6 @@
  font-weight:800;text-transform:uppercase;letter-spacing:.065em;margin-bottom:3px
 }
 .sprouts-page .sprout-card__bottom{flex:none;margin-top:12px;width:100%}
-.sprouts-page .sprout-card__learn:focus-visible,
-.sprouts-page .sprout-card__back:focus-visible{
- outline:2px solid #356e41;outline-offset:3px
-}
 @media(max-width:1140px) and (min-width:901px){
  .sprouts-page .sprouts-grid .sprout-card{height:389px;min-height:389px}
  .sprouts-page .sprout-card__extra{font-size:11.5px;line-height:1.42}

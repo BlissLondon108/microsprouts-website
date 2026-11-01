@@ -301,13 +301,13 @@ check("All eight catalogue cards have accessible Learn more expansions and Add t
  cartClient.includes('document.querySelectorAll("[data-cart-add-variety]")')&&
  cartClient.includes('openCart({add:true,variety});')&&
  cartClient.includes('setStage("pack")'));
-check("Catalogue cards keep their image height while sliding content within a fixed panel",
+check("Each sprout card has an unchanged image, an order action, then a quiet Learn more / Show less toggle",
  (sprouts.match(/class="sprout-card__status"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__swap"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__panel sprout-card__panel--intro"/g)||[]).length===8&&
  (sprouts.match(/class="sprout-card__panel sprout-card__panel--details"/g)||[]).length===8&&
- (sprouts.match(/data-sprout-learn/g)||[]).length===8&&
- (sprouts.match(/data-sprout-back/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__learn" data-sprout-learn/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__learn-wrap"/g)||[]).length===8&&
  (sprouts.split('<strong>Flavour &amp; texture</strong>').length===9)&&
  (sprouts.split('<strong>Ways to enjoy</strong>').length===9)&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>{
@@ -315,44 +315,45 @@ check("Catalogue cards keep their image height while sliding content within a fi
    return part.indexOf('class="sprout-card__status"')<part.indexOf('class="sprout-card__art"')&&
     part.indexOf('class="sprout-card__art"')<part.indexOf('class="sprout-card__body"')&&
     part.indexOf('class="sprout-card__body"')<part.indexOf('<h3>')&&
-    part.indexOf('data-sprout-learn')<part.indexOf('data-sprout-back')&&
     part.indexOf('id="sprout-detail-'+slug+'"')<part.indexOf('data-cart-add-variety')&&
+    part.indexOf('data-cart-add-variety')<part.indexOf('data-sprout-learn')&&
     part.includes('aria-expanded="false"')&&part.includes('aria-hidden="true" inert');
  })&&
- sprouts.includes('href="sprouts-details.css?v=2"')&&
- sprouts.includes('src="sprouts-details.js?v=1" defer')&&
+ sprouts.includes('href="sprouts-details.css?v=3"')&&
+ sprouts.includes('src="sprouts-details.js?v=2" defer')&&
+ !sprouts.includes('data-sprout-back')&&
+ !sprouts.includes('sprout-card__learn-icon')&&
  !sprouts.includes('<details class="sprout-card__expand">')&&
  read("sprouts-details.css").includes('height:356px;min-height:356px')&&
  read("sprouts-details.css").includes('height:200px;min-height:200px')&&
  read("sprouts-details.css").includes('height:215px;min-height:215px')&&
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__panel--details')&&
+ read("sprouts-details.css").includes('.sprout-card__learn-wrap{')&&
+ read("sprouts-details.css").includes('border-top:1px solid #e1eade')&&
  read("sprouts-details.css").includes('prefers-reduced-motion:reduce')&&
+ read("sprouts-details.js").includes('toggle.textContent=open?"Show less":"Learn more"')&&
  read("sprouts-details.js").includes('intro.inert=open;')&&
  read("sprouts-details.js").includes('detail.inert=!open;')&&
- read("sprouts-details.js").includes('learn.setAttribute("aria-expanded",String(open))')&&
  (()=>{try{new vm.Script(read("sprouts-details.js"));return true}catch{return false}})()&&
  !sprouts.includes('data-cart-add-pack'));
 
-// Verify the interactive sliding panel independently from the basket logic.
+// Verify switching the fixed-height panel does not hide the purchase action.
 {
  const script=read("sprouts-details.js");
  const handlers=new Map();
- function button(){
+ function button(id){
    return {
-     attrs:{},focused:false,
+     id,attrs:{},textContent:"Learn more",
      setAttribute(k,v){this.attrs[k]=v},
-     focus(){this.focused=true},
      addEventListener(k,cb){handlers.set(this.id+":"+k,cb)}
    };
  }
- const learn=button(),back=button(),intro=button(),detail=button();
- learn.id="learn";back.id="back";
- detail.inert=true;
+ const toggle=button("toggle"),intro=button("intro"),detail=button("detail");
+ detail.inert=true;detail.scrollTop=7;
  const card={
    dataset:{},
    querySelector(selector){
-     if(selector==="[data-sprout-learn]")return learn;
-     if(selector==="[data-sprout-back]")return back;
+     if(selector==="[data-sprout-learn]")return toggle;
      if(selector==='[data-sprout-panel="intro"]')return intro;
      if(selector==='[data-sprout-panel="details"]')return detail;
      return null;
@@ -360,22 +361,23 @@ check("Catalogue cards keep their image height while sliding content within a fi
  };
  const document={querySelectorAll:()=>[card]};
  vm.runInNewContext(script,{document});
- handlers.get("learn:click")();
- check("Learn more swaps the panel without altering the card layout",
+ handlers.get("toggle:click")();
+ check("Learn more slides in detail while retaining the stationary purchase footer",
   card.dataset.detailOpen==="true"&&
-  learn.attrs["aria-expanded"]==="true"&&
+  toggle.textContent==="Show less"&&
+  toggle.attrs["aria-expanded"]==="true"&&
   intro.inert===true&&detail.inert===false&&
   intro.attrs["aria-hidden"]==="true"&&
-  detail.attrs["aria-hidden"]==="false"&&
-  back.focused);
- handlers.get("back:click")();
- check("Back restores summary text and keyboard focus",
+  detail.attrs["aria-hidden"]==="false");
+ handlers.get("toggle:click")();
+ check("Show less returns to summary and resets detail scrolling",
   card.dataset.detailOpen==="false"&&
-  learn.attrs["aria-expanded"]==="false"&&
+  toggle.textContent==="Learn more"&&
+  toggle.attrs["aria-expanded"]==="false"&&
   intro.inert===false&&detail.inert===true&&
   intro.attrs["aria-hidden"]==="false"&&
   detail.attrs["aria-hidden"]==="true"&&
-  learn.focused);
+  detail.scrollTop===0);
 }
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
