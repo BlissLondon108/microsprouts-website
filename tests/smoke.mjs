@@ -319,9 +319,11 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
     part.indexOf('id="sprout-detail-'+slug+'"')<part.indexOf('data-cart-add-variety')&&
     part.indexOf('data-cart-add-variety')<part.indexOf('data-sprout-learn')&&
     part.includes('aria-expanded="false"')&&part.includes('aria-hidden="true" inert')&&
-    part.indexOf('data-sprout-back')<part.indexOf('data-sprout-panel="intro"');
+    part.indexOf('data-sprout-back')>part.indexOf('class="sprout-card__add-action"')&&
+    part.indexOf('data-sprout-back')<part.indexOf('data-cart-add-variety')&&
+    part.indexOf('data-sprout-back')>part.indexOf('data-sprout-panel="details"');
  })&&
- sprouts.includes('href="sprouts-details.css?v=5"')&&
+ sprouts.includes('href="sprouts-details.css?v=6"')&&
  sprouts.includes('src="sprouts-details.js?v=3" defer')&&
  sprouts.includes('data-sprout-back')&&
  !sprouts.includes('sprout-card__learn-icon')&&
@@ -334,6 +336,9 @@ check("Each sprout card has an unchanged image, a quiet Learn more control and a
  read("sprouts-details.css").includes('border-top:1px solid #e1eade')&&
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__learn-wrap')&&
  read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__back')&&
+ read("sprouts-details.css").includes('.sprout-card__add-action{position:relative}')&&
+ read("sprouts-details.css").includes('position:absolute;top:50%;left:0;z-index:2')&&
+ !read("sprouts-details.css").includes("padding-right:34px")&&
  read("sprouts-details.css").includes('prefers-reduced-motion:reduce')&&
  read("sprouts-details.js").includes('back.addEventListener("click",()=>setOpen(false,true))')&&
  read("sprouts-details.js").includes('toggle.inert=open;')&&

@@ -22,23 +22,21 @@
 .sprouts-page .sprouts-grid .sprout-card__body h3{
  flex:none;max-width:100%;margin:0 0 12px;
 }
+.sprouts-page .sprout-card__add-action{position:relative}
 .sprouts-page .sprout-card__back{
- position:absolute;top:18px;right:clamp(17px,2vw,25px);z-index:2;
- width:31px;height:31px;padding:0;display:grid;place-items:center;
+ position:absolute;top:50%;left:0;z-index:2;
+ width:28px;height:28px;padding:0;display:grid;place-items:center;
  border:1px solid #d8e7d3;border-radius:50%;
  background:#f3f8ef;color:#42664a;cursor:pointer;
- opacity:0;visibility:hidden;pointer-events:none;transform:translateX(4px);
+ opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-50%) translateX(-4px);
  transition:opacity .22s ease,transform .22s ease,background .18s ease
 }
 .sprouts-page .sprout-card__back svg{
- width:16px;height:16px;fill:none;stroke:currentColor;
+ width:14px;height:14px;fill:none;stroke:currentColor;
  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round
 }
 .sprouts-page .sprout-card[data-detail-open="true"] .sprout-card__back{
- opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0)
-}
-.sprouts-page .sprout-card[data-detail-open="true"] .sprout-card__body h3{
- padding-right:34px
+ opacity:1;visibility:visible;pointer-events:auto;transform:translateY(-50%) translateX(0)
 }
 .sprouts-page .sprout-card__back:hover{background:#e5f1df;color:#215a31}
 .sprouts-page .sprout-card__back:focus-visible{
@@ -67,8 +65,8 @@
  font-size:13px;line-height:1.58;color:#576956;margin:0;
  max-width:none
 }
-/* The primary order action sits under the information, while the Learn more
-   control collapses away in detail view so Add to Basket settles lower. */
+/* The purchase button retains its centred width and placement. A small
+   overlaid back arrow in the action row does not change title or button layout. */
 .sprouts-page .sprout-card__learn-wrap{
  width:min(100%,222px);margin:12px auto 0;max-height:60px;overflow:hidden;
  padding:4px 0 0;border-top:1px solid #e1eade;
