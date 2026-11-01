@@ -585,7 +585,7 @@ check("Approved Day 3–5 and Day 6 photographs use exact new assets with no old
  html.includes('src="assets/approved/day6-broccoli-2026.webp"')&&
  html.includes('alt="Developing broccoli sprouts with delicate stems and paired green leaves growing in a clear glass jar"')&&
  html.includes('alt="Dense fresh broccoli sprouts with small green leaves in a rectangular glass container ready for harvest"')&&
- html.includes('comp.css?v=sprout-art-3')&&
+ html.includes('comp.css?v=sprout-gallery-4')&&
  !html.includes('src="assets/approved/jar-real-broccoli.webp"')&&
  !html.includes('class="growth-image__fresh-sprouts"')&&
  !html.includes('class="growth-image growth-image--refreshed-growth"')&&
