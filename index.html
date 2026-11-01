@@ -11,14 +11,13 @@
 <title>MicroSprouts | Freshly grown in London</title>
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
-<link rel="stylesheet" href="comp.css?v=sprout-art-3">
+<link rel="stylesheet" href="comp.css?v=sprout-gallery-4">
 
 <link rel="stylesheet" href="basket-flow.css?v=14">
 <link rel="stylesheet" href="basket-crosspage.css?v=4">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="cart-preview.js?v=19" defer></script>
+<script src="cart-preview.js?v=20" defer></script>
 
-<script src="carousel-interaction.js?v=2" defer></script>
 </head>
 <body>
 <main id="top">
@@ -116,7 +115,7 @@
       <div class="benefit-eyebrow">WHY BROCCOLI SPROUTS ARE GOOD</div>
       <h3 class="serif">Naturally rich in<br>glucoraphanin</h3>
       <p>A study of certain 3-day-old broccoli sprouts found up to 100× more glucoraphanin than mature broccoli. Levels vary by variety and growing stage.</p>
-      <a class="research-link" href="science.html#glucoraphanin">Learn more</a>
+      <a class="research-link" href="science.html#top">Learn more</a>
     </article>
     <article class="benefit-card">
       <img class="benefit-bg" src="assets/approved/toast.webp" width="600" height="400" alt="" loading="lazy" decoding="async">
@@ -130,7 +129,7 @@
       <div class="benefit-eyebrow">THE SCIENCE BEHIND THE GOODNESS</div>
       <h3 class="serif" id="sulforaphane-title">What is Sulforaphane?</h3>
       <p>Sulforaphane is a powerful natural compound that gets released when broccoli sprouts are chewed. Scientific studies suggest it may help protect cells from damage, reduce inflammation and support the body's natural defence systems. Researchers are also exploring its potential role in cancer prevention and its effects on tumour growth.</p>
-      <a class="research-link" href="science.html#sulforaphane">Read about the research</a>
+      <a class="research-link" href="science.html#top">Read about the research</a>
     </article>
   </section>
 
@@ -184,10 +183,9 @@
       <h2 class="serif" id="sprout-showcase-title">Discover your kind of <em>sprout.</em></h2>
       <p>Discover unique flavours and natural goodness in every variety. Select a sprout to learn more.</p>
     </div>
-    <div class="sprout-carousel">
-      <button type="button" class="sprout-carousel__arrow" data-sprout-scroll="-1" aria-label="Scroll sprout varieties left">‹</button>
-      <div class="sprout-marquee" id="sprout-scroll" tabindex="0" aria-label="Sprout varieties; swipe or scroll sideways to explore">
-        <div class="sprout-marquee__track">
+    <div class="sprout-gallery">
+      <div class="sprout-gallery__viewport" id="sprout-scroll" aria-label="All eight sprout varieties">
+        <div class="sprout-gallery__grid">
         <a class="sprout-tile" href="sprouts.html#broccoli" aria-label="Discover Broccoli sprouts">
           <span class="sprout-orb sprout-orb--broccoli">
             <span class="sprout-orb__letter" aria-hidden="true">B</span>
@@ -258,7 +256,6 @@
         </a>
         </div>
       </div>
-      <button type="button" class="sprout-carousel__arrow" data-sprout-scroll="1" aria-label="Scroll sprout varieties right">›</button>
     </div>
   </section>
 

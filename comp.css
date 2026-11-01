@@ -769,3 +769,46 @@ body.overlay-open{overflow:hidden}
  -webkit-user-drag:none;user-select:none;
 }
 
+
+/* Complete eight-variety homepage gallery, no carousel, clipping or arrows. */
+.sprout-showcase{overflow:visible}
+.sprout-gallery{
+ width:min(100%,1440px);margin:0 auto;
+ padding:0 clamp(16px,2.6vw,40px)
+}
+.sprout-gallery__viewport{overflow:visible;min-width:0}
+.sprout-gallery__grid{
+ display:grid;grid-template-columns:repeat(8,minmax(0,1fr));
+ gap:clamp(8px,1.25vw,20px);align-items:start
+}
+.sprout-gallery .sprout-tile{
+ width:100%;min-width:0;flex:none;padding:7px 2px 16px;
+ scroll-snap-align:none
+}
+.sprout-gallery .sprout-orb{
+ width:min(100%,132px);height:auto;aspect-ratio:1;
+ flex:0 0 auto
+}
+.sprout-gallery .sprout-tile__title{
+ font-size:clamp(13px,1.18vw,17px);margin-top:17px;line-height:1.25
+}
+.sprout-gallery .sprout-tile__subtitle{
+ font-size:clamp(10px,1vw,12px);line-height:1.35
+}
+.sprout-gallery .sprout-tile__price{
+ max-width:100%;font-size:clamp(10px,.88vw,11px);line-height:1.45
+}
+@media(max-width:1000px){
+ .sprout-gallery{width:min(100%,900px);padding:0 22px}
+ .sprout-gallery__grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:26px 14px}
+ .sprout-gallery .sprout-orb{width:min(100%,136px)}
+ .sprout-gallery .sprout-tile__title{font-size:16px}
+ .sprout-gallery .sprout-tile__subtitle{font-size:12px}
+ .sprout-gallery .sprout-tile__price{font-size:11px}
+}
+@media(max-width:520px){
+ .sprout-gallery{padding:0 18px}
+ .sprout-gallery__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 14px}
+ .sprout-gallery .sprout-orb{width:min(100%,130px)}
+ .sprout-gallery .sprout-tile__title{margin-top:15px}
+}

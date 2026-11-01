@@ -34,7 +34,7 @@ check("Cart starts genuinely empty until a shopper adds broccoli",
  cartClient.includes('const storeKey="microsprouts-basket-entries-v3"')&&
  html.includes('id="basket-empty"')&&html.includes('Your basket is empty.')&&
  html.includes('id="basket-start"')&&
- cartClient.includes('if(options.add&&!bulkAttempt){if(!docked())closeSproutPicker();addEntry(options);}')&&
+ cartClient.includes('if(options.add&&!bulkAttempt){addEntry(options);}')&&
  cartClient.includes('el("basket-start").addEventListener("click"')&&
  cartClient.includes('state.entries=state.entries.filter(entry=>entry.id!==id)'));
 check("Add Sprouts offers all eight approved priced varieties",
@@ -70,7 +70,7 @@ check("Multi-entry basket keeps the four minimal decision stages",
  !html.includes('id="stripe-checkout-form"')&&
  !html.includes('class="checkout-alert"')&&
  !html.includes('class="checkout-summary"')&&
- html.includes('src="cart-preview.js?v=19"')&&
+ html.includes('src="cart-preview.js?v=20"')&&
  html.includes('href="basket-flow.css?v=14"'));
 check("Chips appear before active broccoli heading and never say Edit",
  html.indexOf('id="basket-selections"')<html.indexOf('class="basket-flow__product"')&&
@@ -207,7 +207,7 @@ check("Sprout packs are visually separated by broccoli-green backgrounds",
  flowCss.includes('border-bottom:4px solid')&&
  flowCss.includes('.basket-flow__current{')&&
  flowCss.includes('.basket-flow__field--name'));
-check("Three order choices remain above manual sprout gallery",
+check("Three order choices remain above the complete eight-variety gallery",
  html.indexOf('id="order-options"')<html.indexOf('id="explore-sprouts"')&&
  html.indexOf('id="explore-sprouts"')<html.indexOf('id="faq"')&&
  (html.match(/<article class="order-choice-card/g)||[]).length===3&&
@@ -215,8 +215,14 @@ check("Three order choices remain above manual sprout gallery",
  html.includes("https://wa.me/447386853514?text=Hello%20MicroSprouts%21")&&
  ["broccoli","radish","mung-bean","leek","mustard","fenugreek","alfalfa","green-pea"].every(name=>
   html.includes('class="sprout-tile" href="sprouts.html#'+name+'"'))&&
- html.includes('src="carousel-interaction.js?v=2"')&&
- carouselClient.includes('viewport.scrollBy({left: delta, behavior:"smooth"})'));
+ html.includes('class="sprout-gallery__grid"')&&
+ (html.match(/class="sprout-tile" href="sprouts.html#/g)||[]).length===8&&
+ !html.includes('data-sprout-scroll')&&
+ !html.includes('src="carousel-interaction.js?v=2"')&&
+ css.includes('.sprout-gallery__grid{')&&
+ css.includes('grid-template-columns:repeat(8,minmax(0,1fr))')&&
+ css.includes('grid-template-columns:repeat(4,minmax(0,1fr))')&&
+ css.includes('grid-template-columns:repeat(2,minmax(0,1fr))'));
 check("Legacy standalone checkout remains unchanged",
  read("checkout.html").includes('id="stripe-checkout-form"')&&
  read("checkout.html").includes('src="checkout.js?v=stripe-only-live-3"'));
@@ -297,8 +303,8 @@ check("All eight catalogue cards have one centered Add to Basket action and no i
  cartClient.includes('setStage("pack")'));
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
-check("Benefit cards link to useful internal destinations", html.includes('href="science.html#glucoraphanin">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
-check("Sulforaphane research link now navigates internally", html.includes('href="science.html#sulforaphane">Read about the research</a>') && idsFor(science).has("sulforaphane"));
+check("Benefit cards link to useful internal destinations", html.includes('href="science.html#top">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
+check("Research link opens the top of the science page", html.includes('href="science.html#top">Read about the research</a>') && idsFor(science).has("top"));
 check("Cross-page internal links resolve", Object.values(docs).every(markup => [...markup.matchAll(/href="((?:index|sprouts|science)\.html)(?:#([^"]+))?"/g)].every(m => !!docs[m[1]] && (!m[2] || idsFor(docs[m[1]]).has(m[2])))));
 check("All new locally hosted images exist", [sprouts,science].every(markup => [...markup.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].every(m => fs.existsSync(path.join(root,m[1])))));
 check("New menu script parses", (()=>{try{new vm.Script(pagesJs);return true}catch{return false}})());
@@ -469,7 +475,7 @@ const homepageShell=homepageStart>=0&&homepageEnd>homepageStart?
 check("All three main pages have a nav basket with the same full shopping drawer",
  [html,sprouts,science].every(doc=>doc.includes('id="open-cart"')&&doc.includes('id="nav-cart-count"'))&&
  [sprouts,science].every(doc=>doc.includes('src="basket-shell.js?v=5"')&&
- doc.includes('src="cart-preview.js?v=19"')&&doc.includes('href="basket-flow.css?v=14"')&&
+ doc.includes('src="cart-preview.js?v=20"')&&doc.includes('href="basket-flow.css?v=14"')&&
  doc.includes('href="basket-crosspage.css?v=4"'))&&
  savedShell&&homepageShell&&savedShell===homepageShell&&
  !sprouts.includes('id="cart-overlay"')&&!science.includes('id="cart-overlay"')&&
@@ -543,7 +549,7 @@ check("Carousel says Select Your Favorite and fades both horizontal edges",
 
 check("An eleventh pack offers an elegant WhatsApp bulk-enquiry popup on every page",
  ["index.html","sprouts.html","science.html"].every(file=>
-   read(file).includes('basket-flow.css?v=14')&&read(file).includes('cart-preview.js?v=19'))&&
+   read(file).includes('basket-flow.css?v=14')&&read(file).includes('cart-preview.js?v=20'))&&
  [sprouts,science].every(file=>file.includes('basket-shell.js?v=5'))&&
  html.includes('id="basket-bulk-overlay" hidden')&&
  html.includes('id="basket-bulk-title">Planning a larger order?')&&
@@ -584,3 +590,12 @@ check("Approved Day 3–5 and Day 6 photographs use exact new assets with no old
  !html.includes('class="growth-image__fresh-sprouts"')&&
  !html.includes('class="growth-image growth-image--refreshed-growth"')&&
  !read("comp.css").includes('.growth-image--refreshed-growth'));
+
+check("Checkout, catalogue and restored baskets keep the picker docked unless full",
+ cartClient.includes('if(entry&&!docked())dockSproutPicker();')&&
+ cartClient.includes('if(isEmpty&&docked())resetSproutPicker();')&&
+ cartClient.includes('const atCapacity=state.entries.length>=maxOnlinePacks;')&&
+ [html,sprouts,science].every(page=>page.includes('cart-preview.js?v=20'))&&
+ html.includes('href="comp.css?v=sprout-gallery-4"')&&
+ html.includes('href="science.html#top">Learn more</a>')&&
+ html.includes('href="science.html#top">Read about the research</a>'));

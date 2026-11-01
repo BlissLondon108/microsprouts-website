@@ -179,6 +179,10 @@
  function render(){
    const entry=active();
    const isEmpty=!entry;
+   // Any populated basket—including homepage checkout and restored sessions—
+   // displays the same picker as a selection made directly from its cards.
+   if(entry&&!docked())dockSproutPicker();
+   if(isEmpty&&docked())resetSproutPicker();
    // Full basket: hide the entire carousel, but retain its docked DOM position.
    // Removing any pack immediately restores the gallery without losing its scroll.
    if(docked()){
@@ -283,7 +287,7 @@
    // The nav cart simply opens the basket. Explicit shopping CTAs create
    // one separate entry, but opening an empty basket never creates broccoli.
    const bulkAttempt=!!options.add&&state.entries.length>=maxOnlinePacks;
-   if(options.add&&!bulkAttempt){if(!docked())closeSproutPicker();addEntry(options);}
+   if(options.add&&!bulkAttempt){addEntry(options);}
    if(active()&&!complete(active())&&state.stage==="details")
      state.stage=active().frequency?"delivery":active().pack?"order":"pack";
    overlay.hidden=false;document.body.classList.add("overlay-open");

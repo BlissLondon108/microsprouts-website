@@ -172,6 +172,23 @@ check("Opening nav basket doesn't add broccoli or start checkout",
  el("basket-other-items").hidden&&
  el("nav-cart-count").textContent==="0");
 el("close-cart").listeners.click();
+// Main homepage Checkout adds a pack directly, but still docks the variety picker.
+openButtons[0].listeners.click({preventDefault(){}});
+check("Homepage Checkout reveals the persistent variety picker alongside the pack",
+ !el("cart-overlay").hidden&&
+ !el("basket-picker-dock").hidden&&
+ !el("basket-sprout-picker").hidden&&
+ el("basket-picker-dock").children.includes(el("basket-sprout-picker"))&&
+ el("nav-cart-count").textContent==="1"&&
+ el("basket-selected-pack").textContent==="500g"&&
+ !stages[1].hidden);
+el("basket-remove-entry").listeners.click();
+check("Removing the Checkout pack restores empty basket picker",
+ el("basket-picker-dock").hidden&&
+ el("basket-sprout-picker").hidden&&
+ el("basket-picker-home").children.includes(el("basket-sprout-picker"))&&
+ el("nav-cart-count").textContent==="0");
+el("close-cart").listeners.click();
 el("basket-start").listeners.click();
 check("Add Sprouts opens a touch-scrollable carousel with no arrow controls",
  !el("basket-sprout-picker").hidden&&
