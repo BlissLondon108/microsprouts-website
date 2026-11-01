@@ -16,12 +16,13 @@
 <link rel="stylesheet" href="basket-crosspage.css?v=4">
 <link rel="stylesheet" href="sprouts-orbs.css?v=9">
 <link rel="stylesheet" href="sprouts-spotlight.css?v=1">
-<link rel="stylesheet" href="sprouts-details.css?v=1">
+<link rel="stylesheet" href="sprouts-details.css?v=2">
 <script src="pages.js" defer></script>
 <script src="basket-shell.js?v=5" defer></script>
 <script src="cart-preview.js?v=20" defer></script>
 <script src="sprouts-orbs.js?v=4" defer></script>
 <script src="sprouts-spotlight.js?v=1" defer></script>
+<script src="sprouts-details.js?v=1" defer></script>
 </head>
 <body class="interior-page sprouts-page">
 <div class="interior-head" id="top">
@@ -126,15 +127,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Broccoli Sprouts</h3>
-          <p class="sprout-card__description">Delicate little green shoots with a fresh, gently peppery flavour. An easy addition to toast, sandwiches and salads.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Broccoli Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">Delicate little green shoots with a fresh, gently peppery flavour. An easy addition to toast, sandwiches and salads.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-broccoli" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-broccoli" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> A soft, leafy texture with a subtle peppery finish.</p>
                 <p><strong>Ways to enjoy</strong> Try a handful over avocado toast, sandwiches or a freshly dressed salad just before serving.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="broccoli" aria-label="Add Broccoli sprouts to your basket">Add to Basket</button>
             </div>
@@ -149,15 +157,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Radish Sprouts</h3>
-          <p class="sprout-card__description">Bright, punchy and peppery. A lovely way to bring fresh flavour and a little colour to your everyday meals.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Radish Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">Bright, punchy and peppery. A lovely way to bring fresh flavour and a little colour to your everyday meals.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-radish" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-radish" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> A bright, peppery bite that stands out in a mix of milder greens.</p>
                 <p><strong>Ways to enjoy</strong> Pair with hummus, cucumber, creamy dressings or grain bowls for a lively contrast.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="radish" aria-label="Add Radish sprouts to your basket">Add to Basket</button>
             </div>
@@ -172,15 +187,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Mung Bean Sprouts</h3>
-          <p class="sprout-card__description">Juicy, crunchy stems with a gentle nutty flavour. Especially good in noodle dishes, soups and stir-fries.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Mung Bean Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">Juicy, crunchy stems with a gentle nutty flavour. Especially good in noodle dishes, soups and stir-fries.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-mung-bean" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-mung-bean" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> Thick, juicy stems with satisfying crunch and a mild, nutty taste.</p>
                 <p><strong>Ways to enjoy</strong> A favourite for noodles, rice dishes and stir-fries; follow appropriate sprout cooking guidance.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="mung-bean" aria-label="Add Mung bean sprouts to your basket">Add to Basket</button>
             </div>
@@ -195,15 +217,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Leek Sprouts</h3>
-          <p class="sprout-card__description">Fine, slender sprouts with a gentle onion-like flavour. A savoury finishing touch for salads and bowls.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Leek Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">Fine, slender sprouts with a gentle onion-like flavour. A savoury finishing touch for salads and bowls.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-leek" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-leek" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> Slender shoots with a savoury, gently onion-like character.</p>
                 <p><strong>Ways to enjoy</strong> Sprinkle over baked potatoes, savoury bowls or creamy spreads as a finishing touch.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="leek" aria-label="Add Leek sprouts to your basket">Add to Basket</button>
             </div>
@@ -218,15 +247,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Mustard Sprouts</h3>
-          <p class="sprout-card__description">A lively, mustardy bite with a crisp finish. Wonderful scattered over sandwiches, salads and savoury bowls.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Mustard Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">A lively, mustardy bite with a crisp finish. Wonderful scattered over sandwiches, salads and savoury bowls.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-mustard" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-mustard" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> A punchy, mustardy flavour that brings a sharp, fresh accent.</p>
                 <p><strong>Ways to enjoy</strong> Start with a small handful on sandwiches, roasted vegetables or savoury toast.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="mustard" aria-label="Add Mustard sprouts to your basket">Add to Basket</button>
             </div>
@@ -241,15 +277,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Fenugreek Sprouts</h3>
-          <p class="sprout-card__description">Gently earthy and nutty, with a distinctive aromatic flavour. Try them in grain bowls and hearty salads.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Fenugreek Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">Gently earthy and nutty, with a distinctive aromatic flavour. Try them in grain bowls and hearty salads.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-fenugreek" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-fenugreek" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> Earthy, aromatic notes with a distinctive gently bitter edge.</p>
                 <p><strong>Ways to enjoy</strong> Try alongside chickpeas, lentils or hearty grain salads for a fuller flavour.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="fenugreek" aria-label="Add Fenugreek sprouts to your basket">Add to Basket</button>
             </div>
@@ -264,15 +307,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Alfalfa Sprouts</h3>
-          <p class="sprout-card__description">Fine, tender shoots with a mild, fresh flavour. A simple topping for wraps, toast and sandwiches.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Alfalfa Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">Fine, tender shoots with a mild, fresh flavour. A simple topping for wraps, toast and sandwiches.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-alfalfa" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-alfalfa" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> Light, feathery shoots with a mild flavour and delicate texture.</p>
                 <p><strong>Ways to enjoy</strong> Layer into wraps, open sandwiches or mixed salads for a soft fresh finish.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="alfalfa" aria-label="Add Alfalfa sprouts to your basket">Add to Basket</button>
             </div>
@@ -287,15 +337,22 @@
         </div>
         <div class="sprout-card__body">
           <h3>Green Pea Sprouts</h3>
-          <p class="sprout-card__description">Tender shoots sprouted from green peas, with a fresh, pleasantly sweet pea flavour. Enjoy them as a colourful addition to salads and bowls.</p>
-          <div class="sprout-card__bottom">
-            <details class="sprout-card__expand">
-              <summary class="sprout-card__learn">Learn more <span class="sprout-card__learn-icon" aria-hidden="true">+</span></summary>
+          <div class="sprout-card__swap" aria-label="Green Pea Sprouts information">
+            <div class="sprout-card__panel sprout-card__panel--intro" data-sprout-panel="intro">
+              <p class="sprout-card__description">Tender shoots sprouted from green peas, with a fresh, pleasantly sweet pea flavour. Enjoy them as a colourful addition to salads and bowls.</p>
+              <button type="button" class="sprout-card__learn" data-sprout-learn aria-controls="sprout-detail-green-pea" aria-expanded="false">
+                Learn more <span class="sprout-card__learn-icon" aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="sprout-card__panel sprout-card__panel--details" id="sprout-detail-green-pea" data-sprout-panel="details" aria-hidden="true" inert>
+              <button type="button" class="sprout-card__back" data-sprout-back><span aria-hidden="true">←</span> Back</button>
               <div class="sprout-card__extra">
                 <p><strong>Flavour &amp; texture</strong> Tender green shoots with a gently sweet, garden-pea character.</p>
                 <p><strong>Ways to enjoy</strong> Enjoy with lemony dressings, crisp vegetables or as a fresh garnish on bowls.</p>
               </div>
-            </details>
+            </div>
+          </div>
+          <div class="sprout-card__bottom">
             <div class="sprout-card__add-action">
               <button type="button" class="sprout-card__add-button" data-cart-add-variety data-variety="green-pea" aria-label="Add Green pea sprouts to your basket">Add to Basket</button>
             </div>

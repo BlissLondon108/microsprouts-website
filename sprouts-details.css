@@ -1,5 +1,5 @@
-/* Sprout catalogue: photo-badge and accessible expandable details.
-   Native <details> avoids an extra JS dependency and works with keyboard/touch. */
+/* In-card sliding content. The image and overall card height never
+   change when Learn more / Back is pressed. */
 .sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__status{
  position:absolute;top:16px;left:16px;z-index:3;
  display:inline-flex;align-items:center;gap:7px;
@@ -13,62 +13,104 @@
 .sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__status::before{
  content:"";width:6px;height:6px;flex:none;border-radius:50%;background:#4c8d38
 }
+.sprouts-page .sprouts-grid .sprout-card{height:356px;min-height:356px}
+.sprouts-page .sprouts-grid .sprout-card__visual{height:100%;min-height:0}
 .sprouts-page .sprouts-grid .sprout-card__body{
- padding-top:23px
+ height:100%;min-height:0;overflow:hidden;
+ padding:23px clamp(19px,2.15vw,29px) 23px
 }
 .sprouts-page .sprouts-grid .sprout-card__body h3{
- margin-top:0;margin-bottom:10px
+ flex:none;max-width:100%;margin:0 0 12px;
 }
-.sprouts-page .sprouts-grid .sprout-card__description{
- margin-bottom:14px
+.sprouts-page .sprout-card__swap{
+ position:relative;flex:1;min-height:0;width:100%;overflow:hidden;
 }
-.sprouts-page .sprout-card__expand{
- width:100%;margin-bottom:15px;min-width:0
+.sprouts-page .sprout-card__panel{
+ position:absolute;inset:0;min-width:0;
+ display:flex;flex-direction:column;
+ transition:transform .33s cubic-bezier(.25,.78,.22,1),opacity .33s ease;
+ will-change:transform
+}
+.sprouts-page .sprout-card__panel--intro{transform:translateX(0);opacity:1}
+.sprouts-page .sprout-card__panel--details{
+ transform:translateX(110%);opacity:0;pointer-events:none
+}
+.sprouts-page .sprout-card[data-detail-open="true"] .sprout-card__panel--intro{
+ transform:translateX(-110%);opacity:0;pointer-events:none
+}
+.sprouts-page .sprout-card[data-detail-open="true"] .sprout-card__panel--details{
+ transform:translateX(0);opacity:1;pointer-events:auto
+}
+.sprouts-page .sprout-card__description{
+ font-size:13px;line-height:1.58;color:#576956;margin:0;
+ max-width:none
 }
 .sprouts-page .sprout-card__learn{
- display:flex;align-items:center;justify-content:space-between;
- gap:10px;min-height:39px;width:100%;
- padding:9px 13px;box-sizing:border-box;
- border:1px solid #d0dfc9;border-radius:11px;
+ appearance:none;display:flex;align-items:center;justify-content:space-between;
+ margin-top:auto;width:100%;gap:9px;min-height:39px;
+ padding:9px 12px;border:1px solid #d0dfc9;border-radius:11px;
  background:#f1f6eb;color:#245a35;
- font:700 12px/1.35 Arial,Helvetica,sans-serif;
- cursor:pointer;list-style:none;transition:background .18s ease,border-color .18s ease
+ font:700 12px/1.3 Arial,Helvetica,sans-serif;
+ cursor:pointer;text-align:left;
+ transition:background .18s,border-color .18s
 }
-.sprouts-page .sprout-card__learn::-webkit-details-marker{display:none}
-.sprouts-page .sprout-card__learn::marker{content:""}
-.sprouts-page .sprout-card__learn:hover,
-.sprouts-page .sprout-card__expand[open] .sprout-card__learn{
+.sprouts-page .sprout-card__learn:hover{
  background:#e5f1dc;border-color:#a7c69d
 }
-.sprouts-page .sprout-card__learn:focus-visible{
- outline:2px solid #356e41;outline-offset:3px
-}
 .sprouts-page .sprout-card__learn-icon{
- display:grid;place-items:center;flex:none;width:21px;height:21px;
- border-radius:50%;background:#dbead0;color:#285e38;
- font-size:18px;font-weight:400;line-height:1;
- transition:transform .18s ease
+ display:grid;place-items:center;flex:none;width:22px;height:22px;
+ border-radius:50%;background:#dcebd3;color:#285e38;
+ font-size:17px;font-weight:400;line-height:1
 }
-.sprouts-page .sprout-card__expand[open] .sprout-card__learn-icon{
- transform:rotate(45deg)
+.sprouts-page .sprout-card__back{
+ appearance:none;display:inline-flex;align-items:center;align-self:flex-start;
+ gap:7px;margin:0 0 10px;padding:4px 0;
+ background:transparent;border:0;color:#2b7040;
+ font:700 12px/1.25 Arial,Helvetica,sans-serif;
+ cursor:pointer
 }
+.sprouts-page .sprout-card__back:hover{text-decoration:underline;text-underline-offset:3px}
+.sprouts-page .sprout-card__back span{font-size:17px;line-height:1}
 .sprouts-page .sprout-card__extra{
- padding:13px 3px 0;color:#526852;font-size:12px;line-height:1.6
+ padding:0;min-width:0;color:#526852;
+ font-size:12px;line-height:1.48
 }
-.sprouts-page .sprout-card__extra p{margin:0 0 10px}
+.sprouts-page .sprout-card__extra p{margin:0 0 9px}
 .sprouts-page .sprout-card__extra p:last-child{margin-bottom:0}
 .sprouts-page .sprout-card__extra strong{
- display:block;color:#315b37;font-size:10px;line-height:1.5;
+ display:block;color:#315b37;font-size:9.5px;line-height:1.45;
  font-weight:800;text-transform:uppercase;letter-spacing:.065em;margin-bottom:3px
+}
+.sprouts-page .sprout-card__bottom{flex:none;margin-top:12px;width:100%}
+.sprouts-page .sprout-card__learn:focus-visible,
+.sprouts-page .sprout-card__back:focus-visible{
+ outline:2px solid #356e41;outline-offset:3px
+}
+@media(max-width:1140px) and (min-width:901px){
+ .sprouts-page .sprouts-grid .sprout-card{height:389px;min-height:389px}
+ .sprouts-page .sprout-card__extra{font-size:11.5px;line-height:1.42}
+}
+@media(max-width:900px){
+ .sprouts-page .sprouts-grid .sprout-card{height:auto;min-height:0}
+ .sprouts-page .sprouts-grid .sprout-card__visual{height:200px;min-height:200px}
+ .sprouts-page .sprouts-grid .sprout-card__body{
+  height:322px;min-height:322px;padding:22px 24px
+ }
+ .sprouts-page .sprout-card__extra{font-size:12px}
 }
 @media(max-width:520px){
  .sprouts-page .sprouts-grid .sprout-card__visual .sprout-card__status{
   top:13px;left:13px;padding:7px 10px;font-size:10px
  }
- .sprouts-page .sprouts-grid .sprout-card__body{padding-top:20px}
- .sprouts-page .sprout-card__extra{font-size:13px}
+ .sprouts-page .sprouts-grid .sprout-card__visual{height:215px;min-height:215px}
+ .sprouts-page .sprouts-grid .sprout-card__body{
+  height:338px;min-height:338px;padding:20px 24px 22px
+ }
+ .sprouts-page .sprout-card__description{font-size:13px}
+ .sprouts-page .sprout-card__extra{font-size:12.5px;line-height:1.5}
 }
 @media(prefers-reduced-motion:reduce){
- .sprouts-page .sprout-card__learn,
- .sprouts-page .sprout-card__learn-icon{transition:none}
+ .sprouts-page .sprout-card__panel,
+ .sprouts-page .sprout-card__learn{transition:none}
+ .sprouts-page .sprout-card__panel{will-change:auto}
 }

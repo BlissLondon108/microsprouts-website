@@ -301,10 +301,13 @@ check("All eight catalogue cards have accessible Learn more expansions and Add t
  cartClient.includes('document.querySelectorAll("[data-cart-add-variety]")')&&
  cartClient.includes('openCart({add:true,variety});')&&
  cartClient.includes('setStage("pack")'));
-check("Catalogue badges appear inside pictures and native detail controls reveal variety-specific information",
+check("Catalogue cards keep their image height while sliding content within a fixed panel",
  (sprouts.match(/class="sprout-card__status"/g)||[]).length===8&&
- (sprouts.match(/class="sprout-card__expand"/g)||[]).length===8&&
- (sprouts.match(/<summary class="sprout-card__learn">Learn more/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__swap"/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__panel sprout-card__panel--intro"/g)||[]).length===8&&
+ (sprouts.match(/class="sprout-card__panel sprout-card__panel--details"/g)||[]).length===8&&
+ (sprouts.match(/data-sprout-learn/g)||[]).length===8&&
+ (sprouts.match(/data-sprout-back/g)||[]).length===8&&
  (sprouts.split('<strong>Flavour &amp; texture</strong>').length===9)&&
  (sprouts.split('<strong>Ways to enjoy</strong>').length===9)&&
  ['broccoli','radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>{
@@ -312,12 +315,68 @@ check("Catalogue badges appear inside pictures and native detail controls reveal
    return part.indexOf('class="sprout-card__status"')<part.indexOf('class="sprout-card__art"')&&
     part.indexOf('class="sprout-card__art"')<part.indexOf('class="sprout-card__body"')&&
     part.indexOf('class="sprout-card__body"')<part.indexOf('<h3>')&&
-    part.indexOf('class="sprout-card__expand"')<part.indexOf('data-cart-add-variety');
+    part.indexOf('data-sprout-learn')<part.indexOf('data-sprout-back')&&
+    part.indexOf('id="sprout-detail-'+slug+'"')<part.indexOf('data-cart-add-variety')&&
+    part.includes('aria-expanded="false"')&&part.includes('aria-hidden="true" inert');
  })&&
- sprouts.includes('href="sprouts-details.css?v=1"')&&
- read("sprouts-details.css").includes('.sprout-card__expand[open] .sprout-card__learn-icon')&&
- read("sprouts-details.css").includes('.sprout-card__visual .sprout-card__status')&&
+ sprouts.includes('href="sprouts-details.css?v=2"')&&
+ sprouts.includes('src="sprouts-details.js?v=1" defer')&&
+ !sprouts.includes('<details class="sprout-card__expand">')&&
+ read("sprouts-details.css").includes('height:356px;min-height:356px')&&
+ read("sprouts-details.css").includes('height:200px;min-height:200px')&&
+ read("sprouts-details.css").includes('height:215px;min-height:215px')&&
+ read("sprouts-details.css").includes('.sprout-card[data-detail-open="true"] .sprout-card__panel--details')&&
+ read("sprouts-details.css").includes('prefers-reduced-motion:reduce')&&
+ read("sprouts-details.js").includes('intro.inert=open;')&&
+ read("sprouts-details.js").includes('detail.inert=!open;')&&
+ read("sprouts-details.js").includes('learn.setAttribute("aria-expanded",String(open))')&&
+ (()=>{try{new vm.Script(read("sprouts-details.js"));return true}catch{return false}})()&&
  !sprouts.includes('data-cart-add-pack'));
+
+// Verify the interactive sliding panel independently from the basket logic.
+{
+ const script=read("sprouts-details.js");
+ const handlers=new Map();
+ function button(){
+   return {
+     attrs:{},focused:false,
+     setAttribute(k,v){this.attrs[k]=v},
+     focus(){this.focused=true},
+     addEventListener(k,cb){handlers.set(this.id+":"+k,cb)}
+   };
+ }
+ const learn=button(),back=button(),intro=button(),detail=button();
+ learn.id="learn";back.id="back";
+ detail.inert=true;
+ const card={
+   dataset:{},
+   querySelector(selector){
+     if(selector==="[data-sprout-learn]")return learn;
+     if(selector==="[data-sprout-back]")return back;
+     if(selector==='[data-sprout-panel="intro"]')return intro;
+     if(selector==='[data-sprout-panel="details"]')return detail;
+     return null;
+   }
+ };
+ const document={querySelectorAll:()=>[card]};
+ vm.runInNewContext(script,{document});
+ handlers.get("learn:click")();
+ check("Learn more swaps the panel without altering the card layout",
+  card.dataset.detailOpen==="true"&&
+  learn.attrs["aria-expanded"]==="true"&&
+  intro.inert===true&&detail.inert===false&&
+  intro.attrs["aria-hidden"]==="true"&&
+  detail.attrs["aria-hidden"]==="false"&&
+  back.focused);
+ handlers.get("back:click")();
+ check("Back restores summary text and keyboard focus",
+  card.dataset.detailOpen==="false"&&
+  learn.attrs["aria-expanded"]==="false"&&
+  intro.inert===false&&detail.inert===true&&
+  intro.attrs["aria-hidden"]==="false"&&
+  detail.attrs["aria-hidden"]==="true"&&
+  learn.focused);
+}
 check("Three research articles link to verified originals", (science.match(/<article class="research-card"/g)||[]).length === 3 && ["https://pubmed.ncbi.nlm.nih.gov/9294217/","https://pmc.ncbi.nlm.nih.gov/articles/PMC5773831/","https://pubmed.ncbi.nlm.nih.gov/37650498/"].every(u => science.includes('href="'+u+'"')));
 check("Two research links removed from homepage", !html.includes('>Read the original study</a>') && !html.includes('>Explore the nutritional research</a>'));
 check("Benefit cards link to useful internal destinations", html.includes('href="science.html#top">Learn more</a>') && html.includes('href="sprouts.html#how-to-eat">How to add sprouts to your diet</a>') && idsFor(sprouts).has("how-to-eat"));
