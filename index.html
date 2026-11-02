@@ -12,18 +12,18 @@
 <link rel="preload" as="image" href="assets/single-ornate-wide-v1.svg">
 <link rel="preconnect" href="https://images.pexels.com" crossorigin>
 <link rel="stylesheet" href="comp.css?v=sprout-gallery-4">
-<link rel="stylesheet" href="hero-varieties.css?v=1">
+<link rel="stylesheet" href="hero-varieties.css?v=2">
 
 <link rel="stylesheet" href="basket-flow.css?v=14">
 <link rel="stylesheet" href="basket-crosspage.css?v=4">
 <script src="comp.js?v=basket-preview-1" defer></script>
-<script src="hero-varieties.js?v=1" defer></script>
+<script src="hero-varieties.js?v=2" defer></script>
 <script src="cart-preview.js?v=20" defer></script>
 
 </head>
 <body>
 <main id="top">
-  <div class="site-hero" id="hero">
+  <div class="site-hero" id="hero" data-hero-variety="broccoli">
     <header class="comp-nav">
       <a href="#top" class="wordmark">MicroSprouts</a>
       <nav aria-label="Main navigation">
@@ -55,16 +55,16 @@
       </div>
 
       <div class="product-panel" id="hero-variety-panel">
-        <nav class="hero-variety-nav" aria-label="Browse sprout varieties">
-          <button type="button" class="hero-variety-arrow" id="hero-variety-prev" aria-label="Previous sprout variety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-          <span class="hero-variety-index" id="hero-variety-index" aria-live="polite" aria-atomic="true">01 / 08</span>
-          <button type="button" class="hero-variety-arrow" id="hero-variety-next" aria-label="Next sprout variety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-        </nav>
         <div class="hero-variety-slide" id="hero-variety-slide">
           <h1 id="product-heading">Broccoli Sprouts</h1>
         <p class="tagline">Freshly grown in London</p>
         <p class="description">Grown with love and care. Naturally contains glucoraphanin, the precursor to sulforaphane.</p>
         <div class="package-options" id="hero-package-options" aria-label="Choose your broccoli sprouts pack">
+        <nav class="hero-variety-nav" aria-label="Browse sprout varieties">
+          <button type="button" class="hero-variety-arrow" id="hero-variety-prev" aria-label="Previous sprout variety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span class="hero-variety-index" id="hero-variety-index" aria-live="polite" aria-atomic="true">01 / 08</span>
+          <button type="button" class="hero-variety-arrow" id="hero-variety-next" aria-label="Next sprout variety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+        </nav>
           <button type="button" class="package-option" data-pack="200" aria-pressed="true">
             <span class="radio-circle" aria-hidden="true"></span>
             <span class="package-info"><strong class="package-grams">200g</strong><span class="package-title">Single Pack</span><strong class="package-price">£9.99</strong></span>

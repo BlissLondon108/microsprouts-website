@@ -234,10 +234,20 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
- html.includes('href="hero-varieties.css?v=1"')&&
- html.includes('src="hero-varieties.js?v=1" defer')&&
+ html.includes('href="hero-varieties.css?v=2"')&&
+ html.includes('src="hero-varieties.js?v=2" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
+ html.includes('data-hero-variety="broccoli"')&&
+ html.indexOf('id="hero-package-options"')<html.indexOf('id="hero-variety-prev"')&&
+ html.indexOf('id="hero-variety-next"')<html.indexOf('data-pack="200"')&&
+ read("hero-varieties.css").includes('#hero-package-options{position:relative;padding-top:42px}')&&
+ read("hero-varieties.css").includes('position:absolute;top:0;left:50%;transform:translateX(-50%)')&&
+ read("hero-varieties.css").includes('width:42px;height:42px;padding:0')&&
+ read("hero-varieties.js").includes('heroRoot.dataset.heroVariety=item[0]')&&
+ !read("hero-varieties.js").includes("pointerdown")&&
+ !read("hero-varieties.js").includes("pointerup")&&
+ ['radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>read("hero-varieties.css").includes('.site-hero[data-hero-variety="'+slug+'"]'))&&
  read("hero-varieties.js").includes("select(current+1,1)")&&
  app.includes("window.MicroHeroVarieties?.onPack?.(pack)")&&
  read("hero-varieties.css").includes('.hero-variety-slide.is-leaving-next')&&

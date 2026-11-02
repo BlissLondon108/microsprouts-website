@@ -14,6 +14,7 @@
   ['green-pea','Green Pea','Sweet, fresh pea shoots that add colour and a delicate crunch to your plate.']
  ];
  const photo=$('hero-photo'),frame=document.querySelector('.gallery-main'),gallery=$('hero-product-gallery');
+ const heroRoot=$('hero');
  const row=$('gallery-thumbs'),originalThumbs=[...document.querySelectorAll('#gallery-thumbs .gallery-thumb')];
  const slide=$('hero-variety-slide'),heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
  const chooser=$('hero-package-options'),checkout=$('checkout-button'),count=$('hero-variety-index');
@@ -56,6 +57,7 @@
  }
  function render(){
   const item=items[current];
+  if(heroRoot)heroRoot.dataset.heroVariety=item[0];
   heading.textContent=item[1]+' Sprouts';desc.textContent=item[2];
   chooser?.setAttribute('aria-label','Choose your '+item[1].toLowerCase()+' sprouts pack');
   if(checkout){
@@ -95,17 +97,5 @@
    imageForCurrent();return true;
   }
  };
- // Swipe only from non-interactive panel space; clicks on pack and checkout
- // buttons remain their own actions, and vertical scrolling remains native.
- const panel=$('hero-variety-panel');let start=null;
- panel?.addEventListener('pointerdown',event=>{
-  if(event.target.closest('button,a,input,select'))return;
-  start={id:event.pointerId,x:event.clientX,y:event.clientY};
- });
- panel?.addEventListener('pointerup',event=>{
-  if(!start||event.pointerId!==start.id)return;
-  const dx=event.clientX-start.x,dy=event.clientY-start.y;start=null;
-  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)select(current+(dx<0?1:-1),dx<0?1:-1);
- });
- panel?.addEventListener('pointercancel',()=>{start=null});
+ // Variety changes are click-only. Touch/swipe navigation will be designed separately.
 })();
