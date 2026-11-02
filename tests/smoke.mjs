@@ -247,8 +247,8 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  read("hero-varieties.css").includes('#hero-package-options{position:relative}')&&
  !read("hero-varieties.css").includes('padding-top:42px')&&
  html.indexOf('class="delivery-highlights"')>html.indexOf('id="checkout-button"')&&
- (html.match(/£2\.30 UK shipping/g)||[]).length===1&&
- (html.match(/Free collection/g)||[]).length===1&&
+ (html.match(/<\/svg>£2\.30 UK shipping<\/span>/g)||[]).length===1&&
+ (html.match(/<\/svg>Free collection<\/span>/g)||[]).length===1&&
  read("hero-varieties.css").includes('position:absolute;inset:0;z-index:5')&&
  read("hero-varieties.css").includes('width:56px;height:56px;padding:0')&&
  read("hero-varieties.css").includes('.hero-variety-arrow--prev{left:10px}')&&
