@@ -234,16 +234,25 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
- html.includes('href="hero-varieties.css?v=2"')&&
- html.includes('src="hero-varieties.js?v=2" defer')&&
+ html.includes('href="hero-varieties.css?v=3"')&&
+ html.includes('src="hero-varieties.js?v=3" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
  html.includes('data-hero-variety="broccoli"')&&
- html.indexOf('id="hero-package-options"')<html.indexOf('id="hero-variety-prev"')&&
- html.indexOf('id="hero-variety-next"')<html.indexOf('data-pack="200"')&&
+ html.indexOf('id="hero-variety-prev"')<html.indexOf('id="products"')&&
+ html.indexOf('id="hero-variety-next"')<html.indexOf('id="products"')&&
+ html.indexOf('id="hero-variety-prev"')<html.indexOf('id="hero-variety-next"')&&
+ !html.includes('id="hero-variety-index"')&&
+ !read("hero-varieties.js").includes("hero-variety-index")&&
  read("hero-varieties.css").includes('#hero-package-options{position:relative;padding-top:42px}')&&
- read("hero-varieties.css").includes('position:absolute;top:0;left:50%;transform:translateX(-50%)')&&
- read("hero-varieties.css").includes('width:42px;height:42px;padding:0')&&
+ read("hero-varieties.css").includes('position:absolute;inset:0;z-index:5')&&
+ read("hero-varieties.css").includes('width:56px;height:56px;padding:0')&&
+ read("hero-varieties.css").includes('.hero-variety-arrow--prev{left:10px}')&&
+ read("hero-varieties.css").includes('.hero-variety-arrow--next{right:10px}')&&
+ read("hero-varieties.css").includes('#hero-variety-slide #product-heading{')&&
+ read("hero-varieties.css").includes('white-space:nowrap')&&
+ read("hero-varieties.js").includes('heading.style.fontSize=')&&
+ read("hero-varieties.js").includes('fitTitle();')&&
  read("hero-varieties.js").includes('heroRoot.dataset.heroVariety=item[0]')&&
  !read("hero-varieties.js").includes("pointerdown")&&
  !read("hero-varieties.js").includes("pointerup")&&

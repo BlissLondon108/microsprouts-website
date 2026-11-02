@@ -60,34 +60,57 @@
  background:var(--hero-accent,#caeb8e)
 }
 
-/* The arrows occupy the exact 42px previously used above the title.
-   They float in the reserved space above the pack choices instead, so the
-   title rises and the pack / checkout geometry does not move. */
+/* The two controls are independently overlaid on the full-width hero.
+   Left: beside the main photograph. Right: vertically below the trolley,
+   sharing its horizontal centre near the page edge. Neither arrow occupies
+   grid space or changes the position of title, pack or checkout controls. */
+.site-hero{position:relative}
 #hero-package-options{position:relative;padding-top:42px}
 .hero-variety-nav{
- position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:2;
- display:flex;align-items:center;justify-content:center;gap:16px;
- height:42px;margin:0;white-space:nowrap;color:#dcecc5
+ position:absolute;inset:0;z-index:5;
+ pointer-events:none;margin:0;padding:0
 }
 .hero-variety-arrow{
- display:grid;place-items:center;flex:none;
- width:42px;height:42px;padding:0;
- border:1px solid #e1f2d588;border-radius:50%;
- background:#ecf8d91b;color:#f2f8e9;
- transition:background .2s,border-color .2s,transform .2s
+ appearance:none;position:absolute;top:184px;z-index:1;
+ display:grid;place-items:center;
+ width:56px;height:56px;padding:0;
+ border:1.5px solid var(--hero-accent,#e1f1c6);
+ border-radius:50%;
+ background:rgba(7,35,21,.63);color:#fbfff3;
+ box-shadow:0 5px 22px rgba(0,20,11,.32),inset 0 1px 0 rgba(255,255,255,.12);
+ backdrop-filter:blur(6px);
+ pointer-events:auto;cursor:pointer;
+ transition:background .2s,border-color .2s,transform .2s,box-shadow .2s
 }
+.hero-variety-arrow--prev{left:10px}
+.hero-variety-arrow--next{right:10px}
 .hero-variety-arrow:hover,.hero-variety-arrow:focus-visible{
- background:#e2f6d133;border-color:var(--hero-accent,#e1f1c6);
- transform:scale(1.05)
+ background:rgba(17,57,36,.94);
+ box-shadow:0 6px 27px rgba(0,20,11,.36),0 0 0 3px rgba(255,255,255,.12);
+ transform:scale(1.065)
 }
 .hero-variety-arrow svg{
- width:23px;height:23px;fill:none;stroke:currentColor;
- stroke-width:2;stroke-linecap:round;stroke-linejoin:round
+ width:29px;height:29px;fill:none;stroke:currentColor;
+ stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round
 }
-.hero-variety-index{
- min-width:51px;font:650 11px/1.2 Arial,Helvetica,sans-serif;
- text-align:center;letter-spacing:.12em;color:#e6edd7;
- font-variant-numeric:tabular-nums
+/* Fix a single dedicated title line even when a longer variety needs
+   a smaller font. The JS fits to available width without wrapping. */
+#hero-variety-slide #product-heading{
+ white-space:nowrap;
+ height:72px;overflow:visible;
+}
+@media(max-width:1000px){
+ #hero-variety-slide #product-heading{height:58px}
+}
+@media(max-width:770px){
+ .hero-variety-arrow{top:calc(63px + 24vw);width:52px;height:52px}
+ .hero-variety-arrow--prev{left:6px}
+ .hero-variety-arrow--next{right:6px}
+ #hero-variety-slide #product-heading{height:61px}
+}
+@media(max-width:520px){
+ .hero-variety-arrow{top:calc(58px + 20vw)}
+ #hero-variety-slide #product-heading{height:53px}
 }
 .hero-variety-slide{min-width:0;opacity:1;transform:translateX(0);transition:transform .26s cubic-bezier(.2,.8,.25,1),opacity .26s ease}
 .hero-variety-slide.is-leaving-next{opacity:0;transform:translateX(-25px)}
@@ -105,5 +128,5 @@
 .banner{grid-template-columns:minmax(0,34%) minmax(0,1fr);gap:clamp(22px,4.8vw,74px)}
 .banner p{max-width:480px}
 @media(max-width:770px){.banner{grid-template-columns:minmax(0,43%) minmax(0,1fr);gap:18px}}
-@media(max-width:520px){.banner{grid-template-columns:1fr;gap:12px}.banner p{max-width:none}.hero-variety-preview__name{font-size:9px}.gallery-thumbs.is-variety-previews .hero-variety-preview img{padding:3px 4px 0;height:76%}.hero-variety-arrow{width:42px;height:42px}}
+@media(max-width:520px){.banner{grid-template-columns:1fr;gap:12px}.banner p{max-width:none}.hero-variety-preview__name{font-size:9px}.gallery-thumbs.is-variety-previews .hero-variety-preview img{padding:3px 4px 0;height:76%}}
 @media(prefers-reduced-motion:reduce){.hero-variety-slide,.hero-variety-arrow{transition:none}}

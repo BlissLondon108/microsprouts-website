@@ -17,7 +17,7 @@
  const heroRoot=$('hero');
  const row=$('gallery-thumbs'),originalThumbs=[...document.querySelectorAll('#gallery-thumbs .gallery-thumb')];
  const slide=$('hero-variety-slide'),heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
- const chooser=$('hero-package-options'),checkout=$('checkout-button'),count=$('hero-variety-index');
+ const chooser=$('hero-package-options'),checkout=$('checkout-button');
  const path=slug=>'assets/sprout-orbs/'+slug+'.webp';
  const packs={'200':['Single Pack','assets/single-ornate-wide-v1.svg'],'500':['Family Pack','assets/family-ornate-wide-v1.svg']};
  let current=0,pack='200',photoRequest=0,slideTimer=null;
@@ -55,16 +55,30 @@
    row.appendChild(button);
   }
  }
+ function fitTitle(){
+  if(!heading)return;
+  // Preserve the intended headline size for short names. Reduce only when
+  // a longer sprout title would exceed its available single line.
+  heading.style.fontSize='';
+  const width=heading.clientWidth;
+  const full=heading.scrollWidth;
+  if(width>0&&full>width){
+   const baseSize=parseFloat(window.getComputedStyle(heading).fontSize);
+   if(Number.isFinite(baseSize)&&baseSize>0){
+    heading.style.fontSize=Math.max(18,Math.floor(baseSize*(width-5)/full))+'px';
+   }
+  }
+ }
+ window.addEventListener('resize',fitTitle);
  function render(){
   const item=items[current];
   if(heroRoot)heroRoot.dataset.heroVariety=item[0];
-  heading.textContent=item[1]+' Sprouts';desc.textContent=item[2];
+  heading.textContent=item[1]+' Sprouts';fitTitle();desc.textContent=item[2];
   chooser?.setAttribute('aria-label','Choose your '+item[1].toLowerCase()+' sprouts pack');
   if(checkout){
    checkout.dataset.variety=item[0];checkout.dataset.pack=pack;
    checkout.setAttribute('aria-label','Open shopping basket for '+item[1]+' sprouts, '+packs[pack][0]);
   }
-  count.textContent=String(current+1).padStart(2,'0')+' / '+String(items.length).padStart(2,'0');
   imageForCurrent();previewButtons();
  }
  function select(index,dir=1){
