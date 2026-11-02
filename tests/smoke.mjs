@@ -234,7 +234,7 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
- html.includes('href="hero-varieties.css?v=3"')&&
+ html.includes('href="hero-varieties.css?v=4"')&&
  html.includes('src="hero-varieties.js?v=4" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
@@ -244,7 +244,11 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.indexOf('id="hero-variety-prev"')<html.indexOf('id="hero-variety-next"')&&
  !html.includes('id="hero-variety-index"')&&
  !read("hero-varieties.js").includes("hero-variety-index")&&
- read("hero-varieties.css").includes('#hero-package-options{position:relative;padding-top:42px}')&&
+ read("hero-varieties.css").includes('#hero-package-options{position:relative}')&&
+ !read("hero-varieties.css").includes('padding-top:42px')&&
+ html.indexOf('class="delivery-highlights"')>html.indexOf('id="checkout-button"')&&
+ (html.match(/£2\.30 UK shipping/g)||[]).length===1&&
+ (html.match(/Free collection/g)||[]).length===1&&
  read("hero-varieties.css").includes('position:absolute;inset:0;z-index:5')&&
  read("hero-varieties.css").includes('width:56px;height:56px;padding:0')&&
  read("hero-varieties.css").includes('.hero-variety-arrow--prev{left:10px}')&&

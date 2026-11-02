@@ -65,7 +65,7 @@
    sharing its horizontal centre near the page edge. Neither arrow occupies
    grid space or changes the position of title, pack or checkout controls. */
 .site-hero{position:relative}
-#hero-package-options{position:relative;padding-top:42px}
+#hero-package-options{position:relative}
 .hero-variety-nav{
  position:absolute;inset:0;z-index:5;
  pointer-events:none;margin:0;padding:0
