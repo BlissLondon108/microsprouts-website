@@ -234,8 +234,8 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
- html.includes('href="hero-varieties.css?v=6"')&&
- html.includes('src="hero-varieties.js?v=5" defer')&&
+ html.includes('href="hero-varieties.css?v=7"')&&
+ html.includes('src="hero-varieties.js?v=6" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
  html.includes('data-hero-variety="broccoli"')&&
@@ -261,16 +261,23 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  !read("hero-varieties.js").includes('heroRoot.dataset.heroVariety=item[0]')&&
  !read("hero-varieties.css").includes('[data-hero-variety="radish"]')&&
  !read("hero-varieties.css").includes('--hero-glow:')&&
+ read("hero-varieties.css").includes('.site-hero .hero-variety-carousel-track{')&&
+ read("hero-varieties.css").includes('will-change:transform;transform:translate3d(0,0,0)')&&
  read("hero-varieties.css").includes('.site-hero .hero-variety-ghost{')&&
  read("hero-varieties.js").includes('content.cloneNode(true)')&&
- read("hero-varieties.js").includes('outgoing.inert=true')&&
- read("hero-varieties.js").includes('Promise.allSettled([exit.finished,entry.finished]).then(finish)')&&
- read("hero-varieties.js").includes("preload.onload=()=>moveShowcase(target,dir,true)")&&
- read("hero-varieties.js").includes('render(preloaded)')&&
+ read("hero-varieties.js").includes('copy.inert=true')&&
+ read("hero-varieties.js").includes("track.append(incoming,outgoing)")&&
+ read("hero-varieties.js").includes("track.append(outgoing,incoming)")&&
+ read("hero-varieties.js").includes("duration:900")&&
+ read("hero-varieties.js").includes("animation.finished.then(finish,finish)")&&
+ read("hero-varieties.js").includes("content.style.visibility='hidden'")&&
+ read("hero-varieties.js").includes("content.style.visibility=oldVisibility")&&
+ read("hero-varieties.js").includes("Promise.allSettled([...new Set(urls)]")&&
+ read("hero-varieties.js").includes("render(preloaded)")&&
  read("hero-varieties.js").includes("current=target;render();")&&
  !read("hero-varieties.js").includes("pointerdown")&&
  !read("hero-varieties.js").includes("pointerup")&&
- read("hero-varieties.css").includes('.hero-variety-ghost .product-panel h1{white-space:nowrap;height:72px}')&&
+ read("hero-varieties.css").includes('.hero-variety-ghost .product-panel h1{white-space:nowrap;height:72px;overflow:visible}')&&
  read("hero-varieties.css").includes('.hero-variety-ghost .product-panel .description{min-height:4.5em}')&&
  read("hero-varieties.css").includes('.site-hero #products{position:relative;z-index:1}')&&
  read("hero-varieties.js").includes("select(current+1,1)")&&

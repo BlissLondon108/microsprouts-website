@@ -53,7 +53,7 @@
    button.type='button';button.className='gallery-thumb hero-variety-preview';
    button.setAttribute('aria-label','Choose '+entry[1]+' sprouts');
    button.setAttribute('aria-pressed',String(i===current));
-   const image=document.createElement('img');image.src=path(entry[0]);image.alt='';image.loading='lazy';
+   const image=document.createElement('img');image.src=path(entry[0]);image.alt='';image.loading='eager';
    const caption=document.createElement('span');caption.className='hero-variety-preview__name';caption.textContent=entry[1];
    button.append(image,caption);
    button.addEventListener('click',()=>select(i,i<current?-1:1));
@@ -85,55 +85,75 @@
   }
   imageForCurrent(preloaded);previewButtons();
  }
- /* Create an inert picture of the outgoing two-column showcase,
-    then slide it off while the new complete showcase enters beside it.
-    The fixed navbar, green frame and overlay arrows never move. */
+ /* Both showcase slides live in one fixed-size track. Moving one track
+    avoids the old two-animation race that caused a visible snap/jitter.
+    Live checkout remains in the DOM but is concealed during the motion. */
+ function snapshot(){
+  const copy=content.cloneNode(true);
+  copy.removeAttribute('id');
+  copy.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+  copy.setAttribute('aria-hidden','true');
+  copy.inert=true;
+  copy.classList.add('hero-variety-ghost');
+  return copy;
+ }
  function moveShowcase(target,dir,preloaded){
   if(!content||!heroRoot||!content.animate){
    current=target;render(preloaded);transitioning=false;
    arrows.forEach(button=>button.disabled=false);
    return;
   }
-  const oldRect=content.getBoundingClientRect();
-  const hostRect=heroRoot.getBoundingClientRect();
-  const outgoing=content.cloneNode(true);
-  outgoing.removeAttribute('id');
-  outgoing.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
-  outgoing.setAttribute('aria-hidden','true');
-  outgoing.inert=true;
-  outgoing.classList.add('hero-variety-ghost');
-  outgoing.style.left=(oldRect.left-hostRect.left)+'px';
-  outgoing.style.top=(oldRect.top-hostRect.top)+'px';
-  outgoing.style.width=oldRect.width+'px';
-  outgoing.style.height=oldRect.height+'px';
-  heroRoot.appendChild(outgoing);
-  current=target;render(preloaded);
-  const distance=oldRect.width;
-  const step=dir<0?-1:1;
-  const settings={duration:480,easing:'cubic-bezier(.22,.76,.22,1)',fill:'both'};
-  // Hold enough room for both content states during the slide.
+  const previous=content.getBoundingClientRect();
+  const container=heroRoot.getBoundingClientRect();
+  const outgoing=snapshot();
+  const oldVisibility=content.style.visibility;
   const oldMinHeight=content.style.minHeight;
-  content.style.minHeight=Math.max(oldRect.height,content.getBoundingClientRect().height)+'px';
+  const oldInert=content.inert;
+  current=target;
+  render(preloaded);
+  const incoming=snapshot();
+  const requiredHeight=Math.max(previous.height,content.getBoundingClientRect().height);
+  content.style.minHeight=requiredHeight+'px';
+  content.style.visibility='hidden';
   content.inert=true;
-  let exit,entry;
+  const viewport=document.createElement('div');
+  viewport.className='hero-variety-carousel-viewport';
+  viewport.setAttribute('aria-hidden','true');
+  viewport.inert=true;
+  viewport.style.left=(previous.left-container.left)+'px';
+  viewport.style.top=(previous.top-container.top)+'px';
+  viewport.style.width=previous.width+'px';
+  viewport.style.height=requiredHeight+'px';
+  const track=document.createElement('div');
+  track.className='hero-variety-carousel-track';
+  if(dir<0)track.append(incoming,outgoing);
+  else track.append(outgoing,incoming);
+  viewport.appendChild(track);
+  heroRoot.classList.add('is-hero-moving');
+  heroRoot.appendChild(viewport);
+
+  const distance=previous.width;
+  const start=dir<0?-distance:0;
+  const end=dir<0?0:-distance;
+  const options={duration:900,easing:'cubic-bezier(.38,0,.22,1)',fill:'both'};
+  let done=false;
   const finish=()=>{
-   outgoing.remove();
-   content.inert=false;
+   if(done)return;done=true;
+   viewport.remove();
+   content.style.visibility=oldVisibility;
    content.style.minHeight=oldMinHeight;
+   content.inert=oldInert;
+   heroRoot.classList.remove('is-hero-moving');
    transitioning=false;
    arrows.forEach(button=>button.disabled=false);
   };
   try{
-   exit=outgoing.animate([
-    {transform:'translateX(0px)'},
-    {transform:'translateX('+(-step*distance)+'px)'}
-   ],settings);
-   entry=content.animate([
-    {transform:'translateX('+(step*distance)+'px)'},
-    {transform:'translateX(0px)'}
-   ],settings);
-  }catch{finish();return}
-  Promise.allSettled([exit.finished,entry.finished]).then(finish);
+   const animation=track.animate([
+    {transform:'translate3d('+start+'px,0,0)'},
+    {transform:'translate3d('+end+'px,0,0)'}
+   ],options);
+   animation.finished.then(finish,finish);
+  }catch{finish()}
  }
  function select(index,dir=1){
   const target=(index+items.length)%items.length;
@@ -144,12 +164,18 @@
   }
   transitioning=true;
   arrows.forEach(button=>button.disabled=true);
-  // Preload the incoming picture so the entire new slide is ready
-  // before its coordinated movement begins.
-  const preload=new Image();
-  preload.onload=()=>moveShowcase(target,dir,true);
-  preload.onerror=()=>moveShowcase(target,dir,false);
-  preload.src=imageSource(target);
+  // The incoming hero photograph and its previews load before movement,
+  // preventing image changes halfway through the visual transition.
+  const urls=[imageSource(target)];
+  if(target!==0){
+   for(const offset of [-1,0,1,2]){
+    urls.push(path(items[(target+offset+items.length)%items.length][0]));
+   }
+  }
+  Promise.allSettled([...new Set(urls)].map(src=>new Promise(resolve=>{
+   const image=new Image();
+   image.onload=resolve;image.onerror=resolve;image.src=src;
+  }))).then(()=>moveShowcase(target,dir,true));
  }
  $('hero-variety-prev')?.addEventListener('click',()=>select(current-1,-1));
  $('hero-variety-next')?.addEventListener('click',()=>select(current+1,1));

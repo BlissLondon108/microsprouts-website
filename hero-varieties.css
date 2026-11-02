@@ -5,14 +5,30 @@
    the surrounding frame. */
 .site-hero{position:relative}
 .site-hero #products{position:relative;z-index:1}
-.site-hero .hero-variety-ghost{
- position:absolute;z-index:2;margin:0;
- pointer-events:none;user-select:none
+.site-hero .hero-variety-carousel-viewport{
+ position:absolute;z-index:2;overflow:hidden;
+ pointer-events:none;user-select:none;contain:paint
 }
-/* Cloned slides have their IDs removed for accessibility and validity.
-   Keep the outgoing headline and description exactly aligned with the
-   original while they move side by side. */
-.hero-variety-ghost .product-panel h1{white-space:nowrap;height:72px}
+.site-hero .hero-variety-carousel-track{
+ display:flex;align-items:flex-start;width:200%;height:100%;
+ will-change:transform;transform:translate3d(0,0,0);
+ backface-visibility:hidden
+}
+.site-hero .hero-variety-ghost{
+ flex:0 0 50%;width:50%;min-width:0;
+ margin:0;padding-top:0;padding-bottom:24px;
+ pointer-events:none;user-select:none;
+ backface-visibility:hidden
+}
+/* Prevent hover-zoom from nudging pictures during a track transition. */
+.site-hero.is-hero-moving .gallery-main img,
+.site-hero.is-hero-moving .gallery-thumb{
+ transform:none!important;transition:none!important
+}
+.site-hero #products{overflow-anchor:none}
+/* The two inert carousel copies have their IDs removed for accessibility.
+   Restore the same heading and description geometry as the live view. */
+.hero-variety-ghost .product-panel h1{white-space:nowrap;height:72px;overflow:visible}
 .hero-variety-ghost .product-panel .description{min-height:4.5em}
 @media(max-width:1000px){.hero-variety-ghost .product-panel h1{height:58px}}
 @media(max-width:770px){.hero-variety-ghost .product-panel h1{height:61px}}
@@ -74,6 +90,7 @@
  #hero-variety-slide #product-heading{height:53px}
 }
 /* Keep the inner panel still. The complete #products grid now animates. */
+/* The real product panel itself never slides independently. */
 .hero-variety-slide{min-width:0}
 .hero-variety-arrow:disabled{cursor:default;opacity:.7}
 #hero-variety-panel .description{min-height:4.5em}
