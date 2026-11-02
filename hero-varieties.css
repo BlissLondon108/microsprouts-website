@@ -1,63 +1,16 @@
 /* The homepage variety chooser is deliberately confined to the hero panel. */
 
-/* Botanical colour stories, restricted to the top product/checkout hero.
-   Deep shades maintain contrast for white type, controls, and the navbar. */
-.site-hero[data-hero-variety="broccoli"]{
- --hero-glow:#0c461c;--hero-mid:#042b12;--hero-deep:#00210b;
- --hero-gallery-glow:#699d6c;--hero-gallery-mid:#205235;
- --hero-accent:#e7ed94
-}
-.site-hero[data-hero-variety="radish"]{
- --hero-glow:#8c4156;--hero-mid:#572b41;--hero-deep:#2b1727;
- --hero-gallery-glow:#cf7991;--hero-gallery-mid:#752b4d;
- --hero-accent:#f5bbc9
-}
-.site-hero[data-hero-variety="mung-bean"]{
- --hero-glow:#777939;--hero-mid:#434e2a;--hero-deep:#252f1b;
- --hero-gallery-glow:#a8b76b;--hero-gallery-mid:#536e3c;
- --hero-accent:#e9e1a1
-}
-.site-hero[data-hero-variety="leek"]{
- --hero-glow:#376c65;--hero-mid:#194940;--hero-deep:#092a29;
- --hero-gallery-glow:#75aca1;--hero-gallery-mid:#306d65;
- --hero-accent:#c6e9da
-}
-.site-hero[data-hero-variety="mustard"]{
- --hero-glow:#8f6c27;--hero-mid:#584119;--hero-deep:#322714;
- --hero-gallery-glow:#d4ac56;--hero-gallery-mid:#99752c;
- --hero-accent:#f7df91
-}
-.site-hero[data-hero-variety="fenugreek"]{
- --hero-glow:#85523a;--hero-mid:#53362d;--hero-deep:#2c201c;
- --hero-gallery-glow:#b4825f;--hero-gallery-mid:#785340;
- --hero-accent:#f1c4a1
-}
-.site-hero[data-hero-variety="alfalfa"]{
- --hero-glow:#4f7b57;--hero-mid:#2b5542;--hero-deep:#17362b;
- --hero-gallery-glow:#8eaf85;--hero-gallery-mid:#4f7855;
- --hero-accent:#dcebbb
-}
-.site-hero[data-hero-variety="green-pea"]{
- --hero-glow:#387a46;--hero-mid:#205e38;--hero-deep:#0b3923;
- --hero-gallery-glow:#7ac079;--hero-gallery-mid:#367b4c;
- --hero-accent:#d5efab
-}
-.site-hero{
- background:radial-gradient(ellipse at 32% 38%,
-   var(--hero-glow,#0c461c) 0%,var(--hero-mid,#042b12) 48%,
-   var(--hero-deep,#00210b) 100%)
+/* All eight varieties share the original broccoli-green hero background.
+   The image and checkout panel travel together, rather than recolouring
+   the surrounding frame. */
+.site-hero{position:relative}
+.site-hero #products{position:relative;z-index:1}
+.site-hero .hero-variety-ghost{
+ position:absolute;z-index:2;margin:0;
+ pointer-events:none;user-select:none
 }
 .site-hero .gallery-main.is-variety-view{
- background:radial-gradient(ellipse at 52% 33%,
-   var(--hero-gallery-glow,#699d6c) 0%,
-   var(--hero-gallery-mid,#205235) 53%,var(--hero-deep,#082c1b) 100%)
-}
-.site-hero .package-option[aria-pressed="true"]{
- border-color:var(--hero-accent,#e7ed94);
- box-shadow:0 0 0 1px var(--hero-accent,#e7ed94)
-}
-.site-hero .package-option[aria-pressed="true"] .radio-circle::after{
- background:var(--hero-accent,#caeb8e)
+ background:radial-gradient(ellipse at 52% 33%,#699d6c 0%,#205235 53%,#082c1b 100%)
 }
 
 /* The two controls are independently overlaid on the full-width hero.
@@ -112,11 +65,9 @@
  .hero-variety-arrow{top:calc(58px + 20vw)}
  #hero-variety-slide #product-heading{height:53px}
 }
-.hero-variety-slide{min-width:0;opacity:1;transform:translateX(0);transition:transform .26s cubic-bezier(.2,.8,.25,1),opacity .26s ease}
-.hero-variety-slide.is-leaving-next{opacity:0;transform:translateX(-25px)}
-.hero-variety-slide.is-leaving-prev{opacity:0;transform:translateX(25px)}
-.hero-variety-slide.is-entering-next{opacity:0;transform:translateX(25px)}
-.hero-variety-slide.is-entering-prev{opacity:0;transform:translateX(-25px)}
+/* Keep the inner panel still. The complete #products grid now animates. */
+.hero-variety-slide{min-width:0}
+.hero-variety-arrow:disabled{cursor:default;opacity:.7}
 #hero-variety-panel .description{min-height:4.5em}
 .gallery-main.is-variety-view{background:radial-gradient(ellipse at 52% 33%,#699d6c 0%,#205235 53%,#082c1b 100%)}
 .gallery-main img.is-variety-photo{object-fit:contain;object-position:center;padding:15px 8% 18px;filter:drop-shadow(0 13px 19px rgba(1,21,12,.3))}
@@ -129,4 +80,4 @@
 .banner p{max-width:480px}
 @media(max-width:770px){.banner{grid-template-columns:minmax(0,43%) minmax(0,1fr);gap:18px}}
 @media(max-width:520px){.banner{grid-template-columns:1fr;gap:12px}.banner p{max-width:none}.hero-variety-preview__name{font-size:9px}.gallery-thumbs.is-variety-previews .hero-variety-preview img{padding:3px 4px 0;height:76%}}
-@media(prefers-reduced-motion:reduce){.hero-variety-slide,.hero-variety-arrow{transition:none}}
+@media(prefers-reduced-motion:reduce){.hero-variety-arrow{transition:none}}

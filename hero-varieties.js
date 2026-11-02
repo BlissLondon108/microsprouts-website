@@ -14,26 +14,31 @@
   ['green-pea','Green Pea','Sweet, fresh pea shoots that add colour and a delicate crunch to your plate.']
  ];
  const photo=$('hero-photo'),frame=document.querySelector('.gallery-main'),gallery=$('hero-product-gallery');
- const heroRoot=$('hero');
+ const heroRoot=$('hero'),content=$('products');
+ const arrows=[$('hero-variety-prev'),$('hero-variety-next')].filter(Boolean);
  const row=$('gallery-thumbs'),originalThumbs=[...document.querySelectorAll('#gallery-thumbs .gallery-thumb')];
- const slide=$('hero-variety-slide'),heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
+ const heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
  const chooser=$('hero-package-options'),checkout=$('checkout-button');
  const path=slug=>'assets/sprout-orbs/'+slug+'.webp';
  const packs={'200':['Single Pack','assets/single-ornate-wide-v1.svg'],'500':['Family Pack','assets/family-ornate-wide-v1.svg']};
- let current=0,pack='200',photoRequest=0,slideTimer=null;
+ let current=0,pack='200',photoRequest=0,transitioning=false;
  const reduced=()=>Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
- function imageForCurrent(){
+ const imageSource=index=>index===0?packs[pack][1]:path(items[index][0]);
+ function imageForCurrent(preloaded=false){
   const item=items[current],broccoli=current===0;
-  const src=broccoli?packs[pack][1]:path(item[0]);
+  const src=imageSource(current);
   const alt=broccoli?'Fresh broccoli sprouts on a porcelain plate, '+packs[pack][0]:'Fresh '+item[1].toLowerCase()+' sprouts';
-  const token=++photoRequest, image=new Image();
-  image.onload=()=>{
+  const token=++photoRequest;
+  const apply=()=>{
    if(token!==photoRequest||!photo)return;
    photo.src=src;photo.alt=alt;
    photo.classList.toggle('is-pack-photo',broccoli);
    photo.classList.toggle('is-variety-photo',!broccoli);
    frame?.classList.toggle('is-variety-view',!broccoli);
   };
+  if(preloaded){apply();return}
+  const image=new Image();
+  image.onload=apply;
   image.src=src;
  }
  function previewButtons(){
@@ -70,32 +75,81 @@
   }
  }
  window.addEventListener('resize',fitTitle);
- function render(){
+ function render(preloaded=false){
   const item=items[current];
-  if(heroRoot)heroRoot.dataset.heroVariety=item[0];
   heading.textContent=item[1]+' Sprouts';fitTitle();desc.textContent=item[2];
   chooser?.setAttribute('aria-label','Choose your '+item[1].toLowerCase()+' sprouts pack');
   if(checkout){
    checkout.dataset.variety=item[0];checkout.dataset.pack=pack;
    checkout.setAttribute('aria-label','Open shopping basket for '+item[1]+' sprouts, '+packs[pack][0]);
   }
-  imageForCurrent();previewButtons();
+  imageForCurrent(preloaded);previewButtons();
+ }
+ /* Create an inert picture of the outgoing two-column showcase,
+    then slide it off while the new complete showcase enters beside it.
+    The fixed navbar, green frame and overlay arrows never move. */
+ function moveShowcase(target,dir,preloaded){
+  if(!content||!heroRoot||!content.animate){
+   current=target;render(preloaded);transitioning=false;
+   arrows.forEach(button=>button.disabled=false);
+   return;
+  }
+  const oldRect=content.getBoundingClientRect();
+  const hostRect=heroRoot.getBoundingClientRect();
+  const outgoing=content.cloneNode(true);
+  outgoing.removeAttribute('id');
+  outgoing.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+  outgoing.setAttribute('aria-hidden','true');
+  outgoing.inert=true;
+  outgoing.classList.add('hero-variety-ghost');
+  outgoing.style.left=(oldRect.left-hostRect.left)+'px';
+  outgoing.style.top=(oldRect.top-hostRect.top)+'px';
+  outgoing.style.width=oldRect.width+'px';
+  outgoing.style.height=oldRect.height+'px';
+  heroRoot.appendChild(outgoing);
+  current=target;render(preloaded);
+  const distance=oldRect.width;
+  const step=dir<0?-1:1;
+  const settings={duration:480,easing:'cubic-bezier(.22,.76,.22,1)',fill:'both'};
+  // Hold enough room for both content states during the slide.
+  const oldMinHeight=content.style.minHeight;
+  content.style.minHeight=Math.max(oldRect.height,content.getBoundingClientRect().height)+'px';
+  content.inert=true;
+  let exit,entry;
+  const finish=()=>{
+   outgoing.remove();
+   content.inert=false;
+   content.style.minHeight=oldMinHeight;
+   transitioning=false;
+   arrows.forEach(button=>button.disabled=false);
+  };
+  try{
+   exit=outgoing.animate([
+    {transform:'translateX(0px)'},
+    {transform:'translateX('+(-step*distance)+'px)'}
+   ],settings);
+   entry=content.animate([
+    {transform:'translateX('+(step*distance)+'px)'},
+    {transform:'translateX(0px)'}
+   ],settings);
+  }catch{finish();return}
+  Promise.allSettled([exit.finished,entry.finished]).then(finish);
  }
  function select(index,dir=1){
   const target=(index+items.length)%items.length;
-  if(target===current&&!slideTimer)return;
-  current=target;
-  if(slideTimer){clearTimeout(slideTimer);slideTimer=null}
-  if(!slide||reduced()){render();return}
-  slide.classList.remove('is-entering-next','is-entering-prev','is-leaving-next','is-leaving-prev');
-  slide.classList.add(dir<0?'is-leaving-prev':'is-leaving-next');
-  slideTimer=setTimeout(()=>{
-   slide.classList.remove('is-leaving-next','is-leaving-prev');
-   const entering=dir<0?'is-entering-prev':'is-entering-next';
-   slide.classList.add(entering);render();
-   requestAnimationFrame(()=>requestAnimationFrame(()=>slide.classList.remove(entering)));
-   slideTimer=null;
-  },145);
+  if(target===current||transitioning)return;
+  if(reduced()){
+   current=target;render();
+   return;
+  }
+  transitioning=true;
+  arrows.forEach(button=>button.disabled=true);
+  // Preload the incoming picture so the entire new slide is ready
+  // before its coordinated movement begins.
+  const preload=new Image();
+  preload.onload=()=>moveShowcase(target,dir,true);
+  preload.onerror=()=>moveShowcase(target,dir,false);
+  preload.src=imageSource(target);
  }
  $('hero-variety-prev')?.addEventListener('click',()=>select(current-1,-1));
  $('hero-variety-next')?.addEventListener('click',()=>select(current+1,1));

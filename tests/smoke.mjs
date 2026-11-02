@@ -234,8 +234,8 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
- html.includes('href="hero-varieties.css?v=4"')&&
- html.includes('src="hero-varieties.js?v=4" defer')&&
+ html.includes('href="hero-varieties.css?v=5"')&&
+ html.includes('src="hero-varieties.js?v=5" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
  html.includes('data-hero-variety="broccoli"')&&
@@ -258,13 +258,23 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  read("hero-varieties.js").includes('heading.style.fontSize=')&&
  read("hero-varieties.js").includes('fitTitle();')&&
  read('hero-varieties.js').includes('fitTitle();\n // Variety changes are click-only')&&
- read("hero-varieties.js").includes('heroRoot.dataset.heroVariety=item[0]')&&
+ !read("hero-varieties.js").includes('heroRoot.dataset.heroVariety=item[0]')&&
+ !read("hero-varieties.css").includes('[data-hero-variety="radish"]')&&
+ !read("hero-varieties.css").includes('--hero-glow:')&&
+ read("hero-varieties.css").includes('.site-hero .hero-variety-ghost{')&&
+ read("hero-varieties.js").includes('content.cloneNode(true)')&&
+ read("hero-varieties.js").includes('outgoing.inert=true')&&
+ read("hero-varieties.js").includes('Promise.allSettled([exit.finished,entry.finished]).then(finish)')&&
+ read("hero-varieties.js").includes("preload.onload=()=>moveShowcase(target,dir,true)")&&
+ read("hero-varieties.js").includes('render(preloaded)')&&
+ read("hero-varieties.js").includes("current=target;render();")&&
  !read("hero-varieties.js").includes("pointerdown")&&
  !read("hero-varieties.js").includes("pointerup")&&
  ['radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>read("hero-varieties.css").includes('.site-hero[data-hero-variety="'+slug+'"]'))&&
  read("hero-varieties.js").includes("select(current+1,1)")&&
  app.includes("window.MicroHeroVarieties?.onPack?.(pack)")&&
- read("hero-varieties.css").includes('.hero-variety-slide.is-leaving-next')&&
+ !read("hero-varieties.css").includes('.hero-variety-slide.is-leaving-next')&&
+ read("hero-varieties.css").includes('.hero-variety-slide{min-width:0}')&&
  read("hero-varieties.css").includes('.banner{grid-template-columns:')&&
  (()=>{try{new vm.Script(read("hero-varieties.js"));return true}catch{return false}})());
 
