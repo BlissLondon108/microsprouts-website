@@ -9,6 +9,14 @@
  position:absolute;z-index:2;margin:0;
  pointer-events:none;user-select:none
 }
+/* Cloned slides have their IDs removed for accessibility and validity.
+   Keep the outgoing headline and description exactly aligned with the
+   original while they move side by side. */
+.hero-variety-ghost .product-panel h1{white-space:nowrap;height:72px}
+.hero-variety-ghost .product-panel .description{min-height:4.5em}
+@media(max-width:1000px){.hero-variety-ghost .product-panel h1{height:58px}}
+@media(max-width:770px){.hero-variety-ghost .product-panel h1{height:61px}}
+@media(max-width:520px){.hero-variety-ghost .product-panel h1{height:53px}}
 .site-hero .gallery-main.is-variety-view{
  background:radial-gradient(ellipse at 52% 33%,#699d6c 0%,#205235 53%,#082c1b 100%)
 }
