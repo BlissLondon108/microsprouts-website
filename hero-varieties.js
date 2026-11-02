@@ -111,5 +111,7 @@
    imageForCurrent();return true;
   }
  };
+ // Fit the initial Broccoli heading too, including on the first mobile render.
+ fitTitle();
  // Variety changes are click-only. Touch/swipe navigation will be designed separately.
 })();

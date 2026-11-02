@@ -235,7 +235,7 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
  html.includes('href="hero-varieties.css?v=3"')&&
- html.includes('src="hero-varieties.js?v=3" defer')&&
+ html.includes('src="hero-varieties.js?v=4" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
  html.includes('data-hero-variety="broccoli"')&&
@@ -253,6 +253,7 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  read("hero-varieties.css").includes('white-space:nowrap')&&
  read("hero-varieties.js").includes('heading.style.fontSize=')&&
  read("hero-varieties.js").includes('fitTitle();')&&
+ read('hero-varieties.js').includes('fitTitle();\n // Variety changes are click-only')&&
  read("hero-varieties.js").includes('heroRoot.dataset.heroVariety=item[0]')&&
  !read("hero-varieties.js").includes("pointerdown")&&
  !read("hero-varieties.js").includes("pointerup")&&
