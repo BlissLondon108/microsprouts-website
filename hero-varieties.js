@@ -20,6 +20,14 @@
  const heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
  const chooser=$('hero-package-options'),checkout=$('checkout-button');
  const path=slug=>'assets/sprout-orbs/'+slug+'.webp';
+ const galleryPath=(slug,stage)=>'assets/variety-gallery/'+slug+'-'+stage+'.webp';
+ // The four photo slots follow the approved broccoli gallery's progression.
+ const galleryStages=[
+  ['seeds','Seeds before sprouting'],
+  ['sprouting','Seeds beginning to sprout'],
+  ['closeup','Mature sprouts close-up'],
+  ['serving','A fresh serving idea']
+ ];
  const packs={'200':['Single Pack','assets/single-ornate-wide-v1.svg'],'500':['Family Pack','assets/family-ornate-wide-v1.svg']};
  let current=0,pack='200',photoRequest=0,transitioning=false;
  const reduced=()=>Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
@@ -34,29 +42,56 @@
    photo.src=src;photo.alt=alt;
    photo.classList.toggle('is-pack-photo',broccoli);
    photo.classList.toggle('is-variety-photo',!broccoli);
+   photo.classList.remove('is-variety-detail-photo');
    frame?.classList.toggle('is-variety-view',!broccoli);
+   frame?.classList.remove('is-variety-detail-view');
+   frame?.style.removeProperty('--variety-detail-image');
   };
   if(preloaded){apply();return}
   const image=new Image();
   image.onload=apply;
   image.src=src;
  }
+ function showVarietyDetail(src,description,selected){
+  const token=++photoRequest;
+  const image=new Image();
+  image.onload=()=>{
+   // Navigating to another sprout invalidates the previous image request.
+   if(token!==photoRequest||current===0||!photo)return;
+   photo.src=src;
+   photo.alt=items[current][1]+' sprouts: '+description.toLowerCase();
+   photo.classList.remove('is-pack-photo');
+   photo.classList.add('is-variety-photo','is-variety-detail-photo');
+   frame?.classList.add('is-variety-view','is-variety-detail-view');
+   frame?.style.setProperty('--variety-detail-image','url("'+src+'")');
+   row?.querySelectorAll('.hero-variety-preview').forEach(
+    button=>button.setAttribute('aria-pressed',String(button===selected))
+   );
+  };
+  image.src=src;
+ }
  function previewButtons(){
   if(!row)return;
   row.querySelectorAll('.hero-variety-preview').forEach(button=>button.remove());
-  originalThumbs.forEach(button=>{button.hidden=current!==0;if(current!==0)button.setAttribute('aria-pressed','false')});
+  originalThumbs.forEach(button=>{
+   button.hidden=current!==0;
+   if(current!==0)button.setAttribute('aria-pressed','false');
+  });
   row.classList.toggle('is-variety-previews',current!==0);
   gallery?.setAttribute('aria-label',items[current][1]+' sprouts gallery');
   if(current===0)return;
-  for(const delta of [-1,0,1,2]){
-   const i=(current+delta+items.length)%items.length,entry=items[i],button=document.createElement('button');
-   button.type='button';button.className='gallery-thumb hero-variety-preview';
-   button.setAttribute('aria-label','Choose '+entry[1]+' sprouts');
-   button.setAttribute('aria-pressed',String(i===current));
-   const image=document.createElement('img');image.src=path(entry[0]);image.alt='';image.loading='eager';
-   const caption=document.createElement('span');caption.className='hero-variety-preview__name';caption.textContent=entry[1];
-   button.append(image,caption);
-   button.addEventListener('click',()=>select(i,i<current?-1:1));
+  const item=items[current];
+  for(const [stage,description] of galleryStages){
+   const src=galleryPath(item[0],stage);
+   const button=document.createElement('button');
+   button.type='button';
+   button.className='gallery-thumb hero-variety-preview';
+   button.setAttribute('aria-label','View '+item[1]+' sprouts: '+description.toLowerCase());
+   button.setAttribute('aria-pressed','false');
+   const image=document.createElement('img');
+   image.src=src;image.alt='';image.loading='eager';image.decoding='async';
+   button.appendChild(image);
+   button.addEventListener('click',()=>showVarietyDetail(src,description,button));
    row.appendChild(button);
   }
  }
@@ -168,8 +203,8 @@
   // preventing image changes halfway through the visual transition.
   const urls=[imageSource(target)];
   if(target!==0){
-   for(const offset of [-1,0,1,2]){
-    urls.push(path(items[(target+offset+items.length)%items.length][0]));
+   for(const [stage] of galleryStages){
+    urls.push(galleryPath(items[target][0],stage));
    }
   }
   Promise.allSettled([...new Set(urls)].map(src=>new Promise(resolve=>{
@@ -187,8 +222,10 @@
     checkout.dataset.pack=pack;
     checkout.setAttribute('aria-label','Open shopping basket for '+items[current][1]+' sprouts, '+packs[pack][0]);
    }
+   // Pack-size selection doesn't replace a manually chosen variety photo.
+   // Broccoli retains its existing pack-specific photograph handling.
    if(current===0)return false;
-   imageForCurrent();return true;
+   return true;
   }
  };
  // Fit the initial Broccoli heading too, including on the first mobile render.

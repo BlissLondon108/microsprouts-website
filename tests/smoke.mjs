@@ -234,8 +234,8 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
- html.includes('href="hero-varieties.css?v=7"')&&
- html.includes('src="hero-varieties.js?v=6" defer')&&
+ html.includes('href="hero-varieties.css?v=8"')&&
+ html.includes('src="hero-varieties.js?v=7" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
  html.includes('data-hero-variety="broccoli"')&&
@@ -286,6 +286,20 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  read("hero-varieties.css").includes('.hero-variety-slide{min-width:0}')&&
  read("hero-varieties.css").includes('.banner{grid-template-columns:')&&
  (()=>{try{new vm.Script(read("hero-varieties.js"));return true}catch{return false}})());
+
+check("Seven distinct sprout galleries contain four correct local stage photos",
+ ['radish','mung-bean','leek','mustard','fenugreek','alfalfa','green-pea'].every(slug=>
+  ['seeds','sprouting','closeup','serving'].every(stage=>
+   fs.existsSync(path.join(root,'assets/variety-gallery/'+slug+'-'+stage+'.webp'))))&&
+ read('hero-varieties.js').includes("galleryPath=(slug,stage)")&&
+ read('hero-varieties.js').includes("for(const [stage,description] of galleryStages)")&&
+ read('hero-varieties.js').includes('showVarietyDetail(src,description,button)')&&
+ read('hero-varieties.js').includes("urls.push(galleryPath(items[target][0],stage))")&&
+ !read('hero-varieties.js').includes('for(const delta of [-1,0,1,2])')&&
+ read('hero-varieties.css').includes('.hero-variety-preview img{width:100%;height:100%;object-fit:cover')&&
+ read('hero-varieties.css').includes('.gallery-main.is-variety-detail-view::before')&&
+ read('hero-varieties.js').includes("if(current===0)return false;")
+);
 
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
