@@ -316,7 +316,7 @@ check("Approved high-resolution Radish and Leek gallery assets are present",
 check("Approved high-resolution mustard gallery images are present",
  ['seeds','sprouting','closeup','serving'].every(stage=>
   fs.statSync(path.join(root,'assets/variety-gallery/mustard-'+stage+'.webp')).size>100000)&&
- read('hero-varieties.js').includes("slug==='mustard'?'?v=6'")&&
+ read('hero-varieties.js').includes("(slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6)")&&
  read('hero-varieties.js').includes("galleryPath(items[target][0],stage)")
 );
 
@@ -325,7 +325,7 @@ check("Approved full-resolution Fenugreek gallery images and cache version",
   const file=fs.readFileSync(path.join(root,'assets/variety-gallery/fenugreek-'+stage+'.webp'));
   return file.length>100000&&file.toString('ascii',0,4)==='RIFF'&&file.toString('ascii',8,12)==='WEBP';
  })&&
- read('hero-varieties.js').includes("slug==='fenugreek'?'?v=6'")&&
+ read('hero-varieties.js').includes("(slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6)")&&
  read('hero-varieties.js').includes("galleryPath(item[0],stage)")&&
  read('hero-varieties.js').includes("galleryPath(items[target][0],stage)")
 );
@@ -335,8 +335,8 @@ check("Mustard soup and Fenugreek salad serving images remain full-width WebP as
   const file=fs.readFileSync(path.join(root,'assets/variety-gallery/'+slug+'-serving.webp'));
   return file.length>140000&&file.toString('ascii',0,4)==='RIFF'&&file.toString('ascii',8,12)==='WEBP';
  })&&
- read('hero-varieties.js').includes("slug==='fenugreek'?'?v=6':slug==='mustard'?'?v=6'")&&
- html.includes('hero-varieties.js?v=12')
+ read('hero-varieties.js').includes("(slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6)")&&
+ html.includes('hero-varieties.js?v=13')
 );
 
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
