@@ -4,20 +4,21 @@
  'use strict';
  const $ = id => document.getElementById(id);
  const items = [
-  ['broccoli','Broccoli','Grown with love and care. Naturally contains glucoraphanin, the precursor to sulforaphane.'],
-  ['radish','Radish','Bright, peppery little greens that bring a lively crunch to everyday meals.'],
-  ['mung-bean','Mung Bean','Juicy and crisp with a gentle nutty flavour. Lovely in noodles and stir-fries.'],
-  ['leek','Leek','Fine green shoots with a savoury, onion-like flavour. A fresh finishing touch.'],
-  ['mustard','Mustard','Zesty sprouts with a distinctive mustardy bite for salads and sandwiches.'],
-  ['fenugreek','Fenugreek','Aromatic, earthy sprouts with a gentle nutty flavour and plenty of character.'],
-  ['alfalfa','Alfalfa','Light, tender shoots with a mild, fresh flavour for wraps, salads and toast.'],
-  ['green-pea','Green Pea','Sweet, fresh pea shoots that add colour and a delicate crunch to your plate.']
+  ['broccoli','Broccoli','Grown with love and care. Naturally contains glucoraphanin, the precursor to sulforaphane.','Fresh, mild and tender'],
+  ['radish','Radish','Bright, peppery little greens that bring a lively crunch to everyday meals.','Crisp with a peppery kick'],
+  ['mung-bean','Mung Bean','Juicy and crisp with a gentle nutty flavour. Lovely in noodles and stir-fries.','Crunchy, juicy and refreshing'],
+  ['leek','Leek','Fine green shoots with a savoury, onion-like flavour. A fresh finishing touch.','A gentle onion-like flavour'],
+  ['mustard','Mustard','Zesty sprouts with a distinctive mustardy bite for salads and sandwiches.','Fresh with a spicy bite'],
+  ['fenugreek','Fenugreek','Aromatic, earthy sprouts with a gentle nutty flavour and plenty of character.','Earthy with a hint of bitterness'],
+  ['alfalfa','Alfalfa','Light, tender shoots with a mild, fresh flavour for wraps, salads and toast.','Light, mild and delicate'],
+  ['green-pea','Green Pea','Sweet, fresh pea shoots that add colour and a delicate crunch to your plate.','Sweet, fresh and crunchy']
  ];
  const photo=$('hero-photo'),frame=document.querySelector('.gallery-main'),gallery=$('hero-product-gallery');
  const heroRoot=$('hero'),content=$('products');
  const arrows=[$('hero-variety-prev'),$('hero-variety-next')].filter(Boolean);
  const row=$('gallery-thumbs'),originalThumbs=[...document.querySelectorAll('#gallery-thumbs .gallery-thumb')];
  const heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
+ const tagline=document.querySelector('#hero-variety-panel .tagline');
  const chooser=$('hero-package-options'),checkout=$('checkout-button');
  const path=slug=>'assets/sprout-orbs/'+slug+'.webp';
  const galleryPath=(slug,stage)=>'assets/variety-gallery/'+slug+'-'+stage+'.webp'+((slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6):slug==='mung-bean'?'?v='+(stage==='serving'?4:2):slug==='alfalfa'?'?v=2':slug==='green-pea'?'?v=2':(slug==='radish'||slug==='leek'?'?v=3':''));
@@ -112,7 +113,9 @@
  window.addEventListener('resize',fitTitle);
  function render(preloaded=false){
   const item=items[current];
-  heading.textContent=item[1]+' Sprouts';fitTitle();desc.textContent=item[2];
+  heading.textContent=item[1]+' Sprouts';fitTitle();
+  if(tagline)tagline.textContent=item[3];
+  desc.textContent=item[2];
   chooser?.setAttribute('aria-label','Choose your '+item[1].toLowerCase()+' sprouts pack');
   if(checkout){
    checkout.dataset.variety=item[0];checkout.dataset.pack=pack;
