@@ -20,7 +20,7 @@
  const heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
  const chooser=$('hero-package-options'),checkout=$('checkout-button');
  const path=slug=>'assets/sprout-orbs/'+slug+'.webp';
- const galleryPath=(slug,stage)=>'assets/variety-gallery/'+slug+'-'+stage+'.webp';
+ const galleryPath=(slug,stage)=>'assets/variety-gallery/'+slug+'-'+stage+'.webp'+(slug==='mung-bean'?'?v=2':'');
  // The four photo slots follow the approved broccoli gallery's progression.
  const galleryStages=[
   ['seeds','Seeds before sprouting'],
@@ -63,7 +63,6 @@
    photo.classList.remove('is-pack-photo');
    photo.classList.add('is-variety-photo','is-variety-detail-photo');
    frame?.classList.add('is-variety-view','is-variety-detail-view');
-   frame?.style.setProperty('--variety-detail-image','url("'+src+'")');
    row?.querySelectorAll('.hero-variety-preview').forEach(
     button=>button.setAttribute('aria-pressed',String(button===selected))
    );
