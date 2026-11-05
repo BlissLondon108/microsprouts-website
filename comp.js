@@ -43,11 +43,9 @@
       // the trigger so the drawer receives the hero's current pack choice.
       checkout.dataset.pack = pack;
     }
-    thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'));
-    // The variety browser owns imagery when a different sprout is selected.
-    if (!window.MicroHeroVarieties?.onPack?.(pack)) {
-      setPhoto(packLabels[pack].image, 'Fresh broccoli sprouts on an ornate cream-and-gold porcelain plate, ' + pack + ' gram ' + packLabels[pack].name + ' option', true);
-    }
+    // Pack selection must not clear the chosen thumbnail or replace the
+    // close-up with the old plate image (even when the variety browser is absent).
+    window.MicroHeroVarieties?.onPack?.(pack);
   }
 
   buttons.forEach(btn => btn.addEventListener('click', () => setPack(btn.dataset.pack)));
