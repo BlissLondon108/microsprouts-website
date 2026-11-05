@@ -235,7 +235,7 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
  html.includes('href="hero-varieties.css?v=9"')&&
- html.includes('src="hero-varieties.js?v=8" defer')&&
+ html.includes('src="hero-varieties.js?v=9" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
  html.includes('data-hero-variety="broccoli"')&&
@@ -300,9 +300,17 @@ check("Seven distinct sprout galleries contain four correct local stage photos",
  !read('hero-varieties.css').includes('.gallery-main.is-variety-detail-view::before')&&
  read('hero-varieties.css').includes('object-fit:cover;object-position:center center;')&&
  read('hero-varieties.css').includes('padding:0;filter:none')&&
- read('hero-varieties.js').includes("slug==='mung-bean'?'?v=2':''")&&
+ read('hero-varieties.js').includes("slug==='mung-bean'?'?v=2'")&&
+ read('hero-varieties.js').includes("slug==='radish'||slug==='leek'?'?v=3'")&&
  !read('hero-varieties.js').includes("frame?.style.setProperty('--variety-detail-image'")&&
  read('hero-varieties.js').includes("if(current===0)return false;")
+);
+
+check("Approved high-resolution Radish and Leek gallery assets are present",
+ ['radish','leek'].every(slug=>['seeds','sprouting','closeup','serving'].every(stage=>
+  fs.statSync(path.join(root,'assets/variety-gallery/'+slug+'-'+stage+'.webp')).size>100000))&&
+ read('hero-varieties.js').includes("slug==='radish'||slug==='leek'?'?v=3'")&&
+ !read('hero-varieties.css').includes('.gallery-main.is-variety-detail-view::before')
 );
 
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
