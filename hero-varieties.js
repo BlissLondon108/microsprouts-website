@@ -20,7 +20,7 @@
  const heading=$('product-heading'),desc=document.querySelector('#hero-variety-panel .description');
  const chooser=$('hero-package-options'),checkout=$('checkout-button');
  const path=slug=>'assets/sprout-orbs/'+slug+'.webp';
- const galleryPath=(slug,stage)=>'assets/variety-gallery/'+slug+'-'+stage+'.webp'+((slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6):slug==='mung-bean'?'?v=2':(slug==='radish'||slug==='leek'?'?v=3':''));
+ const galleryPath=(slug,stage)=>'assets/variety-gallery/'+slug+'-'+stage+'.webp'+((slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6):slug==='mung-bean'?'?v='+(stage==='serving'?4:2):slug==='alfalfa'?'?v=2':slug==='green-pea'?'?v=2':(slug==='radish'||slug==='leek'?'?v=3':''));
  // The four photo slots follow the approved broccoli gallery's progression.
  const galleryStages=[
   ['seeds','Seeds before sprouting'],

@@ -300,7 +300,7 @@ check("Seven distinct sprout galleries contain four correct local stage photos",
  !read('hero-varieties.css').includes('.gallery-main.is-variety-detail-view::before')&&
  read('hero-varieties.css').includes('object-fit:cover;object-position:center center;')&&
  read('hero-varieties.css').includes('padding:0;filter:none')&&
- read('hero-varieties.js').includes("slug==='mung-bean'?'?v=2'")&&
+ read('hero-varieties.js').includes("slug==='mung-bean'?'?v='+(stage==='serving'?4:2)")&&
  read('hero-varieties.js').includes("slug==='radish'||slug==='leek'?'?v=3'")&&
  !read('hero-varieties.js').includes("frame?.style.setProperty('--variety-detail-image'")&&
  read('hero-varieties.js').includes("if(current===0)return false;")
@@ -336,7 +336,22 @@ check("Mustard soup and Fenugreek salad serving images remain full-width WebP as
   return file.length>140000&&file.toString('ascii',0,4)==='RIFF'&&file.toString('ascii',8,12)==='WEBP';
  })&&
  read('hero-varieties.js').includes("(slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6)")&&
- html.includes('hero-varieties.js?v=13')
+ html.includes('hero-varieties.js?v=14')
+);
+
+check("Approved Alfalfa and Green Pea galleries and meat-free Mung Bean serving photo",
+ ['alfalfa','green-pea'].every(slug=>['seeds','sprouting','closeup','serving'].every(stage=>{
+  const file=fs.readFileSync(path.join(root,'assets/variety-gallery/'+slug+'-'+stage+'.webp'));
+  return file.length>75000&&file.toString('ascii',0,4)==='RIFF'&&file.toString('ascii',8,12)==='WEBP';
+ }))&&
+ (()=>{
+  const file=fs.readFileSync(path.join(root,'assets/variety-gallery/mung-bean-serving.webp'));
+  return file.length>250000&&file.toString('ascii',0,4)==='RIFF'&&file.toString('ascii',8,12)==='WEBP';
+ })()&&
+ read('hero-varieties.js').includes("slug==='alfalfa'?'?v=2'")&&
+ read('hero-varieties.js').includes("slug==='green-pea'?'?v=2'")&&
+ read('hero-varieties.js').includes("slug==='mung-bean'?'?v='+(stage==='serving'?4:2)")&&
+ html.includes('hero-varieties.js?v=14')
 );
 
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
