@@ -31,20 +31,21 @@
  const packs={'200':['Single Pack','assets/single-ornate-wide-v1.svg'],'500':['Family Pack','assets/family-ornate-wide-v1.svg']};
  let current=0,pack='200',photoRequest=0,transitioning=false;
  const reduced=()=>Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
- const imageSource=index=>index===0?packs[pack][1]:path(items[index][0]);
+ // The third thumbnail is the first visible hero photo for every variety.
+ const imageSource=index=>index===0?'assets/approved/macro.webp':galleryPath(items[index][0],'closeup');
  function imageForCurrent(preloaded=false){
   const item=items[current],broccoli=current===0;
   const src=imageSource(current);
-  const alt=broccoli?'Fresh broccoli sprouts on a porcelain plate, '+packs[pack][0]:'Fresh '+item[1].toLowerCase()+' sprouts';
+  const alt=broccoli?'Close-up of fresh broccoli sprouts, fine stems and paired green leaves':'Close-up of fresh '+item[1].toLowerCase()+' sprouts';
   const token=++photoRequest;
   const apply=()=>{
    if(token!==photoRequest||!photo)return;
    photo.src=src;photo.alt=alt;
-   photo.classList.toggle('is-pack-photo',broccoli);
+   photo.classList.remove('is-pack-photo');
    photo.classList.toggle('is-variety-photo',!broccoli);
-   photo.classList.remove('is-variety-detail-photo');
+   photo.classList.toggle('is-variety-detail-photo',!broccoli);
    frame?.classList.toggle('is-variety-view',!broccoli);
-   frame?.classList.remove('is-variety-detail-view');
+   frame?.classList.toggle('is-variety-detail-view',!broccoli);
    frame?.style.removeProperty('--variety-detail-image');
   };
   if(preloaded){apply();return}
@@ -74,7 +75,7 @@
   row.querySelectorAll('.hero-variety-preview').forEach(button=>button.remove());
   originalThumbs.forEach(button=>{
    button.hidden=current!==0;
-   if(current!==0)button.setAttribute('aria-pressed','false');
+   button.setAttribute('aria-pressed',String(current===0&&button.dataset.gallery==='macro'));
   });
   row.classList.toggle('is-variety-previews',current!==0);
   gallery?.setAttribute('aria-label',items[current][1]+' sprouts gallery');
@@ -86,7 +87,7 @@
    button.type='button';
    button.className='gallery-thumb hero-variety-preview';
    button.setAttribute('aria-label','View '+item[1]+' sprouts: '+description.toLowerCase());
-   button.setAttribute('aria-pressed','false');
+   button.setAttribute('aria-pressed',String(stage==='closeup'));
    const image=document.createElement('img');
    image.src=src;image.alt='';image.loading='eager';image.decoding='async';
    button.appendChild(image);
@@ -221,9 +222,8 @@
     checkout.dataset.pack=pack;
     checkout.setAttribute('aria-label','Open shopping basket for '+items[current][1]+' sprouts, '+packs[pack][0]);
    }
-   // Pack-size selection doesn't replace a manually chosen variety photo.
-   // Broccoli retains its existing pack-specific photograph handling.
-   if(current===0)return false;
+   // A pack selection changes only basket details, never the selected image.
+   // This also preserves the third-photo default for Broccoli.
    return true;
   }
  };
