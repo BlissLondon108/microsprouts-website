@@ -235,7 +235,7 @@ check("Homepage copy and eight-variety hero carousel stay linked to the basket",
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
  html.includes('href="hero-varieties.css?v=9"')&&
- html.includes('src="hero-varieties.js?v=15" defer')&&
+ html.includes('src="hero-varieties.js?v=16" defer')&&
  (read("hero-varieties.js").match(/\['(?:broccoli|radish|mung-bean|leek|mustard|fenugreek|alfalfa|green-pea)'/g)||[]).length===8&&
  read("hero-varieties.js").includes('checkout.dataset.variety=item[0]')&&
  html.includes('data-hero-variety="broccoli"')&&
@@ -336,7 +336,7 @@ check("Mustard soup and Fenugreek salad serving images remain full-width WebP as
   return file.length>140000&&file.toString('ascii',0,4)==='RIFF'&&file.toString('ascii',8,12)==='WEBP';
  })&&
  read('hero-varieties.js').includes("(slug==='fenugreek'||slug==='mustard')?'?v='+(stage==='serving'?7:6)")&&
- html.includes('hero-varieties.js?v=15')
+ html.includes('hero-varieties.js?v=16')
 );
 
 check("Approved Alfalfa and Green Pea galleries and meat-free Mung Bean serving photo",
@@ -351,7 +351,7 @@ check("Approved Alfalfa and Green Pea galleries and meat-free Mung Bean serving 
  read('hero-varieties.js').includes("slug==='alfalfa'?'?v=2'")&&
  read('hero-varieties.js').includes("slug==='green-pea'?'?v=2'")&&
  read('hero-varieties.js').includes("slug==='mung-bean'?'?v='+(stage==='serving'?4:2)")&&
- html.includes('hero-varieties.js?v=15')
+ html.includes('hero-varieties.js?v=16')
 );
 
 check("All eight varieties open with their third close-up photo and preserve the gallery on pack change",
@@ -364,7 +364,24 @@ check("All eight varieties open with their third close-up photo and preserve the
  !app.includes("setPhoto(packLabels[pack].image")&&
  !app.includes("thumbs.forEach(btn => btn.setAttribute('aria-pressed','false'))")&&
  html.includes('src="comp.js?v=basket-preview-2"')&&
- html.includes('src="hero-varieties.js?v=15"')
+ html.includes('src="hero-varieties.js?v=16"')
+);
+
+check("Eight short flavour sublines replace the repeated London tagline",
+ html.includes('<p class="tagline">Fresh, mild and tender</p>')&&
+ !html.includes('<p class="tagline">Freshly grown in London</p>')&&
+ read('hero-varieties.js').includes("const tagline=document.querySelector('#hero-variety-panel .tagline')")&&
+ read('hero-varieties.js').includes('if(tagline)tagline.textContent=item[3]')&&
+ [
+  ['broccoli','Fresh, mild and tender'],
+  ['radish','Crisp with a peppery kick'],
+  ['mung-bean','Crunchy, juicy and refreshing'],
+  ['leek','A gentle onion-like flavour'],
+  ['mustard','Fresh with a spicy bite'],
+  ['fenugreek','Earthy with a hint of bitterness'],
+  ['alfalfa','Light, mild and delicate'],
+  ['green-pea','Sweet, fresh and crunchy']
+ ].every(([slug,line])=>read('hero-varieties.js').includes("['"+slug+"',")&&read('hero-varieties.js').includes(",'"+line+"']"))
 );
 
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
