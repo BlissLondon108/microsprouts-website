@@ -391,8 +391,8 @@ check("Local images exist", localAssetPaths.every(src => fs.existsSync(path.join
 check("Homepage photographs retain containers while refreshing broccoli sprouts",
   html.includes('src="assets/approved/seeds.webp"')&&
   html.includes('src="assets/approved/germination.webp"')&&
-  html.includes('src="assets/approved/day3-5-broccoli-2026.webp"')&&
-  html.includes('src="assets/approved/day6-broccoli-2026.webp"')&&
+  html.includes('src="assets/growth-journey/growth-day-3-5.webp"')&&
+  html.includes('src="assets/growth-journey/growth-day-6-plus.webp"')&&
   html.includes('src="assets/sprout-orbs/broccoli.webp"')&&
   html.includes('src="assets/approved/woman.webp"')&&
   html.includes('src="assets/approved/macro.webp"')&&
@@ -872,16 +872,22 @@ check("Carousel hides at ten packs, restores after removal, and bulk pop-up has 
  cartClient.includes('sproutPicker.hidden=atCapacity;')&&
  flowCss.includes('.basket-flow__carousel-dock.is-at-capacity{display:none!important}'));
 
-check("Approved Day 3–5 and Day 6 photographs use exact new assets with no old layering",
- html.includes('src="assets/approved/day3-5-broccoli-2026.webp"')&&
- html.includes('src="assets/approved/day6-broccoli-2026.webp"')&&
- html.includes('alt="Developing broccoli sprouts with delicate stems and paired green leaves growing in a clear glass jar"')&&
- html.includes('alt="Dense fresh broccoli sprouts with small green leaves in a rectangular glass container ready for harvest"')&&
- html.includes('comp.css?v=sprout-gallery-4')&&
- !html.includes('src="assets/approved/jar-real-broccoli.webp"')&&
- !html.includes('class="growth-image__fresh-sprouts"')&&
- !html.includes('class="growth-image growth-image--refreshed-growth"')&&
- !read("comp.css").includes('.growth-image--refreshed-growth'));
+check("Four approved separate growth photographs and new card layout are present",
+ ['day-0','day-1-2','day-3-5','day-6-plus'].every(stage=>{
+   const file=fs.readFileSync(path.join(root,'assets/growth-journey/growth-'+stage+'.webp'));
+   return file.length>100000&&file.toString('ascii',0,4)==='RIFF'&&file.toString('ascii',8,12)==='WEBP'&&
+     html.includes('src="assets/growth-journey/growth-'+stage+'.webp"');
+ })&&
+ html.includes('alt="Delicate green broccoli sprouts and fine white stems growing inside a clear glass jar"')&&
+ html.includes('alt="Two people exchanging a clear container filled with freshly harvested broccoli sprouts"')&&
+ html.includes('href="growth-refresh.css?v=1"')&&
+ html.includes('class="growth-ornament" aria-hidden="true"')&&
+ read('growth-refresh.css').includes('.growth-item:not(:last-child)::after')&&
+ read('growth-refresh.css').includes('.banner::after')&&
+ read('growth-refresh.css').includes('@media(max-width:600px)')&&
+ html.indexOf('class="growth-section"')<html.indexOf('class="benefits-section"')&&
+ !html.includes('src="assets/approved/day6-broccoli-2026.webp"')&&
+ !html.includes('src="assets/approved/day3-5-broccoli-2026.webp"'));
 
 check("Checkout, catalogue and restored baskets keep the picker docked unless full",
  cartClient.includes('if(entry&&!docked())dockSproutPicker();')&&
