@@ -228,9 +228,9 @@ check("Legacy standalone checkout remains unchanged",
  read("checkout.html").includes('src="checkout.js?v=stripe-only-live-3"'));
 check("Two pack selector options", (html.match(/class="package-option"/g)||[]).length === 2);
 check("Homepage copy and eight-variety hero carousel stay linked to the basket",
- html.includes('Pure, simple and natural.<br>Fresh seeds, water and gentle care.')&&
+ html.includes('<p class="banner__lead">Pure, simple and natural.</p>')&&
  !html.includes('class="separator" aria-hidden="true"')&&
- html.includes('In as little as six days, tiny seeds become vibrant sprouts')&&
+ html.includes('<p class="banner__description">Tiny seeds become vibrant sprouts with their own natural mix of vitamins and minerals.</p>')&&
  html.includes('id="hero-variety-prev"')&&html.includes('id="hero-variety-next"')&&
  html.includes('id="hero-variety-slide"')&&
  html.includes('data-variety="broccoli" aria-label="Open shopping basket')&&
@@ -394,20 +394,33 @@ check("Seed to Harvest matches approved image-card layout without corner illustr
  read('growth-refresh.css').includes('.banner::after')&&
  read('growth-refresh.css').includes('.growth-item:not(:last-child)::after')&&
  !read('growth-refresh.css').includes('.growth-item::before')&&
- html.includes('href="growth-refresh.css?v=3"')&&
+ html.includes('href="growth-refresh.css?v=4"')&&
  html.includes('<span class="growth-caption">Sprouts ready for delivery</span>')&&
  html.indexOf('class="growth-section"')<html.indexOf('class="benefits-section"')
 );
-check("Growth cards come first with six-day copy below, no heading or leaf icon",
+check("Growth cards remain unchanged, with their former explanatory line in the banner",
  html.includes('<section class="growth-section" id="journey" aria-label="From seed to harvest: our growing stages">')&&
  !html.includes('id="journey-title"')&&
  !html.includes('class="growth-ornament"')&&
- html.indexOf('class="growth-grid"')<html.indexOf('class="growth-intro"')&&
- html.indexOf('class="growth-intro"')<html.indexOf('class="benefits-section"')&&
+ !html.includes('class="growth-intro"')&&
+ html.indexOf('class="growth-grid"')<html.indexOf('class="benefits-section"')&&
  html.includes('<span class="growth-caption">Sprouts ready for delivery</span>')&&
  read('growth-refresh.css').includes('padding:15px clamp(18px,3.25vw,55px) 59px')&&
  read('growth-refresh.css').includes('max-width:1100px;margin:27px auto 0')&&
  !read('growth-refresh.css').includes('.growth-ornament')
+);
+check("Story banner uses approved crisp photographic crop and two-level copy",
+ fs.statSync(path.join(root,'assets/story-banner-sprouts.webp')).size>40000&&
+ html.includes('id="story-title">From Seed to<br>Fresh Sprouts</h2>')&&
+ html.includes('class="banner__copy"')&&
+ html.includes('<p class="banner__lead">Pure, simple and natural.</p>')&&
+ html.includes('<p class="banner__description">Tiny seeds become vibrant sprouts with their own natural mix of vitamins and minerals.</p>')&&
+ !html.includes('Fresh seeds, water and gentle care.')&&
+ !html.includes('In as little as six days, tiny seeds become vibrant sprouts')&&
+ read('growth-refresh.css').includes('assets/story-banner-sprouts.webp')&&
+ read('growth-refresh.css').includes('background:linear-gradient(90deg,')&&
+ read('growth-refresh.css').includes('.banner::after')&&
+ read('growth-refresh.css').includes('@media(max-width:600px)')
 );
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
 const localAssetPaths = [...new Set([...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m=>m[1]))];
@@ -904,7 +917,7 @@ check("Four approved separate growth photographs and new card layout are present
  })&&
  html.includes('alt="Delicate green broccoli sprouts and fine white stems growing inside a clear glass jar"')&&
  html.includes('alt="Two people exchanging a clear container filled with freshly harvested broccoli sprouts"')&&
- html.includes('href="growth-refresh.css?v=3"')&&
+ html.includes('href="growth-refresh.css?v=4"')&&
  !html.includes('class="growth-ornament"')&&
  read('growth-refresh.css').includes('.growth-item:not(:last-child)::after')&&
  read('growth-refresh.css').includes('.banner::after')&&
