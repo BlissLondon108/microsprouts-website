@@ -394,9 +394,20 @@ check("Seed to Harvest matches approved image-card layout without corner illustr
  read('growth-refresh.css').includes('.banner::after')&&
  read('growth-refresh.css').includes('.growth-item:not(:last-child)::after')&&
  !read('growth-refresh.css').includes('.growth-item::before')&&
- html.includes('href="growth-refresh.css?v=2"')&&
- html.includes('<span class="growth-caption">Sprouts ready for harvest</span>')&&
+ html.includes('href="growth-refresh.css?v=3"')&&
+ html.includes('<span class="growth-caption">Sprouts ready for delivery</span>')&&
  html.indexOf('class="growth-section"')<html.indexOf('class="benefits-section"')
+);
+check("Growth cards come first with six-day copy below, no heading or leaf icon",
+ html.includes('<section class="growth-section" id="journey" aria-label="From seed to harvest: our growing stages">')&&
+ !html.includes('id="journey-title"')&&
+ !html.includes('class="growth-ornament"')&&
+ html.indexOf('class="growth-grid"')<html.indexOf('class="growth-intro"')&&
+ html.indexOf('class="growth-intro"')<html.indexOf('class="benefits-section"')&&
+ html.includes('<span class="growth-caption">Sprouts ready for delivery</span>')&&
+ read('growth-refresh.css').includes('padding:15px clamp(18px,3.25vw,55px) 59px')&&
+ read('growth-refresh.css').includes('max-width:1100px;margin:27px auto 0')&&
+ !read('growth-refresh.css').includes('.growth-ornament')
 );
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
 const localAssetPaths = [...new Set([...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m=>m[1]))];
@@ -582,7 +593,7 @@ check("Marketing-friendly nutrition cards and a variety-wide growing journey",
  !sprouts.includes("composition records list")&&
  !sprouts.includes("huge amounts")&&
  html.includes('<span class="growth-caption">Seeds soaked in fresh water</span>')&&
- html.includes('<span class="growth-caption">Sprouts ready for harvest</span>')&&
+ html.includes('<span class="growth-caption">Sprouts ready for delivery</span>')&&
  html.includes('aria-label="Our fresh sprout growing stages"')&&
  !html.includes('<span class="growth-caption">Broccoli seeds</span>')&&
  !html.includes('<span class="growth-caption">Fresh broccoli sprouts</span>'));
@@ -893,8 +904,8 @@ check("Four approved separate growth photographs and new card layout are present
  })&&
  html.includes('alt="Delicate green broccoli sprouts and fine white stems growing inside a clear glass jar"')&&
  html.includes('alt="Two people exchanging a clear container filled with freshly harvested broccoli sprouts"')&&
- html.includes('href="growth-refresh.css?v=2"')&&
- html.includes('class="growth-ornament" aria-hidden="true"')&&
+ html.includes('href="growth-refresh.css?v=3"')&&
+ !html.includes('class="growth-ornament"')&&
  read('growth-refresh.css').includes('.growth-item:not(:last-child)::after')&&
  read('growth-refresh.css').includes('.banner::after')&&
  read('growth-refresh.css').includes('@media(max-width:600px)')&&
