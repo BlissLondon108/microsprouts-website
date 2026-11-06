@@ -41,14 +41,14 @@
   margin:0;padding:0;border:0;max-width:none;
   color:#fffdf3;
 }
-.banner .banner__lead{
+.banner .banner__copy p.banner__lead{
   font-family:inherit;
   font-size:clamp(19px,2vw,27px);
   font-weight:700;letter-spacing:-.014em;
   line-height:1.22;
   margin:0 0 13px;
 }
-.banner .banner__description{
+.banner .banner__copy p.banner__description{
   font-family:inherit;
   font-size:clamp(16px,1.5vw,21px);
   line-height:1.4;
@@ -118,8 +118,8 @@
   .banner{grid-template-columns:minmax(0,1fr) minmax(0,1.13fr);gap:22px}
   .banner::before{background:linear-gradient(90deg,#0d351a 0%,rgba(10,48,22,.96) 56%,rgba(10,49,21,.64) 83%,rgba(10,49,21,.3) 100%)}
   .banner__copy{padding-left:22px}
-  .banner .banner__lead{font-size:clamp(18px,2.7vw,23px)}
-  .banner .banner__description{font-size:clamp(15px,1.9vw,18px)}
+  .banner .banner__copy p.banner__lead{font-size:clamp(18px,2.7vw,23px)}
+  .banner .banner__copy p.banner__description{font-size:clamp(15px,1.9vw,18px)}
   .growth-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px;max-width:780px}
   .growth-item:not(:last-child)::after{display:none}
   .growth-image{aspect-ratio:1.44}
@@ -130,8 +130,8 @@
   .banner h2{font-size:clamp(35px,8.2vw,47px)}
   .banner h2::before{display:none}
   .banner__copy{border-left:0;padding:0;margin-top:18px}
-  .banner .banner__lead{font-size:19px;line-height:1.24;margin-bottom:8px}
-  .banner .banner__description{font-size:15px;line-height:1.44;max-width:340px}
+  .banner .banner__copy p.banner__lead{font-size:19px;line-height:1.24;margin-bottom:8px}
+  .banner .banner__copy p.banner__description{font-size:15px;line-height:1.44;max-width:340px}
   .banner::after{height:31px}
   .growth-section{padding:14px 13px 40px}
   .growth-intro{margin-top:22px;font-size:14px}
