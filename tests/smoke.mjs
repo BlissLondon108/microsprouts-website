@@ -385,6 +385,19 @@ check("Eight short flavour sublines replace the repeated London tagline",
 );
 
 check("Four gallery thumbnails", (html.match(/class="gallery-thumb"/g)||[]).length === 4);
+check("Seed to Harvest matches approved image-card layout without corner illustrations",
+ read('growth-refresh.css').includes('aspect-ratio:1.16')&&
+ read('growth-refresh.css').includes('align-items:stretch')&&
+ read('growth-refresh.css').includes('align-self:flex-start')&&
+ read('growth-refresh.css').includes('text-align:left')&&
+ read('growth-refresh.css').includes('.banner h2::before')&&
+ read('growth-refresh.css').includes('.banner::after')&&
+ read('growth-refresh.css').includes('.growth-item:not(:last-child)::after')&&
+ !read('growth-refresh.css').includes('.growth-item::before')&&
+ html.includes('href="growth-refresh.css?v=2"')&&
+ html.includes('<span class="growth-caption">Sprouts ready for harvest</span>')&&
+ html.indexOf('class="growth-section"')<html.indexOf('class="benefits-section"')
+);
 check("Four growth stages", (html.match(/class="growth-item"/g)||[]).length === 4);
 const localAssetPaths = [...new Set([...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m=>m[1]))];
 check("Local images exist", localAssetPaths.every(src => fs.existsSync(path.join(root, src))));
@@ -569,7 +582,7 @@ check("Marketing-friendly nutrition cards and a variety-wide growing journey",
  !sprouts.includes("composition records list")&&
  !sprouts.includes("huge amounts")&&
  html.includes('<span class="growth-caption">Seeds soaked in fresh water</span>')&&
- html.includes('<span class="growth-caption">Sprouts ready for delivery</span>')&&
+ html.includes('<span class="growth-caption">Sprouts ready for harvest</span>')&&
  html.includes('aria-label="Our fresh sprout growing stages"')&&
  !html.includes('<span class="growth-caption">Broccoli seeds</span>')&&
  !html.includes('<span class="growth-caption">Fresh broccoli sprouts</span>'));
@@ -880,7 +893,7 @@ check("Four approved separate growth photographs and new card layout are present
  })&&
  html.includes('alt="Delicate green broccoli sprouts and fine white stems growing inside a clear glass jar"')&&
  html.includes('alt="Two people exchanging a clear container filled with freshly harvested broccoli sprouts"')&&
- html.includes('href="growth-refresh.css?v=1"')&&
+ html.includes('href="growth-refresh.css?v=2"')&&
  html.includes('class="growth-ornament" aria-hidden="true"')&&
  read('growth-refresh.css').includes('.growth-item:not(:last-child)::after')&&
  read('growth-refresh.css').includes('.banner::after')&&
