@@ -1,21 +1,59 @@
 /* MicroSprouts: Seed to Harvest — photographic card timeline.
    Scoped to the story banner and journey only; following sections stay intact. */
 .banner{
-  min-height:206px;
-  grid-template-columns:minmax(0,465px) minmax(0,1fr);
-  gap:clamp(26px,5.5vw,95px);
+  min-height:257px;
+  display:grid;
+  grid-template-columns:minmax(0,450px) minmax(0,570px);
+  gap:clamp(30px,4.3vw,75px);
   align-items:center;
-  padding:24px clamp(30px,6vw,106px) 56px;
+  padding:25px clamp(34px,6vw,106px) 64px;
+  position:relative;
   isolation:isolate;
   overflow:hidden;
+  color:#fffdf3;
+  /* Dedicated photographic crop of sharp, dew-covered sprouts from approved artwork. */
+  background:#10391e url("assets/story-banner-sprouts.webp") right center/auto 125% no-repeat;
 }
-.banner h2{font-size:clamp(40px,4.5vw,64px);line-height:1.02;position:relative}
+.banner::before{
+  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,
+    #0d351a 0%,#0d351a 28%,rgba(10,48,22,.99) 44%,
+    rgba(10,48,22,.93) 59%,rgba(10,49,21,.70) 70%,
+    rgba(10,49,21,.20) 83%,rgba(10,49,21,0) 100%);
+}
+.banner>*{position:relative;z-index:2}
+.banner h2{
+  font-size:clamp(40px,4.3vw,64px);
+  line-height:1.01;letter-spacing:-.035em;
+  position:relative;
+  text-shadow:0 1px 8px rgba(2,25,9,.12);
+}
 .banner h2::before{
-  content:"";position:absolute;left:-28px;top:11%;bottom:12%;width:2px;
+  content:"";position:absolute;left:-30px;top:10%;bottom:11%;width:2px;
   background:#b4cc80;
 }
-.banner p{font-size:clamp(17px,1.35vw,21px);line-height:1.4;max-width:450px;border-left:1px solid #d6e9b9a6;padding-left:clamp(18px,2.8vw,40px)}
-.banner>*{z-index:2}
+.banner__copy{
+  border-left:2px solid #abc97a;
+  padding-left:clamp(24px,3vw,43px);
+  max-width:590px;
+}
+.banner .banner__copy p{
+  margin:0;padding:0;border:0;max-width:none;
+  color:#fffdf3;
+}
+.banner .banner__lead{
+  font-family:inherit;
+  font-size:clamp(19px,2vw,27px);
+  font-weight:700;letter-spacing:-.014em;
+  line-height:1.22;
+  margin:0 0 13px;
+}
+.banner .banner__description{
+  font-family:inherit;
+  font-size:clamp(16px,1.5vw,21px);
+  line-height:1.4;
+  max-width:520px;
+}
 .banner::after{
   content:"";position:absolute;z-index:1;pointer-events:none;left:0;right:0;bottom:-1px;height:58px;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 70' preserveAspectRatio='none'%3E%3Cpath fill='%23fcf9f0' d='M0 24 C190 78 342 38 535 30 S793 55 942 45 S1202 26 1440 27 L1440 70 L0 70 Z'/%3E%3C/svg%3E") center bottom/100% 100% no-repeat;
@@ -77,16 +115,23 @@
   box-shadow:0 3px 13px rgba(30,54,19,.13);pointer-events:none;
 }
 @media(max-width:1000px){
-  .banner{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+  .banner{grid-template-columns:minmax(0,1fr) minmax(0,1.13fr);gap:22px}
+  .banner::before{background:linear-gradient(90deg,#0d351a 0%,rgba(10,48,22,.96) 56%,rgba(10,49,21,.64) 83%,rgba(10,49,21,.3) 100%)}
+  .banner__copy{padding-left:22px}
+  .banner .banner__lead{font-size:clamp(18px,2.7vw,23px)}
+  .banner .banner__description{font-size:clamp(15px,1.9vw,18px)}
   .growth-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px;max-width:780px}
   .growth-item:not(:last-child)::after{display:none}
   .growth-image{aspect-ratio:1.44}
 }
 @media(max-width:600px){
-  .banner{display:block;min-height:0;padding:26px 23px 53px}
+  .banner{display:block;min-height:0;padding:29px 23px 64px;background-position:right center;background-size:auto 110%}
+  .banner::before{background:linear-gradient(90deg,rgba(8,42,18,.98) 0%,rgba(8,42,18,.94) 45%,rgba(8,42,18,.70) 82%,rgba(8,42,18,.56) 100%)}
   .banner h2{font-size:clamp(35px,8.2vw,47px)}
   .banner h2::before{display:none}
-  .banner p{font-size:14px;border-left:0;padding:0;margin:12px 0 0;max-width:320px}
+  .banner__copy{border-left:0;padding:0;margin-top:18px}
+  .banner .banner__lead{font-size:19px;line-height:1.24;margin-bottom:8px}
+  .banner .banner__description{font-size:15px;line-height:1.44;max-width:340px}
   .banner::after{height:31px}
   .growth-section{padding:14px 13px 40px}
   .growth-intro{margin-top:22px;font-size:14px}
